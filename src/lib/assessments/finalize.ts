@@ -8,6 +8,7 @@ import type {
   MatchingPairRecord,
   QuestionOptionRecord,
   QuestionRecord,
+  SubmissionReason,
 } from "@/lib/domain/types";
 import {
   buildAutomaticResults,
@@ -25,6 +26,7 @@ export type FinalizeOutcome =
       maxScore: number | null;
       percentage: number | null;
       pendingReview: boolean;
+      reason?: SubmissionReason | null;
     }
   | { ok: false; error: AssessmentErrorCode };
 
@@ -54,6 +56,7 @@ function toNumber(value: unknown): number {
 export async function finalizeAttempt(options: {
   attemptId: string;
   studentId?: string;
+  reason?: SubmissionReason;
 }): Promise<FinalizeOutcome> {
   let admin: ReturnType<typeof createAdminClient>;
 
@@ -66,7 +69,7 @@ export async function finalizeAttempt(options: {
   const { data: attempt, error: attemptError } = await admin
     .from("attempts")
     .select(
-      "id, assessment_id, student_id, status, score, max_score, percentage",
+      "id, assessment_id, student_id, status, score, max_score, percentage, submission_reason",
     )
     .eq("id", options.attemptId)
     .maybeSingle();
@@ -93,6 +96,7 @@ export async function finalizeAttempt(options: {
       percentage:
         attempt.percentage === null ? null : toNumber(attempt.percentage),
       pendingReview: attempt.status === "grading",
+      reason: (attempt.submission_reason as SubmissionReason | null) ?? null,
     };
   }
 
@@ -244,6 +248,7 @@ export async function finalizeAttempt(options: {
   const { data, error } = await admin.rpc("finalize_attempt", {
     p_attempt_id: options.attemptId,
     p_results: results,
+    p_reason: options.reason ?? "student_submitted",
   });
 
   if (error) {
@@ -256,6 +261,7 @@ export async function finalizeAttempt(options: {
     score: number | null;
     max_score: number | null;
     percentage: number | null;
+    submission_reason: SubmissionReason | null;
     pending_review: boolean;
   };
 
@@ -275,7 +281,55 @@ export async function finalizeAttempt(options: {
     percentage:
       summary.percentage === null ? null : toNumber(summary.percentage),
     pendingReview: Boolean(summary.pending_review),
+    reason: summary.submission_reason ?? null,
   };
+}
+
+/**
+ * Closes expired and heartbeat-stale attempts. Idempotent: every attempt is
+ * finalised through the normal path, so a concurrent call cannot double-grade.
+ */
+export async function finalizeStaleAttempts(limit = 25): Promise<{
+  ok: boolean;
+  finalized: number;
+}> {
+  let admin: ReturnType<typeof createAdminClient>;
+
+  try {
+    admin = createAdminClient();
+  } catch {
+    return { ok: false, finalized: 0 };
+  }
+
+  const { data, error } = await admin.rpc("finalize_stale_attempts", {
+    p_limit: limit,
+  });
+
+  if (error) {
+    console.error("stale attempt sweep failed", error.message);
+    return { ok: false, finalized: 0 };
+  }
+
+  const rows = (data ?? []) as Array<{
+    attempt_id: string;
+    student_id: string;
+    reason: SubmissionReason;
+  }>;
+  let finalized = 0;
+
+  for (const row of rows) {
+    const outcome = await finalizeAttempt({
+      attemptId: row.attempt_id,
+      studentId: row.student_id,
+      reason: row.reason,
+    });
+
+    if (outcome.ok) {
+      finalized += 1;
+    }
+  }
+
+  return { ok: true, finalized };
 }
 
 /** Small helper used by tests and by the teacher grading screen. */

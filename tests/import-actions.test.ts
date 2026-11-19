@@ -206,7 +206,7 @@ function makeRow(overrides: Record<string, unknown> = {}) {
     assessment_id: null,
     created_at: "2026-11-17T10:00:00.000Z",
     updated_at: "2026-11-17T10:00:00.000Z",
-    expires_at: "2026-11-18T10:00:00.000Z",
+    expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     ...overrides,
   };
 }

@@ -19,6 +19,7 @@ import {
   assessmentTypeCopy,
   assessmentsUi,
 } from "@/lib/i18n/assessments";
+import { strictDefaultsForType } from "@/lib/assessments/strict";
 import { cn } from "@/lib/utils";
 import type {
   AssessmentErrorCode,
@@ -40,6 +41,13 @@ type Values = {
   available_from: string;
   available_until: string;
   is_published: boolean;
+  strict_exam_mode: boolean;
+  submit_on_tab_hidden: boolean;
+  submit_on_navigation: boolean;
+  heartbeat_timeout_seconds: string;
+  allow_resume_after_connection_loss: boolean;
+  randomize_question_order: boolean;
+  randomize_option_order: boolean;
 };
 
 function toLocalInput(value: string | null): string {
@@ -63,8 +71,11 @@ function initialValues(
   grades: GradeSummary[],
   defaultGradeId: string | undefined,
 ): Values {
+  const type = assessment?.type ?? "quiz";
+  const strict = assessment ?? strictDefaultsForType(type);
+
   return {
-    type: assessment?.type ?? "quiz",
+    type,
     title_en: assessment?.title_en ?? "",
     title_ar: assessment?.title_ar ?? "",
     instructions_en: assessment?.instructions_en ?? "",
@@ -78,6 +89,38 @@ function initialValues(
     available_from: toLocalInput(assessment?.available_from ?? null),
     available_until: toLocalInput(assessment?.available_until ?? null),
     is_published: assessment?.is_published ?? false,
+    strict_exam_mode: strict.strict_exam_mode,
+    submit_on_tab_hidden: strict.submit_on_tab_hidden,
+    submit_on_navigation: strict.submit_on_navigation,
+    heartbeat_timeout_seconds: String(strict.heartbeat_timeout_seconds),
+    allow_resume_after_connection_loss:
+      strict.allow_resume_after_connection_loss,
+    randomize_question_order: strict.randomize_question_order,
+    randomize_option_order: strict.randomize_option_order,
+  };
+}
+
+function strictValuesForType(type: "quiz" | "exam"): Pick<
+  Values,
+  | "strict_exam_mode"
+  | "submit_on_tab_hidden"
+  | "submit_on_navigation"
+  | "heartbeat_timeout_seconds"
+  | "allow_resume_after_connection_loss"
+  | "randomize_question_order"
+  | "randomize_option_order"
+> {
+  const strict = strictDefaultsForType(type);
+
+  return {
+    strict_exam_mode: strict.strict_exam_mode,
+    submit_on_tab_hidden: strict.submit_on_tab_hidden,
+    submit_on_navigation: strict.submit_on_navigation,
+    heartbeat_timeout_seconds: String(strict.heartbeat_timeout_seconds),
+    allow_resume_after_connection_loss:
+      strict.allow_resume_after_connection_loss,
+    randomize_question_order: strict.randomize_question_order,
+    randomize_option_order: strict.randomize_option_order,
   };
 }
 
@@ -107,10 +150,16 @@ export function AssessmentForm({
   const changeType = (type: "quiz" | "exam") => {
     setValues((previous) => {
       if (type === "exam") {
-        return { ...previous, type, allow_retakes: false, max_attempts: "1" };
+        return {
+          ...previous,
+          ...strictValuesForType(type),
+          type,
+          allow_retakes: false,
+          max_attempts: "1",
+        };
       }
 
-      return { ...previous, type };
+      return { ...previous, ...strictValuesForType(type), type };
     });
   };
 
@@ -151,6 +200,14 @@ export function AssessmentForm({
       available_from: iso(values.available_from),
       available_until: iso(values.available_until),
       is_published: values.is_published,
+      strict_exam_mode: values.strict_exam_mode,
+      submit_on_tab_hidden: values.submit_on_tab_hidden,
+      submit_on_navigation: values.submit_on_navigation,
+      heartbeat_timeout_seconds: values.heartbeat_timeout_seconds,
+      allow_resume_after_connection_loss:
+        values.allow_resume_after_connection_loss,
+      randomize_question_order: values.randomize_question_order,
+      randomize_option_order: values.randomize_option_order,
     };
 
     startTransition(async () => {
@@ -484,6 +541,201 @@ export function AssessmentForm({
             />
           </Field>
         </div>
+      </div>
+
+      <div className="grid gap-5 rounded-xl border border-border bg-card p-5 shadow-xs">
+        <div>
+          <h3 className="text-sm font-bold text-foreground">
+            <Bi
+              en={assessmentsUi.strict.title.en}
+              ar={assessmentsUi.strict.title.ar}
+            />
+          </h3>
+          <p className="mt-1 text-xs text-muted-foreground">
+            <Bi
+              en={assessmentsUi.strict.settingsHint.en}
+              ar={assessmentsUi.strict.settingsHint.ar}
+            />
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <label className="flex items-center gap-2 text-sm font-semibold text-foreground">
+            <input
+              type="checkbox"
+              checked={values.strict_exam_mode}
+              onChange={(event) =>
+                update("strict_exam_mode", event.target.checked)
+              }
+              className="size-4 rounded border-input"
+            />
+            <Bi
+              en={assessmentsUi.strict.enabled.en}
+              ar={assessmentsUi.strict.enabled.ar}
+            />
+          </label>
+          <p className="text-xs text-muted-foreground">
+            <Bi
+              en={assessmentsUi.strict.enabledHint.en}
+              ar={assessmentsUi.strict.enabledHint.ar}
+            />
+          </p>
+        </div>
+
+        {values.strict_exam_mode ? (
+          <>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                  <input
+                    type="checkbox"
+                    checked={values.submit_on_tab_hidden}
+                    onChange={(event) =>
+                      update("submit_on_tab_hidden", event.target.checked)
+                    }
+                    className="size-4 rounded border-input"
+                  />
+                  <Bi
+                    en={assessmentsUi.strict.tabHidden.en}
+                    ar={assessmentsUi.strict.tabHidden.ar}
+                  />
+                </label>
+                <p className="text-xs text-muted-foreground">
+                  <Bi
+                    en={assessmentsUi.strict.tabHiddenHint.en}
+                    ar={assessmentsUi.strict.tabHiddenHint.ar}
+                  />
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                  <input
+                    type="checkbox"
+                    checked={values.submit_on_navigation}
+                    onChange={(event) =>
+                      update("submit_on_navigation", event.target.checked)
+                    }
+                    className="size-4 rounded border-input"
+                  />
+                  <Bi
+                    en={assessmentsUi.strict.navigation.en}
+                    ar={assessmentsUi.strict.navigation.ar}
+                  />
+                </label>
+                <p className="text-xs text-muted-foreground">
+                  <Bi
+                    en={assessmentsUi.strict.navigationHint.en}
+                    ar={assessmentsUi.strict.navigationHint.ar}
+                  />
+                </p>
+              </div>
+            </div>
+
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Field
+                id="heartbeat_timeout_seconds"
+                label={assessmentsUi.strict.heartbeat}
+                hint={assessmentsUi.strict.heartbeatHint}
+                error={errors.heartbeat_timeout_seconds}
+                errorCopy={assessmentErrorCopy}
+              >
+                <Input
+                  id="heartbeat_timeout_seconds"
+                  type="number"
+                  min={15}
+                  max={600}
+                  value={values.heartbeat_timeout_seconds}
+                  aria-invalid={Boolean(errors.heartbeat_timeout_seconds)}
+                  onChange={(event) =>
+                    update("heartbeat_timeout_seconds", event.target.value)
+                  }
+                />
+              </Field>
+
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                  <input
+                    type="checkbox"
+                    checked={values.allow_resume_after_connection_loss}
+                    onChange={(event) =>
+                      update(
+                        "allow_resume_after_connection_loss",
+                        event.target.checked,
+                      )
+                    }
+                    className="size-4 rounded border-input"
+                  />
+                  <Bi
+                    en={assessmentsUi.strict.allowResume.en}
+                    ar={assessmentsUi.strict.allowResume.ar}
+                  />
+                </label>
+                <p className="text-xs text-muted-foreground">
+                  <Bi
+                    en={assessmentsUi.strict.allowResumeHint.en}
+                    ar={assessmentsUi.strict.allowResumeHint.ar}
+                  />
+                </p>
+              </div>
+            </div>
+
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                  <input
+                    type="checkbox"
+                    checked={values.randomize_question_order}
+                    onChange={(event) =>
+                      update("randomize_question_order", event.target.checked)
+                    }
+                    className="size-4 rounded border-input"
+                  />
+                  <Bi
+                    en={assessmentsUi.strict.randomizeQuestions.en}
+                    ar={assessmentsUi.strict.randomizeQuestions.ar}
+                  />
+                </label>
+                <p className="text-xs text-muted-foreground">
+                  <Bi
+                    en={assessmentsUi.strict.randomizeQuestionsHint.en}
+                    ar={assessmentsUi.strict.randomizeQuestionsHint.ar}
+                  />
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                  <input
+                    type="checkbox"
+                    checked={values.randomize_option_order}
+                    onChange={(event) =>
+                      update("randomize_option_order", event.target.checked)
+                    }
+                    className="size-4 rounded border-input"
+                  />
+                  <Bi
+                    en={assessmentsUi.strict.randomizeOptions.en}
+                    ar={assessmentsUi.strict.randomizeOptions.ar}
+                  />
+                </label>
+                <p className="text-xs text-muted-foreground">
+                  <Bi
+                    en={assessmentsUi.strict.randomizeOptionsHint.en}
+                    ar={assessmentsUi.strict.randomizeOptionsHint.ar}
+                  />
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-xs text-amber-950 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-100">
+              <Bi
+                en={assessmentsUi.strict.warning.en}
+                ar={assessmentsUi.strict.warning.ar}
+              />
+            </div>
+          </>
+        ) : null}
       </div>
 
       <div className="flex flex-wrap items-center gap-3">

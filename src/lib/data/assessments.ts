@@ -36,6 +36,13 @@ const ASSESSMENT_SELECT = `
   is_published,
   available_from,
   available_until,
+  strict_exam_mode,
+  submit_on_tab_hidden,
+  submit_on_navigation,
+  heartbeat_timeout_seconds,
+  allow_resume_after_connection_loss,
+  randomize_question_order,
+  randomize_option_order,
   created_by,
   created_at,
   updated_at,
@@ -329,7 +336,7 @@ export async function listAssessmentAttempts(
   const { data, error } = await supabase
     .from("attempts")
     .select(
-      "id, assessment_id, student_id, attempt_number, status, started_at, expires_at, submitted_at, score, max_score, percentage, manual_review_status, student:profiles!attempts_student_id_fkey ( id, full_name_en, full_name_ar, student_number )",
+      "id, assessment_id, student_id, attempt_number, status, started_at, expires_at, submitted_at, score, max_score, percentage, manual_review_status, submission_reason, last_heartbeat_at, tab_hidden_count, focus_loss_count, signal_count, student:profiles!attempts_student_id_fkey ( id, full_name_en, full_name_ar, student_number )",
     )
     .eq("assessment_id", assessmentId)
     .order("submitted_at", { ascending: false, nullsFirst: false })

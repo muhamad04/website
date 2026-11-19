@@ -7,7 +7,7 @@ import { AttemptRunner } from "@/components/assessments/attempt-runner";
 import { Badge } from "@/components/ui/badge";
 import { requireStudent } from "@/lib/auth/dal";
 import { getStudentAttemptPayload } from "@/lib/data/assessments";
-import { finalizeAttempt } from "@/lib/assessments/finalize";
+import { finalizeAttempt, finalizeStaleAttempts } from "@/lib/assessments/finalize";
 import {
   assessmentTypeCopy,
   assessmentsUi,
@@ -40,6 +40,10 @@ export default async function StudentAttemptPage({
     notFound();
   }
 
+  // A reload after a dropped connection must not resume a strict attempt that
+  // exceeded its heartbeat timeout. Sweep before reading the payload.
+  await finalizeStaleAttempts(10);
+
   const { payload, error } = await getStudentAttemptPayload(attemptId);
 
   if (error || !payload) {
@@ -60,6 +64,7 @@ export default async function StudentAttemptPage({
     const outcome = await finalizeAttempt({
       attemptId,
       studentId: student.id,
+      reason: "time_expired",
     });
 
     if (!outcome.ok) {
@@ -131,6 +136,15 @@ export default async function StudentAttemptPage({
             ? fileNameFromPath(answer.file_path)
             : null,
         }))}
+        strictExamMode={payload.assessment.strict_exam_mode}
+        submitOnTabHidden={payload.assessment.submit_on_tab_hidden}
+        submitOnNavigation={payload.assessment.submit_on_navigation}
+        heartbeatTimeoutSeconds={
+          payload.assessment.heartbeat_timeout_seconds
+        }
+        allowResumeAfterConnectionLoss={
+          payload.assessment.allow_resume_after_connection_loss
+        }
       />
     </div>
   );

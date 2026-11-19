@@ -17,6 +17,7 @@ import type {
   ResourceRecord,
   ResultsVisibility,
   StudentAssessmentOverview,
+  SubmissionReason,
 } from "@/lib/domain/types";
 import {
   EXPORT_ROW_LIMIT,
@@ -106,6 +107,10 @@ export type ReportingAttemptRow = {
   max_score: number | null;
   percentage: number | null;
   manual_review_status: ManualReviewStatus;
+  submission_reason: SubmissionReason | null;
+  tab_hidden_count: number;
+  focus_loss_count: number;
+  signal_count: number;
   assessment: {
     id: string;
     title_en: string;
@@ -140,6 +145,10 @@ const ATTEMPT_SELECT = `
   max_score,
   percentage,
   manual_review_status,
+  submission_reason,
+  tab_hidden_count,
+  focus_loss_count,
+  signal_count,
   assessment:assessments!attempts_assessment_id_fkey (
     id,
     title_en,

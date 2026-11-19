@@ -6,6 +6,7 @@ import type {
   GradingMode,
   QuestionType,
   ResultsVisibility,
+  SubmissionReason,
 } from "@/lib/domain/types";
 import type { AssessmentErrorCode } from "@/lib/validation/assessments";
 
@@ -410,6 +411,90 @@ export const assessmentsUi = {
       "لديك محاولة قيد التنفيذ بالفعل.",
     ),
   },
+  strict: {
+    title: bi("Strict exam mode", "وضع الاختبار الصارم"),
+    settingsHint: bi(
+      "Strict mode closes the attempt when the student leaves the page, switches tabs or loses the connection. It cannot prevent every kind of cheating: a student may still use another device.",
+      "يُغلق الوضع الصارم المحاولة عندما يغادر الطالب الصفحة أو يبدّل التبويب أو ينقطع اتصاله. لا يمكنه منع كل أنواع الغش: قد يستخدم الطالب جهازًا آخر.",
+    ),
+    enabled: bi("Enable strict exam mode", "تفعيل وضع الاختبار الصارم"),
+    enabledHint: bi(
+      "Enabled by default for exams. Quizzes keep the normal behaviour unless you enable it.",
+      "مفعّل افتراضيًا للاختبارات النهائية. تحتفظ الاختبارات القصيرة بالسلوك العادي ما لم تفعّله.",
+    ),
+    tabHidden: bi("Submit when the tab is hidden", "التسليم عند إخفاء التبويب"),
+    tabHiddenHint: bi(
+      "Switching tabs or minimising the browser closes the attempt.",
+      "يؤدي تبديل التبويب أو تصغير المتصفح إلى إغلاق المحاولة.",
+    ),
+    navigation: bi("Submit on navigation or page close", "التسليم عند الانتقال أو إغلاق الصفحة"),
+    navigationHint: bi(
+      "Refreshing, closing the page or navigating away closes the attempt when the browser reports it.",
+      "يؤدي تحديث الصفحة أو إغلاقها أو الانتقال منها إلى إغلاق المحاولة عندما يبلّغ المتصفح بذلك.",
+    ),
+    heartbeat: bi("Heartbeat timeout (seconds)", "مهلة نبض الاتصال (ثانية)"),
+    heartbeatHint: bi(
+      "If the browser stops sending heartbeats for this long, the server closes the attempt.",
+      "إذا توقف المتصفح عن إرسال نبض الاتصال لهذه المدة، يغلق الخادم المحاولة.",
+    ),
+    allowResume: bi(
+      "Allow resuming after a connection loss",
+      "السماح بالاستئناف بعد انقطاع الاتصال",
+    ),
+    allowResumeHint: bi(
+      "Leave off for exams so a lost connection closes the attempt. Turn on for quizzes.",
+      "اتركه معطّلًا للاختبارات النهائية ليُغلق الاتصال المفقود المحاولة. فعّله للاختبارات القصيرة.",
+    ),
+    randomizeQuestions: bi("Randomize question order", "عشوائية ترتيب الأسئلة"),
+    randomizeQuestionsHint: bi(
+      "Each attempt gets a stable shuffled order. Question marks and answers are unchanged.",
+      "تحصل كل محاولة على ترتيب عشوائي ثابت. لا تتغير الدرجات أو الإجابات.",
+    ),
+    randomizeOptions: bi(
+      "Randomize multiple-choice options",
+      "عشوائية خيارات الاختيار من متعدد",
+    ),
+    randomizeOptionsHint: bi(
+      "Options are shuffled per attempt. The stored answer still points at the same option.",
+      "تُخلط الخيارات لكل محاولة. تظل الإجابة المحفوظة مرتبطة بالخيار نفسه.",
+    ),
+    warning: bi(
+      "Leaving this assessment, switching tabs, minimizing the browser, or closing the page may submit your attempt automatically.",
+      "قد يؤدي مغادرة هذا الاختبار أو تبديل علامة التبويب أو تصغير المتصفح أو إغلاق الصفحة إلى إرسال محاولتك تلقائيًا.",
+    ),
+    notFoolproof: bi(
+      "Strict mode reduces simple page-switching, but it cannot prevent every kind of cheating. A student can still use another device.",
+      "يقلل الوضع الصارم من تبديل الصفحات البسيط، لكنه لا يمنع كل أنواع الغش. لا يزال بإمكان الطالب استخدام جهاز آخر.",
+    ),
+    confirmationTitle: bi("Confirm and start", "التأكيد والبدء"),
+    confirmationIntro: bi(
+      "Check these rules before the timer starts.",
+      "راجع هذه القواعد قبل بدء المؤقت.",
+    ),
+    timed: bi("This is a timed assessment.", "هذا اختبار موقوت."),
+    attempts: bi("Attempts allowed", "المحاولات المسموحة"),
+    leaving: bi("Leaving the page submits the attempt", "مغادرة الصفحة تسلّم المحاولة"),
+    leavingNo: bi("Leaving the page does not submit", "مغادرة الصفحة لا تسلّم المحاولة"),
+    resultsRule: bi("Result visibility", "إظهار النتيجة"),
+    startConfirm: bi("Start now", "ابدأ الآن"),
+    back: bi("Not yet", "ليس الآن"),
+    runnerBanner: bi(
+      "Strict exam mode is active. Leaving, switching tabs, minimising the browser or closing the page may submit this attempt.",
+      "وضع الاختبار الصارم مفعّل. قد تؤدي المغادرة أو تبديل التبويب أو تصغير المتصفح أو إغلاق الصفحة إلى تسليم هذه المحاولة.",
+    ),
+    runnerConnection: bi(
+      "If the connection drops, the server submits the attempt after the heartbeat timeout.",
+      "إذا انقطع الاتصال، يسلّم الخادم المحاولة بعد انتهاء مهلة نبض الاتصال.",
+    ),
+    copyBlocked: bi(
+      "Copying and pasting are disabled during this strict assessment.",
+      "تم تعطيل النسخ واللصق أثناء هذا الاختبار الصارم.",
+    ),
+    noCheatClaim: bi(
+      "This control does not guarantee that cheating is impossible.",
+      "لا يضمن هذا الإجراء استحالة الغش.",
+    ),
+  },
   results: {
     title: bi("Attempts & grading", "المحاولات والتصحيح"),
     subtitle: bi(
@@ -421,6 +506,11 @@ export const assessmentsUi = {
     status: bi("Status", "الحالة"),
     score: bi("Score", "الدرجة"),
     submitted: bi("Submitted", "تاريخ التسليم"),
+    reason: bi("Submission reason", "سبب التسليم"),
+    flags: bi("Suspicious events", "الأحداث المشبوهة"),
+    tabHidden: bi("Tab hidden", "إخفاء التبويب"),
+    focusLoss: bi("Focus loss", "فقدان التركيز"),
+    noFlags: bi("None", "لا يوجد"),
     review: bi("Review", "المراجعة"),
     grade: bi("Grade attempt", "تصحيح المحاولة"),
     empty: bi("No attempts yet", "لا توجد محاولات بعد"),
@@ -506,6 +596,16 @@ export const attemptStatusCopy = mapOf<AttemptStatus>({
   expired: bi("Expired", "منتهية"),
 });
 
+export const submissionReasonCopy = mapOf<SubmissionReason>({
+  student_submitted: bi("Student submitted", "سلّمها الطالب"),
+  time_expired: bi("Time expired", "انتهى الوقت"),
+  left_assessment: bi("Left the assessment", "غادر الاختبار"),
+  tab_hidden: bi("Tab hidden", "أُخفي التبويب"),
+  page_unloaded: bi("Page closed or refreshed", "أُغلقت الصفحة أو حُدّثت"),
+  heartbeat_expired: bi("Connection timed out", "انتهت مهلة الاتصال"),
+  connection_lost: bi("Connection lost", "انقطع الاتصال"),
+});
+
 export const questionTypeCopy = mapOf<QuestionType>({
   multiple_choice: bi("Multiple choice", "اختيار من متعدد"),
   true_false: bi("True / false", "صحيح / خطأ"),
@@ -532,6 +632,10 @@ export const assessmentEventCopy = mapOf<AssessmentAdminAction>({
   question_deleted: bi("Question deleted", "حُذف السؤال"),
   questions_reordered: bi("Questions reordered", "أُعيد ترتيب الأسئلة"),
   attempt_graded: bi("Attempt graded", "صُححت المحاولة"),
+  attempt_auto_submitted: bi(
+    "Attempt submitted automatically",
+    "تم تسليم المحاولة تلقائيًا",
+  ),
   import_started: bi("Assessment import started", "بدأ استيراد اختبار"),
   import_draft_created: bi("Imported draft created", "أُنشئت مسودة مستوردة"),
   import_draft_edited: bi("Imported draft edited", "عُدّلت المسودة المستوردة"),
@@ -572,6 +676,14 @@ export const assessmentErrorCopy: Record<AssessmentErrorCode, Bilingual> = {
   time_limit_invalid: bi(
     "The time limit must be between 1 and 600 minutes.",
     "يجب أن تكون المدة بين دقيقة و600 دقيقة.",
+  ),
+  heartbeat_invalid: bi(
+    "The heartbeat timeout must be between 15 and 600 seconds.",
+    "يجب أن تكون مهلة نبض الاتصال بين 15 و600 ثانية.",
+  ),
+  reason_invalid: bi(
+    "That submission reason is not valid.",
+    "سبب التسليم هذا غير صالح.",
   ),
   visibility_invalid: bi(
     "Choose a valid result visibility.",

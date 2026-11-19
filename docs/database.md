@@ -20,6 +20,7 @@ The schema lives in `supabase/migrations/` and is applied in filename order.
 | `20261116130000_student_identity_trigger_guard_fix.sql` | Explicit NULL handling so the auth trigger never inserts a NULL role |
 | `20261116140000_staff_management.sql` | Staff audit log, admin-only RLS and the last-admin / self-protection trigger |
 | `20261116150000_assessment_import.sql` | Private assessment-import staging table, owner/path guard trigger, private `assessment-imports` bucket and four import audit actions |
+| `20261119120000_strict_exam_mode.sql` | Strict exam settings, submission reasons, heartbeat/suspicious-event counters, stale-attempt sweep, seeded question/option randomisation and the `attempt_auto_submitted` audit action |
 
 ## Tables
 
@@ -30,12 +31,12 @@ The schema lives in `supabase/migrations/` and is applied in filename order.
 | `classes` | Classes inside a grade; composite `(id, grade_id)` key |
 | `resource_categories` | Grammar, Reading, Listening, etc. |
 | `resources` | PDFs, images and YouTube links by grade/category |
-| `assessments` | Quiz/exam metadata, timer, retake rules, grading mode |
+| `assessments` | Quiz/exam metadata, timer, retake rules, grading mode, strict-mode settings |
 | `assessment_sections` | Ordered sections within an assessment |
 | `questions` | All eight question types, marks, prompt, answer key |
 | `question_options` | Multiple-choice / true-false options |
 | `matching_pairs` | Matching left/right items with an opaque `right_key` |
-| `attempts` | One row per student attempt, with server-set timer fields |
+| `attempts` | One row per student attempt, with server-set timer fields, heartbeat time, submission reason and suspicious-event counters |
 | `answers` | Structured student responses and marks |
 | `manual_grades` | Reviewer score and feedback for manually graded answers |
 | `google_sheet_sync_logs` | Idempotency ledger: one row per attempt |
@@ -63,9 +64,15 @@ assessment, while sections/questions/options cascade with their parent.
   student cannot be placed in a class from another grade.
 - `assessments`: retakes and `max_attempts` must agree (1 attempt when retakes
   are off; 2–10 when enabled). Availability windows must be ordered.
+  `heartbeat_timeout_seconds` is limited to 15–600. `strict_exam_mode` and
+  `allow_resume_after_connection_loss` default from the type (exams strict,
+  quizzes optional) through a `BEFORE INSERT/UPDATE` trigger.
 - `attempts`: unique `(assessment_id, student_id, attempt_number)` prevents
   duplicate attempts; `expires_at > started_at`; submissions cannot predate the
-  start.
+  start. `submission_reason` is a seven-value enum, and the suspicious-event
+  counters cannot go negative. Students may not change the reason, heartbeat or
+  counters directly; only the heartbeat RPC (which checks ownership and state)
+  and trusted service-role finalisation can write them.
 - `answers`: unique `(attempt_id, question_id)` prevents duplicate answers.
 - `manual_grades`: one grade per answer; `score <= max_score`.
 - `google_sheet_sync_logs.attempt_id` is unique, which makes retries idempotent.
@@ -118,7 +125,7 @@ RLS checks on `profiles`:
 | `current_grade_id()` | Active student's grade, or null |
 | `is_active_user()` | Caller has an active profile |
 | `is_privileged()` | Teacher/admin **or** service-role request |
-| `get_student_assessment_payload(uuid)` | Grade-checked, answer-key-free assessment JSON |
+| `get_student_assessment_payload(uuid, text)` | Grade-checked, answer-key-free assessment JSON; the optional seed gives a stable question/option order |
 | `student_can_write_answer(uuid, uuid)` | Caller owns an open attempt that contains the question |
 | `student_owns_open_attempt(uuid)` | Caller owns the attempt and it is `in_progress` |
 | `student_can_read_answers(uuid)` | Own open attempt, or submitted results when `results_visibility` allows them |
@@ -127,14 +134,44 @@ Assessment RPCs (all `security definer`; `anon` is revoked):
 
 | Function | Caller | Purpose |
 | -------- | ------ | ------- |
-| `student_assessment_overview()` | Student | Published assessments for the caller's grade with attempt counts and visibility-gated result summary |
-| `student_start_attempt(uuid)` | Student | Validate grade/publication/window/retakes/create or resume the timed attempt |
+| `student_assessment_overview()` | Student | Published assessments for the caller's grade with attempt counts, strict settings and a visibility-gated result summary |
+| `student_start_attempt(uuid)` | Student | Validate grade/publication/window/retakes/create or resume the timed attempt; refuses an attempt whose heartbeat went stale |
 | `student_attempt_payload(uuid)` | Student | Sanitized assessment + saved answers, only while `in_progress` |
 | `student_attempt_result(uuid)` | Student | Ownership- and visibility-gated result; returns `visible = false` without score, answers or feedback when hidden |
-| `finalize_attempt(uuid, jsonb)` | Service role / staff | Apply trusted automatic marks, set the timer-derived status and score, idempotent once closed |
+| `attempt_heartbeat(uuid, boolean, boolean)` | Student (owner) | Record a server heartbeat and suspicious-event counts; returns `stale` when the timeout was missed instead of reviving the attempt |
+| `finalize_attempt(uuid, jsonb, attempt_submission_reason)` | Service role / staff | Apply trusted automatic marks, record the submission reason, append an audit event for automatic closes, idempotent once closed |
+| `finalize_stale_attempts(integer)` | Service role / staff | Return expired or heartbeat-stale attempts for idempotent finalisation |
 | `teacher_grade_attempt(uuid, jsonb)` | Teacher/admin | Save manual marks and bilingual feedback, then recompute the attempt score |
 | `reorder_assessment_sections(uuid, uuid[])` | Teacher/admin | Atomic section reorder |
 | `reorder_section_questions(uuid, uuid[])` | Teacher/admin | Atomic question reorder |
+
+## Strict Exam Mode
+
+Strict mode is a server-authoritative policy, not a client trick:
+
+- `assessments.strict_exam_mode` defaults to true for exams and false for
+  quizzes. `submit_on_tab_hidden`, `submit_on_navigation` and
+  `allow_resume_after_connection_loss` decide which signals close an attempt;
+  `heartbeat_timeout_seconds` decides when a silent browser counts as gone.
+- The browser only reports `visibilitychange`, `pagehide`, `beforeunload`,
+  `offline`, focus loss and in-app navigation. The signal route
+  (`/api/student/attempts/[attemptId]/signal`) authenticates the student, proves
+  ownership, re-reads the settings and only then finalises through
+  `finalize_attempt`.
+- A heartbeat is stored server-side. When a strict attempt without connection-loss
+  resume misses its timeout, `attempt_heartbeat` reports `stale`,
+  `student_start_attempt` refuses to resume it and
+  `finalize_stale_attempts` returns it for idempotent finalisation.
+- The maintenance endpoint `GET /api/assessments/sweep` runs the sweep. Set
+  `CRON_SECRET` and call it with `Authorization: Bearer <secret>`; without a
+  secret it requires a signed-in teacher/admin. Student pages also sweep lazily.
+- Every closed attempt stores one of `student_submitted`, `time_expired`,
+  `left_assessment`, `tab_hidden`, `page_unloaded`, `heartbeat_expired` or
+  `connection_lost`. Automatic closes append one `attempt_auto_submitted` audit
+  row with the attempt, student and reason — never question or answer content.
+- Strict mode cannot stop a student from using a second device; the UI and docs
+  say so explicitly. Answer keys and hidden results remain protected exactly as
+  before.
 
 ## RLS matrix
 

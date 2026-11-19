@@ -900,6 +900,391 @@ async function run() {
   );
 
   // -------------------------------------------------------------------------
+  // Strict Exam Mode
+  // -------------------------------------------------------------------------
+  for (const type of ["exam", "quiz"]) {
+    const { data: defaults, error: defaultsError } = await admin
+      .from("assessments")
+      .insert({
+        grade_id: gradeA,
+        type,
+        title_en: `RLS strict defaults ${type}`,
+        title_ar: "افتراضيات التحقق",
+        time_limit_minutes: 30,
+        results_visibility: "after_review",
+        grading_mode: "automatic",
+        allow_retakes: false,
+        max_attempts: 1,
+        is_published: false,
+      })
+      .select(
+        "id, type, strict_exam_mode, allow_resume_after_connection_loss, heartbeat_timeout_seconds",
+      )
+      .single();
+
+    if (defaultsError || !defaults) {
+      throw new Error(
+        `strict default ${type} create failed: ${defaultsError?.message}`,
+      );
+    }
+
+    created.assessments.push(defaults.id);
+
+    check(
+      `${type} gets the type-aware strict defaults`,
+      defaults.strict_exam_mode === (type === "exam") &&
+        defaults.allow_resume_after_connection_loss === (type !== "exam") &&
+        Number(defaults.heartbeat_timeout_seconds) === 60,
+      JSON.stringify(defaults),
+    );
+  }
+
+  const assessmentE = await createAssessment({
+    grade_id: gradeA,
+    type: "exam",
+    time_limit_minutes: 30,
+    results_visibility: "immediately",
+    grading_mode: "automatic",
+    allow_retakes: false,
+    max_attempts: 1,
+    strict_exam_mode: true,
+    submit_on_tab_hidden: true,
+    submit_on_navigation: true,
+    heartbeat_timeout_seconds: 15,
+    allow_resume_after_connection_loss: false,
+    randomize_question_order: true,
+    randomize_option_order: true,
+  });
+  const sectionE = await createSection(assessmentE);
+  const strictQuestionA = await createQuestion(sectionE, { position: 0 });
+  const strictQuestionB = await createQuestion(sectionE, {
+    position: 1,
+    marks: 1,
+  });
+  const strictOptions = await addOptions(strictQuestionA, [
+    "One",
+    "Two",
+    "Three",
+    "Four",
+  ]);
+  await addOptions(strictQuestionB, ["Yes", "No"]);
+
+  await expectError(
+    "anonymous cannot send a heartbeat",
+    anon.rpc("attempt_heartbeat", {
+      p_attempt_id: crypto.randomUUID(),
+      p_tab_hidden: false,
+      p_focus_lost: false,
+    }),
+    "permission denied",
+  );
+
+  await expectError(
+    "students cannot run the stale-attempt sweep",
+    studentA.rpc("finalize_stale_attempts", { p_limit: 10 }),
+    "not_authorized",
+  );
+
+  const strictStart = await studentA.rpc("student_start_attempt", {
+    p_assessment_id: assessmentE,
+  });
+  const attemptE = strictStart.data?.attempt_id;
+  check(
+    "strict exam attempt starts",
+    Boolean(attemptE),
+    strictStart.error?.message ?? JSON.stringify(strictStart.data),
+  );
+
+  const strictPayload = await studentA.rpc("student_attempt_payload", {
+    p_attempt_id: attemptE,
+  });
+  check(
+    "strict settings are delivered without answer keys",
+    !strictPayload.error &&
+      strictPayload.data?.assessment?.strict_exam_mode === true &&
+      strictPayload.data?.assessment?.heartbeat_timeout_seconds === 15 &&
+      !hasAnswerKey(strictPayload.data),
+    strictPayload.error?.message ??
+      JSON.stringify(strictPayload.data?.assessment ?? null),
+  );
+
+  const strictAnswer = await studentA.from("answers").insert({
+    attempt_id: attemptE,
+    question_id: strictQuestionA,
+    response: { selectedOptionId: strictOptions[0].id },
+  });
+  check(
+    "strict attempt accepts an answer before finalisation",
+    !strictAnswer.error,
+    strictAnswer.error?.message ?? "saved",
+  );
+
+  const heartbeat = await studentA.rpc("attempt_heartbeat", {
+    p_attempt_id: attemptE,
+    p_tab_hidden: true,
+    p_focus_lost: true,
+  });
+  check(
+    "heartbeat records the server time and suspicious events",
+    !heartbeat.error &&
+      heartbeat.data?.status === "in_progress" &&
+      heartbeat.data?.strict_exam_mode === true,
+    heartbeat.error?.message ?? JSON.stringify(heartbeat.data),
+  );
+
+  const heartbeatRow = await admin
+    .from("attempts")
+    .select(
+      "last_heartbeat_at, tab_hidden_count, focus_loss_count, signal_count, submission_reason",
+    )
+    .eq("id", attemptE)
+    .single();
+  check(
+    "heartbeat counters are stored on the attempt",
+    !heartbeatRow.error &&
+      Boolean(heartbeatRow.data?.last_heartbeat_at) &&
+      Number(heartbeatRow.data?.tab_hidden_count) === 1 &&
+      Number(heartbeatRow.data?.focus_loss_count) === 1 &&
+      Number(heartbeatRow.data?.signal_count) === 1,
+    heartbeatRow.error?.message ?? JSON.stringify(heartbeatRow.data),
+  );
+
+  await expectError(
+    "another student cannot send a heartbeat for my attempt",
+    studentB.rpc("attempt_heartbeat", {
+      p_attempt_id: attemptE,
+      p_tab_hidden: false,
+      p_focus_lost: false,
+    }),
+    "attempt_not_found",
+  );
+
+  const forgedCounters = await studentA
+    .from("attempts")
+    .update({ tab_hidden_count: 999, focus_loss_count: 999 })
+    .eq("id", attemptE);
+  const countersAfterForge = await admin
+    .from("attempts")
+    .select("tab_hidden_count, focus_loss_count")
+    .eq("id", attemptE)
+    .single();
+  check(
+    "students cannot forge suspicious-event counters",
+    !forgedCounters.error &&
+      Number(countersAfterForge.data?.tab_hidden_count) === 1 &&
+      Number(countersAfterForge.data?.focus_loss_count) === 1,
+    forgedCounters.error?.message ?? JSON.stringify(countersAfterForge.data),
+  );
+
+  const forgedReason = await studentA
+    .from("attempts")
+    .update({ submission_reason: "heartbeat_expired" })
+    .eq("id", attemptE);
+  const reasonAfterForge = await admin
+    .from("attempts")
+    .select("submission_reason")
+    .eq("id", attemptE)
+    .single();
+  check(
+    "a direct student update cannot set a submission reason",
+    !forgedReason.error && reasonAfterForge.data?.submission_reason === null,
+    forgedReason.error?.message ?? JSON.stringify(reasonAfterForge.data),
+  );
+
+  const forgedClose = await studentA
+    .from("attempts")
+    .update({ status: "graded" })
+    .eq("id", attemptE);
+  check(
+    "students cannot jump an attempt straight to graded",
+    Boolean(forgedClose.error) &&
+      /invalid_attempt_transition/.test(forgedClose.error.message),
+    forgedClose.error?.message ?? "update unexpectedly succeeded",
+  );
+
+  const randomSeed = `rls-${attemptE}`;
+  const [seededA, seededB] = await Promise.all([
+    studentA.rpc("get_student_assessment_payload", {
+      p_assessment_id: assessmentE,
+      p_seed: randomSeed,
+    }),
+    studentA.rpc("get_student_assessment_payload", {
+      p_assessment_id: assessmentE,
+      p_seed: randomSeed,
+    }),
+  ]);
+  const seededOptions = (payloadData) =>
+    (payloadData?.sections ?? []).flatMap((section) =>
+      section.questions.flatMap((question) =>
+        question.options.map((option) => option.id),
+      ),
+    );
+  check(
+    "a seeded payload order is stable and key-free",
+    !seededA.error &&
+      !seededB.error &&
+      JSON.stringify(seededOptions(seededA.data)) ===
+        JSON.stringify(seededOptions(seededB.data)) &&
+      seededOptions(seededA.data).length === 6 &&
+      !hasAnswerKey(seededA.data),
+    seededA.error?.message ?? "seeded payload mismatch",
+  );
+
+  // Force the heartbeat to look old, exactly like a crashed browser.
+  const staleSince = new Date(Date.now() - 2 * 60000).toISOString();
+  const { error: staleError } = await admin
+    .from("attempts")
+    .update({ last_heartbeat_at: staleSince })
+    .eq("id", attemptE);
+  check(
+    "attempt heartbeat can be aged for testing",
+    !staleError,
+    staleError?.message ?? "ok",
+  );
+
+  const staleBeat = await studentA.rpc("attempt_heartbeat", {
+    p_attempt_id: attemptE,
+  });
+  check(
+    "a missed heartbeat is reported as stale and not refreshed",
+    !staleBeat.error && staleBeat.data?.status === "stale",
+    staleBeat.error?.message ?? JSON.stringify(staleBeat.data),
+  );
+
+  await expectError(
+    "a stale attempt cannot be resumed through the start RPC",
+    studentA.rpc("student_start_attempt", { p_assessment_id: assessmentE }),
+    "attempt_stale",
+  );
+
+  // Never sweep unrelated live attempts on a hosted project. Only run the
+  // maintenance RPC when our attempt is the sole stale row.
+  const { data: openAttempts } = await admin
+    .from("attempts")
+    .select(
+      "id, started_at, last_heartbeat_at, expires_at, status, assessment:assessments!inner(strict_exam_mode, allow_resume_after_connection_loss, heartbeat_timeout_seconds)",
+    )
+    .eq("status", "in_progress")
+    .limit(1000);
+
+  const staleNow = (row) => {
+    const settings = row.assessment ?? {};
+    const expiresAt = Date.parse(row.expires_at);
+    const lastBeat = Date.parse(row.last_heartbeat_at ?? row.started_at);
+
+    return (
+      expiresAt <= Date.now() ||
+      (settings.strict_exam_mode === true &&
+        settings.allow_resume_after_connection_loss !== true &&
+        lastBeat <
+          Date.now() - Number(settings.heartbeat_timeout_seconds ?? 60) * 1000)
+    );
+  };
+  const unrelatedStale = (openAttempts ?? []).filter(
+    (row) => row.id !== attemptE && staleNow(row),
+  );
+
+  if (unrelatedStale.length === 0) {
+    const sweep = await admin.rpc("finalize_stale_attempts", { p_limit: 25 });
+    const swept = (sweep.data ?? []).find((row) => row.attempt_id === attemptE);
+    check(
+      "the stale sweep selects the heartbeat-expired attempt",
+      !sweep.error && swept?.reason === "heartbeat_expired",
+      sweep.error?.message ?? JSON.stringify(sweep.data),
+    );
+  } else {
+    check(
+      "the stale sweep was skipped to protect unrelated live attempts",
+      true,
+      `${unrelatedStale.length} unrelated stale attempt(s) present`,
+    );
+  }
+
+  const strictFinalize = await admin.rpc("finalize_attempt", {
+    p_attempt_id: attemptE,
+    p_results: [
+      { question_id: strictQuestionA, marks_awarded: 2, is_correct: true },
+      { question_id: strictQuestionB, marks_awarded: 1, is_correct: false },
+    ],
+    p_reason: "heartbeat_expired",
+  });
+  check(
+    "automatic finalisation stores the submission reason",
+    !strictFinalize.error &&
+      strictFinalize.data?.status === "graded" &&
+      strictFinalize.data?.submission_reason === "heartbeat_expired",
+    strictFinalize.error?.message ?? JSON.stringify(strictFinalize.data),
+  );
+
+  const lateStrictAnswer = await studentA
+    .from("answers")
+    .update({ response: { selectedOptionId: strictOptions[1].id } })
+    .eq("attempt_id", attemptE)
+    .eq("question_id", strictQuestionA);
+
+  // The RLS update policy only exposes in-progress rows, so a closed attempt
+  // yields a silent zero-row update rather than a raised error. Verify the
+  // stored answer itself is untouched.
+  const storedStrictAnswer = await admin
+    .from("answers")
+    .select("response")
+    .eq("attempt_id", attemptE)
+    .eq("question_id", strictQuestionA)
+    .single();
+  check(
+    "answers cannot be changed after automatic submission",
+    !storedStrictAnswer.error &&
+      storedStrictAnswer.data?.response?.selectedOptionId ===
+        strictOptions[0].id,
+    lateStrictAnswer.error?.message ?? JSON.stringify(storedStrictAnswer.data),
+  );
+
+  const duplicateFinalize = await admin.rpc("finalize_attempt", {
+    p_attempt_id: attemptE,
+    p_results: [
+      { question_id: strictQuestionA, marks_awarded: 0, is_correct: false },
+    ],
+    p_reason: "time_expired",
+  });
+  check(
+    "duplicate finalisation keeps the first score and reason",
+    !duplicateFinalize.error &&
+      Number(duplicateFinalize.data?.score) === Number(
+        strictFinalize.data?.score,
+      ) &&
+      duplicateFinalize.data?.submission_reason === "heartbeat_expired",
+    duplicateFinalize.error?.message ??
+      JSON.stringify(duplicateFinalize.data),
+  );
+
+  const { data: autoEvents } = await admin
+    .from("assessment_admin_events")
+    .select("id, action, detail")
+    .eq("assessment_id", assessmentE)
+    .eq("action", "attempt_auto_submitted");
+  check(
+    "an automatic submission appends exactly one audit event",
+    (autoEvents ?? []).length === 1 &&
+      autoEvents[0]?.detail?.reason === "heartbeat_expired",
+    JSON.stringify(autoEvents ?? []),
+  );
+
+  await expectError(
+    "a closed strict attempt cannot be restarted without retakes",
+    studentA.rpc("student_start_attempt", { p_assessment_id: assessmentE }),
+    "retakes_not_allowed",
+  );
+
+  const closedStrictPayload = await studentA.rpc("student_attempt_payload", {
+    p_attempt_id: attemptE,
+  });
+  check(
+    "the strict runner payload is closed after automatic submission",
+    Boolean(closedStrictPayload.error),
+    closedStrictPayload.error?.message ?? "payload unexpectedly returned",
+  );
+
+  // -------------------------------------------------------------------------
   // Staff access and the audit log
   // -------------------------------------------------------------------------
   await expectRows(

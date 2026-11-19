@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireStudent } from "@/lib/auth/dal";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-import { finalizeAttempt } from "@/lib/assessments/finalize";
+import { finalizeAttempt, finalizeStaleAttempts } from "@/lib/assessments/finalize";
 import { sanitizeAnswerResponse } from "@/lib/assessments/answers";
 import {
   ASSESSMENT_BUCKET,
@@ -17,14 +17,16 @@ import {
   verifySubmissionObject,
 } from "@/lib/assessments/storage";
 import {
-  attemptIdSchema,
   fieldErrorsFrom,
+  heartbeatAttemptSchema,
   prepareSubmissionUploadSchema,
   saveAnswerSchema,
   startAttemptSchema,
+  submitAttemptSchema,
   type AssessmentActionResult,
   type AssessmentErrorCode,
 } from "@/lib/validation/assessments";
+import type { SubmissionReason } from "@/lib/domain/types";
 
 /**
  * Student attempt actions. Identity always comes from the session, never from
@@ -47,6 +49,7 @@ function mapAttemptError(message: string): AssessmentErrorCode {
   if (message.includes("profile_not_ready")) return "forbidden";
   if (message.includes("not_authenticated")) return "forbidden";
   if (message.includes("attempt_expired")) return "attempt_closed";
+  if (message.includes("attempt_stale")) return "attempt_closed";
   if (message.includes("invalid_file_path")) return "file_required";
   return "unknown";
 }
@@ -62,6 +65,10 @@ export async function startAttemptAction(
       fieldErrors: fieldErrorsFrom(parsed.error.issues),
     });
   }
+
+  // Close any stale attempt before the RPC can resume it, so a connection loss
+  // cannot silently revive a strict attempt.
+  await finalizeStaleAttempts(10);
 
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("student_start_attempt", {
@@ -335,15 +342,24 @@ export async function submitAttemptAction(
   input: unknown,
 ): Promise<AssessmentActionResult> {
   const student = await requireStudent();
-  const parsed = attemptIdSchema.safeParse(input);
+  const parsed = submitAttemptSchema.safeParse(input);
 
   if (!parsed.success) {
     return fail("validation_failed");
   }
 
+  const reason: SubmissionReason = parsed.data.reason ?? "student_submitted";
+
+  // Browser actions may only claim a normal submit or timer expiry. Automatic
+  // reasons are decided by the server signal route, never by client input.
+  if (reason !== "student_submitted" && reason !== "time_expired") {
+    return fail("reason_invalid");
+  }
+
   const outcome = await finalizeAttempt({
     attemptId: parsed.data.attempt_id,
     studentId: student.id,
+    reason,
   });
 
   if (!outcome.ok) {
@@ -355,5 +371,91 @@ export async function submitAttemptAction(
   return {
     ok: true,
     attemptId: parsed.data.attempt_id,
+  };
+}
+
+export async function heartbeatAttemptAction(
+  input: unknown,
+): Promise<
+  AssessmentActionResult & {
+    closed?: boolean;
+    expired?: boolean;
+    status?: string;
+    serverTime?: string;
+    expiresAt?: string;
+    strictExamMode?: boolean;
+    submitOnTabHidden?: boolean;
+    submitOnNavigation?: boolean;
+    allowResumeAfterConnectionLoss?: boolean;
+    heartbeatTimeoutSeconds?: number;
+  }
+> {
+  const student = await requireStudent();
+  const parsed = heartbeatAttemptSchema.safeParse(input);
+
+  if (!parsed.success) {
+    return fail("validation_failed");
+  }
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("attempt_heartbeat", {
+    p_attempt_id: parsed.data.attempt_id,
+    p_tab_hidden: false,
+    p_focus_lost: Boolean(parsed.data.focus_lost),
+  });
+
+  if (error) {
+    return fail(mapAttemptError(error.message));
+  }
+
+  const heartbeat = data as {
+    status: string;
+    server_time: string;
+    expires_at: string;
+    submission_reason: SubmissionReason | null;
+    strict_exam_mode?: boolean;
+    submit_on_tab_hidden?: boolean;
+    submit_on_navigation?: boolean;
+    allow_resume_after_connection_loss?: boolean;
+    heartbeat_timeout_seconds?: number;
+  };
+
+  if (heartbeat.status !== "in_progress") {
+    if (heartbeat.status === "expired" || heartbeat.status === "stale") {
+      const outcome = await finalizeAttempt({
+        attemptId: parsed.data.attempt_id,
+        studentId: student.id,
+        reason:
+          heartbeat.status === "stale" ? "heartbeat_expired" : "time_expired",
+      });
+
+      if (!outcome.ok) {
+        return fail(outcome.error);
+      }
+    }
+
+    return {
+      ok: true,
+      attemptId: parsed.data.attempt_id,
+      closed: true,
+      expired: heartbeat.status === "expired",
+      status: heartbeat.status,
+      serverTime: heartbeat.server_time,
+      expiresAt: heartbeat.expires_at,
+    };
+  }
+
+  return {
+    ok: true,
+    attemptId: parsed.data.attempt_id,
+    status: heartbeat.status,
+    serverTime: heartbeat.server_time,
+    expiresAt: heartbeat.expires_at,
+    strictExamMode: heartbeat.strict_exam_mode,
+    submitOnTabHidden: heartbeat.submit_on_tab_hidden,
+    submitOnNavigation: heartbeat.submit_on_navigation,
+    allowResumeAfterConnectionLoss:
+      heartbeat.allow_resume_after_connection_loss,
+    heartbeatTimeoutSeconds: heartbeat.heartbeat_timeout_seconds,
   };
 }

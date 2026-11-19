@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { requireTeacher } from "@/lib/auth/dal";
+import { finalizeStaleAttempts } from "@/lib/assessments/finalize";
 import {
   getTeacherAssessmentById,
   listAssessmentAttempts,
@@ -16,6 +17,7 @@ import {
 import {
   assessmentsUi,
   attemptStatusCopy,
+  submissionReasonCopy,
 } from "@/lib/i18n/assessments";
 import { formatAdminDateTime } from "@/lib/students/format";
 import { isUuid } from "@/lib/search";
@@ -46,6 +48,7 @@ export default async function AssessmentResultsPage({
     notFound();
   }
 
+  await finalizeStaleAttempts(20);
   const result = await listAssessmentAttempts(assessment.id);
 
   return (
@@ -105,7 +108,7 @@ export default async function AssessmentResultsPage({
         />
       ) : (
         <div className="overflow-x-auto rounded-xl border border-border bg-card shadow-xs">
-          <table className="w-full min-w-[52rem] border-collapse text-sm">
+          <table className="w-full min-w-[64rem] border-collapse text-sm">
             <thead>
               <tr className="border-b border-border bg-secondary/40 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 <th className="px-4 py-3">
@@ -136,6 +139,18 @@ export default async function AssessmentResultsPage({
                   <Bi
                     en={assessmentsUi.results.submitted.en}
                     ar={assessmentsUi.results.submitted.ar}
+                  />
+                </th>
+                <th className="px-4 py-3">
+                  <Bi
+                    en={assessmentsUi.results.reason.en}
+                    ar={assessmentsUi.results.reason.ar}
+                  />
+                </th>
+                <th className="px-4 py-3">
+                  <Bi
+                    en={assessmentsUi.results.flags.en}
+                    ar={assessmentsUi.results.flags.ar}
                   />
                 </th>
                 <th className="px-4 py-3">
@@ -221,6 +236,44 @@ export default async function AssessmentResultsPage({
                     </td>
                     <td className="px-4 py-3 text-xs text-muted-foreground">
                       {formatAdminDateTime(attempt.submitted_at)}
+                    </td>
+                    <td className="px-4 py-3 text-xs">
+                      {attempt.submission_reason ? (
+                        <Badge variant="outline">
+                          <Bi
+                            en={submissionReasonCopy[attempt.submission_reason].en}
+                            ar={submissionReasonCopy[attempt.submission_reason].ar}
+                          />
+                        </Badge>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-xs text-muted-foreground">
+                      {attempt.tab_hidden_count + attempt.focus_loss_count ===
+                      0 ? (
+                        <Bi
+                          en={assessmentsUi.results.noFlags.en}
+                          ar={assessmentsUi.results.noFlags.ar}
+                        />
+                      ) : (
+                        <span className="inline-flex flex-wrap gap-1">
+                          <Badge variant="outline">
+                            <Bi
+                              en={assessmentsUi.results.tabHidden.en}
+                              ar={assessmentsUi.results.tabHidden.ar}
+                            />
+                            : {attempt.tab_hidden_count}
+                          </Badge>
+                          <Badge variant="outline">
+                            <Bi
+                              en={assessmentsUi.results.focusLoss.en}
+                              ar={assessmentsUi.results.focusLoss.ar}
+                            />
+                            : {attempt.focus_loss_count}
+                          </Badge>
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-3">{reviewLabel}</td>
                     <td className="px-4 py-3 text-right">

@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import {
+  heartbeatAttemptAction,
   prepareSubmissionUploadAction,
   saveAnswerAction,
   submitAttemptAction,
@@ -24,8 +25,10 @@ import {
 import type {
   StudentAssessmentSection,
   StudentQuestion,
+  SubmissionReason,
 } from "@/lib/domain/types";
 import { assessmentsUi, questionTypeCopy } from "@/lib/i18n/assessments";
+import { heartbeatIntervalMs } from "@/lib/assessments/strict";
 import {
   ASSESSMENT_MAX_FILE_BYTES,
   isAllowedSubmissionMime,
@@ -94,6 +97,11 @@ export function AttemptRunner({
   serverTime,
   sections,
   initialAnswers,
+  strictExamMode = false,
+  submitOnTabHidden = false,
+  submitOnNavigation = false,
+  heartbeatTimeoutSeconds = 60,
+  allowResumeAfterConnectionLoss = true,
 }: {
   attemptId: string;
   assessmentId: string;
@@ -106,6 +114,11 @@ export function AttemptRunner({
     file_path: string | null;
     file_name?: string | null;
   }>;
+  strictExamMode?: boolean;
+  submitOnTabHidden?: boolean;
+  submitOnNavigation?: boolean;
+  heartbeatTimeoutSeconds?: number;
+  allowResumeAfterConnectionLoss?: boolean;
 }) {
   const router = useRouter();
   const questions = useMemo(
@@ -136,13 +149,33 @@ export function AttemptRunner({
   const timers = useRef(new Map<string, ReturnType<typeof setTimeout>>());
   const submittedRef = useRef(false);
   const answersRef = useRef(answers);
+  const lastFocusSignal = useRef(0);
+  const unloadSignalSent = useRef(false);
+  const resultUrl = `/student/assessments/${assessmentId}/attempt/${attemptId}/result`;
 
   const answeredCount = questions.filter((question) =>
     hasResponse(question, answers[question.id] ?? emptyAnswer()),
   ).length;
 
+  const flushAnswers = useCallback(async () => {
+    for (const question of questions) {
+      const answer = answersRef.current[question.id];
+
+      if (!answer || !hasResponse(question, answer)) {
+        continue;
+      }
+
+      await saveAnswerAction({
+        attempt_id: attemptId,
+        question_id: question.id,
+        response: answer.response,
+        file_path: answer.file_path ?? undefined,
+      });
+    }
+  }, [attemptId, questions]);
+
   const submit = useCallback(
-    async (reason: "manual" | "expired") => {
+    async (reason: SubmissionReason) => {
       if (submittedRef.current) {
         return;
       }
@@ -158,28 +191,14 @@ export function AttemptRunner({
 
       // Flush the latest answers before the attempt closes. After expiry the
       // database rejects writes, which is why the client also submits at zero.
-      if (reason === "manual") {
-        for (const question of questions) {
-          const answer = answersRef.current[question.id];
-
-          if (!answer) {
-            continue;
-          }
-
-          if (!hasResponse(question, answer)) {
-            continue;
-          }
-
-          await saveAnswerAction({
-            attempt_id: attemptId,
-            question_id: question.id,
-            response: answer.response,
-            file_path: answer.file_path ?? undefined,
-          });
-        }
+      if (reason === "student_submitted") {
+        await flushAnswers();
       }
 
-      const outcome = await submitAttemptAction({ attempt_id: attemptId });
+      const outcome = await submitAttemptAction({
+        attempt_id: attemptId,
+        reason,
+      });
 
       if (!outcome.ok) {
         submittedRef.current = false;
@@ -188,12 +207,10 @@ export function AttemptRunner({
         return;
       }
 
-      router.push(
-        `/student/assessments/${assessmentId}/attempt/${attemptId}/result`,
-      );
+      router.push(resultUrl);
       router.refresh();
     },
-    [assessmentId, attemptId, questions, router],
+    [attemptId, flushAnswers, resultUrl, router],
   );
 
   useEffect(() => {
@@ -206,7 +223,7 @@ export function AttemptRunner({
 
       if (left <= 0 && !submittedRef.current) {
         startExpiryTransition(() => {
-          void submit("expired");
+          void submit("time_expired");
         });
       }
     };
@@ -215,6 +232,235 @@ export function AttemptRunner({
     const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
   }, [expiresAt, serverTime, submit]);
+
+  const sendSignal = useCallback(
+    async (
+      signal: "tab_hidden" | "left_assessment" | "page_unloaded" | "connection_lost" | "focus_lost",
+      options: { flush?: boolean; keepalive?: boolean } = {},
+    ) => {
+      if (submittedRef.current) {
+        return;
+      }
+
+      if (options.flush) {
+        await flushAnswers();
+      }
+
+      try {
+        const response = await fetch(
+          `/api/student/attempts/${attemptId}/signal`,
+          {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ signal }),
+            keepalive: Boolean(options.keepalive),
+          },
+        );
+
+        if (!response.ok) {
+          return;
+        }
+
+        const payload = (await response.json()) as {
+          submitted?: boolean;
+          redirectTo?: string | null;
+        };
+
+        if (payload.submitted) {
+          submittedRef.current = true;
+          router.push(payload.redirectTo ?? resultUrl);
+          router.refresh();
+        }
+      } catch {
+        // Offline or the tab is already gone; the server heartbeat sweep is the
+        // fallback. The browser signal is only a hint.
+      }
+    },
+    [attemptId, flushAnswers, resultUrl, router],
+  );
+
+  useEffect(() => {
+    if (!strictExamMode) {
+      return;
+    }
+
+    let active = true;
+
+    const beat = async () => {
+      if (!active || submittedRef.current) {
+        return;
+      }
+
+      const outcome = await heartbeatAttemptAction({ attempt_id: attemptId });
+
+      if (!active) {
+        return;
+      }
+
+      if (outcome.ok && outcome.closed) {
+        submittedRef.current = true;
+        router.push(resultUrl);
+        router.refresh();
+        return;
+      }
+
+      if (!outcome.ok && outcome.error === "attempt_closed") {
+        submittedRef.current = true;
+        router.push(resultUrl);
+        router.refresh();
+      }
+    };
+
+    void beat();
+    const interval = setInterval(
+      () => void beat(),
+      heartbeatIntervalMs(heartbeatTimeoutSeconds),
+    );
+
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
+  }, [
+    attemptId,
+    heartbeatTimeoutSeconds,
+    resultUrl,
+    router,
+    strictExamMode,
+  ]);
+
+  useEffect(() => {
+    if (!strictExamMode) {
+      return;
+    }
+
+    let visibilityTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") {
+        if (visibilityTimer !== null) {
+          clearTimeout(visibilityTimer);
+          visibilityTimer = null;
+        }
+        return;
+      }
+
+      if (unloadSignalSent.current) {
+        return;
+      }
+
+      // Give `pagehide`/`beforeunload` a moment to win so closing a tab is
+      // recorded as a page unload, not as a tab switch. Either way the server
+      // is the authority on whether the attempt closes.
+      visibilityTimer = setTimeout(() => {
+        visibilityTimer = null;
+        void sendSignal("tab_hidden", { flush: true });
+      }, 250);
+    };
+
+    const clearVisibilityTimer = () => {
+      if (visibilityTimer !== null) {
+        clearTimeout(visibilityTimer);
+        visibilityTimer = null;
+      }
+    };
+
+    const onPageHide = () => {
+      clearVisibilityTimer();
+
+      if (unloadSignalSent.current) {
+        return;
+      }
+
+      unloadSignalSent.current = true;
+      void sendSignal("page_unloaded", { keepalive: true });
+    };
+
+    const onBeforeUnload = () => {
+      clearVisibilityTimer();
+
+      if (unloadSignalSent.current) {
+        return;
+      }
+
+      unloadSignalSent.current = true;
+      void sendSignal("page_unloaded", { keepalive: true });
+    };
+
+    const onOffline = () => {
+      void sendSignal("connection_lost", { keepalive: true });
+    };
+
+    const onBlur = () => {
+      const now = Date.now();
+
+      if (now - lastFocusSignal.current < 15_000) {
+        return;
+      }
+
+      lastFocusSignal.current = now;
+      void sendSignal("focus_lost");
+    };
+
+    // Client-side navigation does not fire `beforeunload`. Catch links that
+    // leave this page and back/forward navigation, and let the server decide.
+    const onDocumentClick = (event: MouseEvent) => {
+      if (!submitOnNavigation) {
+        return;
+      }
+
+      const target = event.target as Element | null;
+      const anchor = target?.closest?.("a[href]") as HTMLAnchorElement | null;
+
+      if (!anchor || anchor.target === "_blank" || anchor.hasAttribute("download")) {
+        return;
+      }
+
+      const href = anchor.getAttribute("href");
+
+      if (!href || href.startsWith("#")) {
+        return;
+      }
+
+      const destination = new URL(anchor.href, window.location.href);
+
+      if (
+        destination.pathname === window.location.pathname &&
+        destination.search === window.location.search
+      ) {
+        return;
+      }
+
+      void sendSignal("left_assessment", { keepalive: true });
+    };
+
+    const onPopState = () => {
+      if (!submitOnNavigation) {
+        return;
+      }
+
+      void sendSignal("left_assessment", { keepalive: true });
+    };
+
+    document.addEventListener("visibilitychange", onVisibility);
+    document.addEventListener("click", onDocumentClick, true);
+    window.addEventListener("pagehide", onPageHide);
+    window.addEventListener("beforeunload", onBeforeUnload);
+    window.addEventListener("offline", onOffline);
+    window.addEventListener("blur", onBlur);
+    window.addEventListener("popstate", onPopState);
+
+    return () => {
+      clearVisibilityTimer();
+      document.removeEventListener("visibilitychange", onVisibility);
+      document.removeEventListener("click", onDocumentClick, true);
+      window.removeEventListener("pagehide", onPageHide);
+      window.removeEventListener("beforeunload", onBeforeUnload);
+      window.removeEventListener("offline", onOffline);
+      window.removeEventListener("blur", onBlur);
+      window.removeEventListener("popstate", onPopState);
+    };
+  }, [sendSignal, strictExamMode, submitOnNavigation]);
 
   useEffect(() => {
     const pending = timers.current;
@@ -541,7 +787,15 @@ export function AttemptRunner({
   };
 
   return (
-    <div className="space-y-5">
+    <div
+      className="space-y-5"
+      onCopy={strictExamMode ? (event) => event.preventDefault() : undefined}
+      onCut={strictExamMode ? (event) => event.preventDefault() : undefined}
+      onPaste={strictExamMode ? (event) => event.preventDefault() : undefined}
+      onContextMenu={
+        strictExamMode ? (event) => event.preventDefault() : undefined
+      }
+    >
       <div className="sticky top-16 z-30 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card/95 p-3 shadow-sm backdrop-blur">
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant={remaining < 300000 ? "outline" : "default"}>
@@ -588,7 +842,7 @@ export function AttemptRunner({
                   `${assessmentsUi.actions.confirmSubmit.en}\n${assessmentsUi.actions.confirmSubmit.ar}`,
                 )
               ) {
-                void submit("manual");
+                void submit("student_submitted");
               }
             }}
           >
@@ -632,6 +886,55 @@ export function AttemptRunner({
           ar={assessmentsUi.student.submitHint.ar}
         />
       </Alert>
+
+      {strictExamMode ? (
+        <div className="space-y-2 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-100">
+          <p className="font-semibold">
+            <Bi
+              en={assessmentsUi.strict.runnerBanner.en}
+              ar={assessmentsUi.strict.runnerBanner.ar}
+            />
+          </p>
+          <ul className="list-disc space-y-1 ps-5 text-xs">
+            {submitOnTabHidden ? (
+              <li>
+                <Bi
+                  en={assessmentsUi.strict.tabHidden.en}
+                  ar={assessmentsUi.strict.tabHidden.ar}
+                />
+              </li>
+            ) : null}
+            {submitOnNavigation ? (
+              <li>
+                <Bi
+                  en={assessmentsUi.strict.navigation.en}
+                  ar={assessmentsUi.strict.navigation.ar}
+                />
+              </li>
+            ) : null}
+            {!allowResumeAfterConnectionLoss ? (
+              <li>
+                <Bi
+                  en={assessmentsUi.strict.runnerConnection.en}
+                  ar={assessmentsUi.strict.runnerConnection.ar}
+                />
+              </li>
+            ) : null}
+            <li>
+              <Bi
+                en={assessmentsUi.strict.copyBlocked.en}
+                ar={assessmentsUi.strict.copyBlocked.ar}
+              />
+            </li>
+          </ul>
+          <p className="text-xs">
+            <Bi
+              en={assessmentsUi.strict.notFoolproof.en}
+              ar={assessmentsUi.strict.notFoolproof.ar}
+            />
+          </p>
+        </div>
+      ) : null}
 
       {sections.map((section) => (
         <section key={section.id} className="space-y-3">

@@ -1,6 +1,12 @@
 import { z } from "zod";
 import { fieldErrorsFrom, type FieldErrors } from "@/lib/validation/fields";
 import { ASSESSMENT_MAX_FILE_BYTES } from "@/lib/assessments/files";
+import {
+  ATTEMPT_SIGNALS,
+  STRICT_MAX_HEARTBEAT_SECONDS,
+  STRICT_MIN_HEARTBEAT_SECONDS,
+  SUBMISSION_REASONS,
+} from "@/lib/assessments/strict";
 
 /**
  * Stable assessment error codes. Nothing from Postgres or the provider reaches
@@ -17,6 +23,7 @@ export const ASSESSMENT_ERROR_CODES = [
   "grade_not_found",
   "type_invalid",
   "time_limit_invalid",
+  "heartbeat_invalid",
   "visibility_invalid",
   "grading_mode_invalid",
   "grading_method_invalid",
@@ -48,6 +55,7 @@ export const ASSESSMENT_ERROR_CODES = [
   "max_attempts_reached",
   "answer_invalid",
   "answer_too_long",
+  "reason_invalid",
   "file_required",
   "file_type_invalid",
   "file_too_large",
@@ -96,6 +104,14 @@ const booleanValue = z.preprocess((value) => {
   if (value === "false" || value === false) return false;
   return value;
 }, z.boolean().default(false));
+
+/** Optional boolean: omitted values fall back to type-aware strict defaults. */
+const optionalBoolean = z.preprocess((value) => {
+  if (value === "true" || value === true) return true;
+  if (value === "false" || value === false) return false;
+  if (value === undefined || value === null || value === "") return undefined;
+  return value;
+}, z.boolean().optional());
 
 const isoDateTime = z.preprocess(
   (value) =>
@@ -157,6 +173,22 @@ const assessmentBaseSchema = z.object({
   available_from: isoDateTime,
   available_until: isoDateTime,
   is_published: booleanValue,
+  strict_exam_mode: optionalBoolean,
+  submit_on_tab_hidden: optionalBoolean,
+  submit_on_navigation: optionalBoolean,
+  heartbeat_timeout_seconds: z.preprocess(
+    (value) =>
+      value === undefined || value === null || value === "" ? undefined : value,
+    z.coerce
+      .number({ error: "heartbeat_invalid" })
+      .int({ error: "heartbeat_invalid" })
+      .min(STRICT_MIN_HEARTBEAT_SECONDS, { error: "heartbeat_invalid" })
+      .max(STRICT_MAX_HEARTBEAT_SECONDS, { error: "heartbeat_invalid" })
+      .optional(),
+  ),
+  allow_resume_after_connection_loss: optionalBoolean,
+  randomize_question_order: optionalBoolean,
+  randomize_option_order: optionalBoolean,
 });
 
 function refineAssessment(
@@ -456,6 +488,21 @@ export function answerKeyForQuestion(
 
 export const attemptIdSchema = z.object({
   attempt_id: z.uuid({ error: "validation_failed" }),
+});
+
+export const attemptSignalSchema = z.object({
+  attempt_id: z.uuid({ error: "validation_failed" }),
+  signal: z.enum(ATTEMPT_SIGNALS, { error: "validation_failed" }),
+});
+
+export const submitAttemptSchema = z.object({
+  attempt_id: z.uuid({ error: "validation_failed" }),
+  reason: z.enum(SUBMISSION_REASONS, { error: "reason_invalid" }).optional(),
+});
+
+export const heartbeatAttemptSchema = z.object({
+  attempt_id: z.uuid({ error: "validation_failed" }),
+  focus_lost: optionalBoolean,
 });
 
 export const startAttemptSchema = z.object({
