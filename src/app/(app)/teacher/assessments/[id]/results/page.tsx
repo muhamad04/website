@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { requireTeacher } from "@/lib/auth/dal";
-import { finalizeStaleAttempts } from "@/lib/assessments/finalize";
+import { maybeFinalizeStaleAttempts } from "@/lib/assessments/lazy-sweep";
 import {
   getTeacherAssessmentById,
   listAssessmentAttempts,
@@ -48,7 +48,7 @@ export default async function AssessmentResultsPage({
     notFound();
   }
 
-  await finalizeStaleAttempts(20);
+  await maybeFinalizeStaleAttempts(20);
   const result = await listAssessmentAttempts(assessment.id);
 
   return (

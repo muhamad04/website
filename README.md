@@ -112,9 +112,11 @@ only ever see their own grade, their own attempts and their own results.
   randomisation, copy/paste blocking and a disabled context menu while the
   runner is open. Focus loss is counted but never submits on its own, so
   accessibility tools and keyboard navigation are not blocked.
-- `/api/assessments/sweep` runs the idempotent stale-attempt sweep for a
-  scheduler (`CRON_SECRET` bearer token) or a signed-in teacher; student pages
-  also sweep lazily, so a crashed browser is closed even without a cron.
+- `/api/assessments/sweep` exposes the idempotent stale-attempt sweep for
+  manual or future external schedulers (`CRON_SECRET` bearer token) or a
+  signed-in teacher. Vercel Hobby has no minute-level cron, so normal operation
+  relies on the browser signals, the heartbeat, the timer and throttled lazy
+  sweeps on student and teacher pages.
 - `/teacher/assessments/[id]`: builder with sections (create, rename,
   reorder, delete) and questions (create, edit, reorder, delete) plus the
   append-only assessment activity timeline.
@@ -424,7 +426,7 @@ confirmed.
 | `GOOGLE_SHEETS_PRIVATE_KEY`     | Phase 4  | **Server only** | Service-account private key (`\n` escaped) |
 | `GOOGLE_SHEETS_SPREADSHEET_ID`  | Phase 4  | **Server only** | Target spreadsheet |
 | `GOOGLE_SHEETS_SHEET_NAME`      | Phase 4  | **Server only** | Tab name, e.g. `Results` |
-| `CRON_SECRET`                   | Optional | **Server only** | Bearer token for `GET /api/assessments/sweep`; without it the route requires a signed-in teacher/admin |
+| `CRON_SECRET`                   | Optional | **Server only** | Bearer token for manual/external calls to `GET /api/assessments/sweep`; not required on Vercel Hobby, where lazy cleanup and server signals handle stale attempts |
 
 Server secrets are only read in `src/lib/env.server.ts`, which imports
 `server-only`. If a Client Component ever imports it, the build fails.
@@ -775,22 +777,18 @@ Phase 6 checks on a hosted or local project:
 The service-role key must never be added with a `NEXT_PUBLIC_` prefix and must
 never be used in browser code.
 
-### Vercel Cron for the stale-attempt sweep
+### Stale-attempt cleanup on Vercel Hobby
 
-`vercel.json` schedules `GET /api/assessments/sweep` every minute. The route is
-protected by the server-only `CRON_SECRET` bearer token; Vercel sends it
-automatically when the variable is configured:
+Vercel Hobby does not support minute-level cron schedules, so this project does
+not ship a `vercel.json` cron. Automatic submission is handled by the assessment
+server signals (tab hidden, navigation, page unload, connection loss), the
+server-side heartbeat and timer, and throttled lazy cleanup when student and
+teacher pages load. No paid plan or scheduled job is required.
 
-1. In Vercel, open **Project Settings → Environment Variables**.
-2. Add `CRON_SECRET` with a long random value and apply it to the **Production**
-   environment. Never prefix it with `NEXT_PUBLIC_`.
-3. Redeploy the project so the route can read the new variable.
-4. Vercel calls `/api/assessments/sweep` on the schedule in `vercel.json`. The
-   sweep is idempotent, so retries and overlapping runs cannot duplicate
-   finalization or audit events.
-
-Without `CRON_SECRET`, the route falls back to a signed-in teacher/admin session
-and is not callable by Vercel Cron.
+`GET /api/assessments/sweep` remains available for manual maintenance or a
+future external scheduler. It still accepts the server-only `CRON_SECRET` bearer
+token, or a signed-in teacher/admin session when the secret is absent. Setting
+`CRON_SECRET` is optional and is not part of the Vercel Hobby deployment.
 
 ---
 

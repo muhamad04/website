@@ -23,10 +23,8 @@ import {
 } from "@/components/assessments/assessment-actions";
 import { requireStudent } from "@/lib/auth/dal";
 import { listStudentAssessments } from "@/lib/data/assessments";
-import {
-  finalizeAttempt,
-  finalizeStaleAttempts,
-} from "@/lib/assessments/finalize";
+import { finalizeAttempt } from "@/lib/assessments/finalize";
+import { maybeFinalizeStaleAttempts } from "@/lib/assessments/lazy-sweep";
 import { buildStartConfirmation } from "@/lib/assessments/strict";
 import { nowMs } from "@/lib/assessments/time";
 import {
@@ -57,7 +55,7 @@ export default async function StudentAssessmentsPage({
   const params = await searchParams;
   const filters = parseStudentAssessmentFilters(params);
 
-  await finalizeStaleAttempts(10);
+  await maybeFinalizeStaleAttempts(10);
   let result = await listStudentAssessments();
 
   // Expired attempts are finalized lazily: there is no scheduled job, so any

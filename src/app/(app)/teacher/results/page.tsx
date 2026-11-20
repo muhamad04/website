@@ -15,6 +15,7 @@ import { Alert } from "@/components/ui/alert";
 import { buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { requireTeacher } from "@/lib/auth/dal";
+import { maybeFinalizeStaleAttempts } from "@/lib/assessments/lazy-sweep";
 import {
   getTeacherResults,
   listReportingOptions,
@@ -40,6 +41,7 @@ export default async function TeacherResultsPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   await requireTeacher();
+  await maybeFinalizeStaleAttempts(25);
   const filters = parseReportFilters(await searchParams);
   const [results, options] = await Promise.all([
     getTeacherResults(filters),

@@ -162,9 +162,11 @@ Strict mode is a server-authoritative policy, not a client trick:
   resume misses its timeout, `attempt_heartbeat` reports `stale`,
   `student_start_attempt` refuses to resume it and
   `finalize_stale_attempts` returns it for idempotent finalisation.
-- The maintenance endpoint `GET /api/assessments/sweep` runs the sweep. Set
-  `CRON_SECRET` and call it with `Authorization: Bearer <secret>`; without a
-  secret it requires a signed-in teacher/admin. Student pages also sweep lazily.
+- The maintenance endpoint `GET /api/assessments/sweep` runs the sweep for
+  manual or external schedulers. Set the optional `CRON_SECRET` and call it with
+  `Authorization: Bearer <secret>`; without a secret it requires a signed-in
+  teacher/admin. Vercel Hobby has no minute-level cron, so student and teacher
+  pages also sweep lazily with a short throttle.
 - Every closed attempt stores one of `student_submitted`, `time_expired`,
   `left_assessment`, `tab_hidden`, `page_unloaded`, `heartbeat_expired` or
   `connection_lost`. Automatic closes append one `attempt_auto_submitted` audit
