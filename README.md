@@ -580,7 +580,7 @@ npm test
 npm run build
 ```
 
-The 296 unit tests cover role routing, login validation, open-redirect
+The unit tests cover role routing, login validation, open-redirect
 protection, student/grade/class validation, student, resource, assessment and
 staff filter parsing, resource, assessment and staff validation, automatic
 grading, answer sanitising, storage-path helpers, YouTube parsing, staff
@@ -774,6 +774,23 @@ Phase 6 checks on a hosted or local project:
 
 The service-role key must never be added with a `NEXT_PUBLIC_` prefix and must
 never be used in browser code.
+
+### Vercel Cron for the stale-attempt sweep
+
+`vercel.json` schedules `GET /api/assessments/sweep` every minute. The route is
+protected by the server-only `CRON_SECRET` bearer token; Vercel sends it
+automatically when the variable is configured:
+
+1. In Vercel, open **Project Settings → Environment Variables**.
+2. Add `CRON_SECRET` with a long random value and apply it to the **Production**
+   environment. Never prefix it with `NEXT_PUBLIC_`.
+3. Redeploy the project so the route can read the new variable.
+4. Vercel calls `/api/assessments/sweep` on the schedule in `vercel.json`. The
+   sweep is idempotent, so retries and overlapping runs cannot duplicate
+   finalization or audit events.
+
+Without `CRON_SECRET`, the route falls back to a signed-in teacher/admin session
+and is not callable by Vercel Cron.
 
 ---
 
