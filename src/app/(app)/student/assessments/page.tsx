@@ -24,6 +24,8 @@ import {
 import { requireStudent } from "@/lib/auth/dal";
 import { listStudentAssessments } from "@/lib/data/assessments";
 import { finalizeAttempt } from "@/lib/assessments/finalize";
+import { maybeFinalizeStaleAttempts } from "@/lib/assessments/lazy-sweep";
+import { buildStartConfirmation } from "@/lib/assessments/strict";
 import { nowMs } from "@/lib/assessments/time";
 import {
   assessmentTypeCopy,
@@ -53,6 +55,7 @@ export default async function StudentAssessmentsPage({
   const params = await searchParams;
   const filters = parseStudentAssessmentFilters(params);
 
+  await maybeFinalizeStaleAttempts(10);
   let result = await listStudentAssessments();
 
   // Expired attempts are finalized lazily: there is no scheduled job, so any
@@ -70,6 +73,7 @@ export default async function StudentAssessmentsPage({
         const outcome = await finalizeAttempt({
           attemptId: row.in_progress_attempt_id,
           studentId: student.id,
+          reason: "time_expired",
         });
 
         if (outcome.ok) {
@@ -367,6 +371,13 @@ export default async function StudentAssessmentsPage({
                       <StartAttemptButton
                         assessmentId={assessment.id}
                         label={assessmentsUi.actions.resume}
+                        confirmation={buildStartConfirmation({
+                          strict: assessment,
+                          timeLimitMinutes: assessment.time_limit_minutes,
+                          maxAttempts: assessment.max_attempts,
+                          attemptsUsed: assessment.attempts_used,
+                          resultsVisibility: assessment.results_visibility,
+                        })}
                       />
                     ) : assessment.result_visible &&
                       assessment.last_attempt_id ? (
@@ -384,6 +395,13 @@ export default async function StudentAssessmentsPage({
                       <StartAttemptButton
                         assessmentId={assessment.id}
                         label={assessmentsUi.actions.start}
+                        confirmation={buildStartConfirmation({
+                          strict: assessment,
+                          timeLimitMinutes: assessment.time_limit_minutes,
+                          maxAttempts: assessment.max_attempts,
+                          attemptsUsed: assessment.attempts_used,
+                          resultsVisibility: assessment.results_visibility,
+                        })}
                       />
                     ) : null}
 

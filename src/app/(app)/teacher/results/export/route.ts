@@ -1,28 +1,13 @@
 import { requireTeacher } from "@/lib/auth/dal";
 import { getTeacherResultsForExport } from "@/lib/data/reporting";
-import { buildCsv, exportFileName, type CsvValue } from "@/lib/reporting/csv";
+import { buildCsv, exportFileName } from "@/lib/reporting/csv";
+import {
+  RESULTS_CSV_HEADERS,
+  resultsCsvRows,
+} from "@/lib/reporting/results-csv";
 import { parseReportFilters } from "@/lib/reporting/filters";
 
 export const dynamic = "force-dynamic";
-
-const HEADERS = [
-  "Submission ID",
-  "Student ID",
-  "Student name",
-  "Grade",
-  "Class",
-  "Assessment",
-  "Assessment type",
-  "Attempt",
-  "Submitted at",
-  "Score",
-  "Maximum score",
-  "Percentage",
-  "Grading mode",
-  "Result status",
-  "Manual review",
-  "Result visibility",
-];
 
 /**
  * Teacher-only CSV export. The route re-checks the session (never trusts the
@@ -47,26 +32,9 @@ export async function GET(request: Request): Promise<Response> {
     });
   }
 
-  const rows: CsvValue[][] = result.rows.map((attempt) => [
-    attempt.id,
-    attempt.student?.student_number ?? attempt.student_id,
-    attempt.student?.full_name_en ?? "",
-    attempt.student?.grade?.name_en ?? "",
-    attempt.student?.class?.name_en ?? "",
-    attempt.assessment?.title_en ?? "",
-    attempt.assessment?.type ?? "",
-    attempt.attempt_number,
-    attempt.submitted_at ?? "",
-    attempt.score,
-    attempt.max_score,
-    attempt.percentage,
-    attempt.assessment?.grading_mode ?? "",
-    attempt.status,
-    attempt.manual_review_status,
-    attempt.assessment?.results_visibility ?? "",
-  ]);
+  const rows = resultsCsvRows(result.rows);
 
-  return new Response(buildCsv(HEADERS, rows), {
+  return new Response(buildCsv(RESULTS_CSV_HEADERS, rows), {
     status: 200,
     headers: {
       "content-type": "text/csv; charset=utf-8",

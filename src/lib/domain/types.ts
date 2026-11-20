@@ -219,6 +219,24 @@ export type QuestionType =
   | "rewrite"
   | "find_the_mistake";
 export type ManualReviewStatus = "not_required" | "pending" | "completed";
+export type SubmissionReason =
+  | "student_submitted"
+  | "time_expired"
+  | "left_assessment"
+  | "tab_hidden"
+  | "page_unloaded"
+  | "heartbeat_expired"
+  | "connection_lost";
+
+export type StrictExamSettings = {
+  strict_exam_mode: boolean;
+  submit_on_tab_hidden: boolean;
+  submit_on_navigation: boolean;
+  heartbeat_timeout_seconds: number;
+  allow_resume_after_connection_loss: boolean;
+  randomize_question_order: boolean;
+  randomize_option_order: boolean;
+};
 
 /** Answer key shapes stored in questions.correct_answer. */
 export type TrueFalseAnswer = { value: boolean };
@@ -300,7 +318,7 @@ export type AssessmentRecord = {
   created_at: string;
   updated_at: string;
   grade: GradeSummary | null;
-};
+} & StrictExamSettings;
 
 export type AssessmentDetail = AssessmentRecord & {
   sections: AssessmentSectionRecord[];
@@ -323,6 +341,7 @@ export type AssessmentAdminAction =
   | "question_deleted"
   | "questions_reordered"
   | "attempt_graded"
+  | "attempt_auto_submitted"
   | "import_started"
   | "import_draft_created"
   | "import_draft_edited"
@@ -368,7 +387,7 @@ export type StudentAssessmentOverview = {
   last_percentage: number | null;
   result_visible: boolean;
   manual_review_status: ManualReviewStatus | null;
-};
+} & StrictExamSettings;
 
 /** One question inside a sanitized student attempt payload. */
 export type StudentQuestion = {
@@ -421,7 +440,7 @@ export type StudentAttemptPayload = {
     allow_retakes: boolean;
     max_attempts: number;
     results_visibility: ResultsVisibility;
-  };
+  } & StrictExamSettings;
   attempt: {
     id: string;
     number: number;
@@ -494,6 +513,11 @@ export type AssessmentAttemptRow = {
   max_score: number | null;
   percentage: number | null;
   manual_review_status: ManualReviewStatus;
+  submission_reason: SubmissionReason | null;
+  last_heartbeat_at: string | null;
+  tab_hidden_count: number;
+  focus_loss_count: number;
+  signal_count: number;
   student: {
     id: string;
     full_name_en: string;

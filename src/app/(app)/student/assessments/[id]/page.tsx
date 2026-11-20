@@ -21,6 +21,7 @@ import { requireStudent } from "@/lib/auth/dal";
 import { getStudentAssessmentOverviewRow } from "@/lib/data/assessments";
 import { finalizeAttempt } from "@/lib/assessments/finalize";
 import { nowMs } from "@/lib/assessments/time";
+import { buildStartConfirmation } from "@/lib/assessments/strict";
 import {
   assessmentTypeCopy,
   assessmentsUi,
@@ -92,6 +93,13 @@ export default async function StudentAssessmentIntroPage({
     assessment.max_attempts - assessment.attempts_used,
   );
   const canStart = !notOpen && !closed && attemptsLeft > 0;
+  const confirmation = buildStartConfirmation({
+    strict: assessment,
+    timeLimitMinutes: assessment.time_limit_minutes,
+    maxAttempts: assessment.max_attempts,
+    attemptsUsed: assessment.attempts_used,
+    resultsVisibility: assessment.results_visibility,
+  });
 
   return (
     <div className="space-y-5">
@@ -153,6 +161,15 @@ export default async function StudentAssessmentIntroPage({
           <Bi
             en={`${assessmentsUi.student.closed.en} ${formatAdminDateTime(assessment.available_until)}`}
             ar={`${assessmentsUi.student.closed.ar} ${formatAdminDateTime(assessment.available_until)}`}
+          />
+        </Alert>
+      ) : null}
+
+      {assessment.strict_exam_mode ? (
+        <Alert variant="error">
+          <Bi
+            en={assessmentsUi.strict.warning.en}
+            ar={assessmentsUi.strict.warning.ar}
           />
         </Alert>
       ) : null}
@@ -266,6 +283,7 @@ export default async function StudentAssessmentIntroPage({
             <StartAttemptButton
               assessmentId={assessment.id}
               label={assessmentsUi.actions.start}
+              confirmation={confirmation}
             />
           ) : assessment.result_visible && assessment.last_attempt_id ? (
             <Link

@@ -97,8 +97,26 @@ only ever see their own grade, their own attempts and their own results.
 - `/teacher/assessments/new` and `/teacher/assessments/[id]/edit`: bilingual
   title and instructions, grade, quiz/exam type, 1–600 minute limit, results
   visibility (`immediately`, `after_review`, `hidden`), grading mode
-  (`automatic`, `manual`, `mixed`), retakes (exams default to none) and an
-  optional availability window.
+  (`automatic`, `manual`, `mixed`), retakes (exams default to none), an optional
+  availability window and Strict Exam Mode settings.
+- Strict Exam Mode (on by default for exams, optional for quizzes): leaving the
+  page, switching tabs, hiding the window or closing the page can submit the
+  attempt automatically; a configurable 15–600 second server heartbeat closes
+  attempts whose browser stopped reporting. Every attempt stores a submission
+  reason, and teachers see the reason plus tab-hidden/focus-loss counts in
+  results and the CSV export. Automatic closes append an
+  `attempt_auto_submitted` audit event. The pre-start confirmation states the
+  rules, and the UI/docs state clearly that this cannot prevent every kind of
+  cheating (a student may use another device).
+- Strict options also include deterministic per-attempt question and MCQ option
+  randomisation, copy/paste blocking and a disabled context menu while the
+  runner is open. Focus loss is counted but never submits on its own, so
+  accessibility tools and keyboard navigation are not blocked.
+- `/api/assessments/sweep` exposes the idempotent stale-attempt sweep for
+  manual or future external schedulers (`CRON_SECRET` bearer token) or a
+  signed-in teacher. Vercel Hobby has no minute-level cron, so normal operation
+  relies on the browser signals, the heartbeat, the timer and throttled lazy
+  sweeps on student and teacher pages.
 - `/teacher/assessments/[id]`: builder with sections (create, rename,
   reorder, delete) and questions (create, edit, reorder, delete) plus the
   append-only assessment activity timeline.
@@ -110,25 +128,28 @@ only ever see their own grade, their own attempts and their own results.
   no key or explanation is ever included in the student runner or result
   payloads.
 - `/teacher/assessments/[id]/results`: every attempt with status, score,
-  percentage, submission time and manual-review state.
+  percentage, submission time, submission reason, suspicious-event counts and
+  manual-review state.
 - `/teacher/assessments/[id]/results/[attemptId]`: manual grading for essay,
   file-upload and manual questions, with marks and bilingual feedback.
 - `/student/assessments`: only published assessments for the profile's grade,
   type/completed filters, retake counts and result-availability badges.
 - `/student/assessments/[id]`: rules, timer, availability and retake status
-  before starting. Starting creates a server-timed attempt; resuming reuses the
-  open one.
+  before starting, plus a confirmation screen that lists the time limit, allowed
+  attempts, whether leaving submits the attempt and when results appear.
+  Starting creates a server-timed attempt; resuming reuses the open one.
 - `/student/assessments/[id]/attempt/[attemptId]`: timed runner with autosaved
-  answers, file uploads to `assessment-submissions`, a live countdown and
-  automatic submission when the timer reaches zero.
+  answers, file uploads to `assessment-submissions`, a live countdown, an
+  automatic submit at zero and strict-mode signals plus heartbeat.
 - `/student/assessments/[id]/attempt/[attemptId]/result`: visible results with
   per-question marks, feedback and submitted files; hidden results never expose
   the score, answers or feedback.
-- Server-side enforcement: retakes, availability, grade, timer expiry and
-  attempt ownership are checked in SQL functions and integrity triggers, not in
-  the browser. Autosave writes are cut off the moment the timer expires.
-- Every authoring, publish and grading action is written to the append-only
-  `assessment_admin_events` table.
+- Server-side enforcement: retakes, availability, grade, timer expiry, heartbeat
+  staleness and attempt ownership are checked in SQL functions and integrity
+  triggers, not in the browser. Autosave writes are cut off the moment the timer
+  expires or the attempt is submitted, including automatic submission.
+- Every authoring, publish, grading and automatic-submission action is written
+  to the append-only `assessment_admin_events` table.
 
 ## What works in Phase 4 — reporting and Google Sheets
 
@@ -139,12 +160,13 @@ only ever see their own grade, their own attempts and their own results.
   student, assessment, quiz/exam, date range and grading status. Filters are
   plain shareable GET URLs and are re-validated on every request.
 - `/teacher/results`: paginated attempts table (student name and ID, grade and
-  class, assessment title and type, submission time, score and percentage,
-  grading state, result visibility, manual-review state, detail link) with a
-  responsive card layout on small screens.
+  class, assessment title and type, submission time and reason, suspicious-event
+  counts, score and percentage, grading state, result visibility, manual-review
+  state, detail link) with a responsive card layout on small screens.
 - `/teacher/results/export`: teacher-only CSV export that reuses the current
-  filters, handles RFC 4180 quoting, neutralises spreadsheet formula injection
-  and caps the export at 5,000 rows.
+  filters, includes the submission reason and suspicious-event counts, handles
+  RFC 4180 quoting, neutralises spreadsheet formula injection and caps the export
+  at 5,000 rows.
 - `/student`: grade and class, published resources and assessments for the
   student's own grade, completed/pending/in-progress counts, visible scores
   only, pending manual review, teacher feedback and recent activity. Hidden
@@ -404,6 +426,7 @@ confirmed.
 | `GOOGLE_SHEETS_PRIVATE_KEY`     | Phase 4  | **Server only** | Service-account private key (`\n` escaped) |
 | `GOOGLE_SHEETS_SPREADSHEET_ID`  | Phase 4  | **Server only** | Target spreadsheet |
 | `GOOGLE_SHEETS_SHEET_NAME`      | Phase 4  | **Server only** | Tab name, e.g. `Results` |
+| `CRON_SECRET`                   | Optional | **Server only** | Bearer token for manual/external calls to `GET /api/assessments/sweep`; not required on Vercel Hobby, where lazy cleanup and server signals handle stale attempts |
 
 Server secrets are only read in `src/lib/env.server.ts`, which imports
 `server-only`. If a Client Component ever imports it, the build fails.
@@ -559,7 +582,7 @@ npm test
 npm run build
 ```
 
-The 296 unit tests cover role routing, login validation, open-redirect
+The unit tests cover role routing, login validation, open-redirect
 protection, student/grade/class validation, student, resource, assessment and
 staff filter parsing, resource, assessment and staff validation, automatic
 grading, answer sanitising, storage-path helpers, YouTube parsing, staff
@@ -581,9 +604,12 @@ npm run verify:rls:hosted
 It reads `.env.local` and needs the service-role key, so it only belongs on a
 developer machine — never in a deployed environment. Its checks cover anonymous
 denial, grade isolation, answer-key and question-table protection, cross-student
-attempt/answer/submission access, resume and retake rules, timer expiry,
-automatic and manual grading, visibility of `immediately` / `after_review` /
-`hidden` results, the append-only audit logs, submission storage, staff
+attempt/answer/submission access, resume and retake rules, timer expiry, strict
+exam defaults, heartbeat ownership/counters, stale-heartbeat detection, automatic
+submission reasons, one audit event per automatic close, duplicate-finalisation
+idempotency, answer lockout after finalisation, seeded randomisation, automatic
+and manual grading, visibility of `immediately` / `after_review` / `hidden`
+results, the append-only audit logs, submission storage, staff
 audit/self-protection rules, assessment-import staging (staff-only RLS,
 owner-scoped rows, immutable owner, folder-bound paths, private bucket and the
 four import audit actions) and cleanup of every row, audit event and temporary
@@ -750,6 +776,19 @@ Phase 6 checks on a hosted or local project:
 
 The service-role key must never be added with a `NEXT_PUBLIC_` prefix and must
 never be used in browser code.
+
+### Stale-attempt cleanup on Vercel Hobby
+
+Vercel Hobby does not support minute-level cron schedules, so this project does
+not ship a `vercel.json` cron. Automatic submission is handled by the assessment
+server signals (tab hidden, navigation, page unload, connection loss), the
+server-side heartbeat and timer, and throttled lazy cleanup when student and
+teacher pages load. No paid plan or scheduled job is required.
+
+`GET /api/assessments/sweep` remains available for manual maintenance or a
+future external scheduler. It still accepts the server-only `CRON_SECRET` bearer
+token, or a signed-in teacher/admin session when the secret is absent. Setting
+`CRON_SECRET` is optional and is not part of the Vercel Hobby deployment.
 
 ---
 

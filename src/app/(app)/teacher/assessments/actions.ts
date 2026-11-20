@@ -31,6 +31,7 @@ import {
   type AssessmentErrorCode,
 } from "@/lib/validation/assessments";
 import { requestAttemptSync } from "@/lib/reporting/sync";
+import { resolveStrictSettings } from "@/lib/assessments/strict";
 
 /**
  * Assessment authoring actions. Every entry point begins with requireTeacher(),
@@ -124,6 +125,7 @@ export async function createAssessmentAction(
   }
 
   const supabase = await createClient();
+  const strictSettings = resolveStrictSettings(data.type, data);
   const { data: created, error } = await supabase
     .from("assessments")
     .insert({
@@ -141,6 +143,7 @@ export async function createAssessmentAction(
       available_from: data.available_from ?? null,
       available_until: data.available_until ?? null,
       is_published: data.is_published,
+      ...strictSettings,
       created_by: staff.id,
     })
     .select("id")
@@ -187,6 +190,7 @@ export async function updateAssessmentAction(
   }
 
   const supabase = await createClient();
+  const strictSettings = resolveStrictSettings(data.type, data);
   const { error } = await supabase
     .from("assessments")
     .update({
@@ -204,6 +208,7 @@ export async function updateAssessmentAction(
       available_from: data.available_from ?? null,
       available_until: data.available_until ?? null,
       is_published: data.is_published,
+      ...strictSettings,
     })
     .eq("id", data.assessment_id);
 
