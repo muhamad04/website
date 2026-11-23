@@ -165,6 +165,8 @@ describe("question paper parsing", () => {
       warningCount: 0,
       matchedAnswers: 6,
       unmatchedAnswers: 0,
+      reviewCount: 0,
+      parserConfidence: 0.88,
     });
   });
 

@@ -24,6 +24,7 @@ export const IMPORT_ERROR_CODES = [
   "file_type_invalid",
   "file_too_large",
   "file_empty",
+  "file_name_invalid",
   "no_text_extracted",
   "parse_failed",
   "grade_required",
@@ -32,6 +33,8 @@ export const IMPORT_ERROR_CODES = [
   "upload_failed",
   "storage_failed",
   "service_unavailable",
+  "ai_disabled",
+  "ai_limit_reached",
   "save_failed",
   "unknown",
 ] as const;
@@ -44,6 +47,25 @@ export type ImportActionResult = {
   fieldErrors?: FieldErrors;
   importId?: string;
   assessmentId?: string;
+};
+
+export type ImportSignedUploadDescriptor = {
+  role: "questions" | "answers";
+  path: string;
+  token: string;
+  signedUrl: string;
+  fileName: string;
+};
+
+export type ImportUploadInitResult = ImportActionResult & {
+  uploads?: ImportSignedUploadDescriptor[];
+  maxBytes?: number;
+  maxTotalBytes?: number;
+};
+
+export type ImportAiRouteResult = ImportActionResult & {
+  ai?: import("@/lib/import/types").ImportAiState;
+  remainingRequests?: number;
 };
 
 const optionalText = (max: number, error = "validation_failed") =>
@@ -93,6 +115,73 @@ export const importUploadMetaSchema = z.object({
 });
 
 export type ImportUploadMeta = z.infer<typeof importUploadMetaSchema>;
+
+export const importUploadFileSchema = z.object({
+  role: z.enum(["questions", "answers"]),
+  name: z.string().trim().min(1, { error: "file_required" }).max(240),
+  size: z.coerce
+    .number({ error: "file_required" })
+    .int()
+    .min(1, { error: "file_empty" })
+    .max(200 * 1024 * 1024, { error: "file_too_large" }),
+  type: z.string().trim().min(1, { error: "file_type_invalid" }).max(160),
+});
+
+export type ImportUploadFileInput = z.infer<typeof importUploadFileSchema>;
+
+const uploadFilesShape = {
+  files: z
+    .array(importUploadFileSchema)
+    .min(1, { error: "file_required" })
+    .max(2, { error: "validation_failed" }),
+};
+
+function refineUploadRoles(
+  value: { files: ImportUploadFileInput[] },
+  ctx: {
+    addIssue: (issue: {
+      code: "custom";
+      path: Array<string | number>;
+      message: string;
+    }) => void;
+  },
+): void {
+  const questions = value.files.filter((file) => file.role === "questions");
+  const answers = value.files.filter((file) => file.role === "answers");
+
+  if (questions.length !== 1) {
+    ctx.addIssue({ code: "custom", path: ["files"], message: "file_required" });
+  }
+
+  if (answers.length > 1) {
+    ctx.addIssue({ code: "custom", path: ["files"], message: "validation_failed" });
+  }
+}
+
+export const importUploadInitSchema = z
+  .object({
+    grade_id: z.uuid({ error: "grade_required" }),
+    type: z.enum(["quiz", "exam"], { error: "type_invalid" }).default("quiz"),
+    title_en: optionalText(200, "title_too_long"),
+    ...uploadFilesShape,
+  })
+  .superRefine(refineUploadRoles);
+
+export type ImportUploadInitInput = z.infer<typeof importUploadInitSchema>;
+
+export const importUploadFinalizeSchema = z
+  .object({
+    import_id: z.uuid({ error: "validation_failed" }),
+    grade_id: z.uuid({ error: "grade_required" }),
+    type: z.enum(["quiz", "exam"], { error: "type_invalid" }).default("quiz"),
+    title_en: optionalText(200, "title_too_long"),
+    ...uploadFilesShape,
+  })
+  .superRefine(refineUploadRoles);
+
+export type ImportUploadFinalizeInput = z.infer<
+  typeof importUploadFinalizeSchema
+>;
 
 export const importIdSchema = z.object({
   import_id: z.uuid({ error: "validation_failed" }),
@@ -193,6 +282,9 @@ export const importQuestionSchema = z
         error: "question_marks_invalid",
       }),
     confidence: z.enum(["high", "medium", "low"]).default("medium"),
+    confidenceScore: z.coerce.number().min(0).max(1).default(0.5),
+    evidence: z.array(z.string().trim().max(120)).max(12).default([]),
+    reviewed: z.boolean().default(false),
     gradingMethod: z.enum(["automatic", "manual"], {
       error: "grading_method_invalid",
     }),
@@ -289,15 +381,29 @@ export const importSectionSchema = z.object({
   titleEn: requiredText(200, "section_title_required"),
   titleAr: optionalText(200),
   instructionsEn: optionalText(2000),
+  marks: z.coerce.number().min(0).max(1000).nullable().optional(),
   questions: z.array(importQuestionSchema).max(200).default([]),
 });
 
 export type ImportSectionInput = z.infer<typeof importSectionSchema>;
 
+export const importAiDecisionSchema = z.object({
+  id: z.string().trim().min(1).max(200),
+  status: z.enum(["accepted", "rejected"]),
+});
+
+export type ImportAiDecision = z.infer<typeof importAiDecisionSchema>;
+
 export const updateImportDraftSchema = z.object({
   import_id: z.uuid({ error: "validation_failed" }),
   settings: importSettingsSchema,
   sections: z.array(importSectionSchema).max(50).default([]),
+  /**
+   * Only the accept/reject decisions are accepted from the browser. The route
+   * keeps the stored model and request count so a client cannot reset the
+   * per-import AI budget.
+   */
+  ai_decisions: z.array(importAiDecisionSchema).max(200).optional(),
 });
 
 export type UpdateImportDraftInput = z.infer<typeof updateImportDraftSchema>;
@@ -317,6 +423,32 @@ export const saveImportSchema = z.object({
 });
 
 export type SaveImportInput = z.infer<typeof saveImportSchema>;
+
+export const importAiOptionSchema = z.object({
+  text: z.string().trim().min(1).max(500),
+  correct: z.boolean().default(false),
+});
+
+export const importAiSuggestionSchema = z.object({
+  question_number: z
+    .union([z.string(), z.number()])
+    .transform((value) => String(value).trim()),
+  type: z.enum(QUESTION_TYPES),
+  prompt: z.string().trim().max(4000).optional(),
+  marks: z.coerce.number().min(0.01).max(100).optional(),
+  options: z.array(importAiOptionSchema).max(10).optional(),
+  correct_value: z.enum(["true", "false"]).nullable().optional(),
+  accepted: z.array(z.string().trim().min(1).max(500)).max(20).optional(),
+  explanation: z.string().trim().max(2000).optional(),
+  reason: z.string().trim().max(300).optional(),
+});
+
+export const importAiResponseSchema = z.object({
+  suggestions: z.array(importAiSuggestionSchema).max(200).default([]),
+  warnings: z.array(z.string().trim().max(160)).max(20).default([]),
+});
+
+export type ImportAiResponse = z.infer<typeof importAiResponseSchema>;
 
 export { fieldErrorsFrom };
 export type { FieldErrors };

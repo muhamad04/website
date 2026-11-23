@@ -12,8 +12,8 @@ export const importsUi = {
   eyebrow: bi("Assessment centre", "مركز الاختبارات"),
   title: bi("Import an assessment", "استيراد اختبار"),
   subtitle: bi(
-    "Upload a typed DOCX, text PDF or plain-text paper. Parsing runs on this server with free, local libraries; nothing is sent to an external AI service.",
-    "ارفع ورقة مكتوبة بصيغة DOCX أو PDF نصي أو نص عادي. تتم المعالجة على هذا الخادم بمكتبات محلية مجانية، ولا يُرسل أي محتوى إلى خدمة ذكاء اصطناعي خارجية.",
+    "Upload a typed DOCX, text PDF or plain-text paper. Parsing runs on this server with free, local libraries. Optional AI help is off by default and never replaces your review.",
+    "ارفع ورقة مكتوبة بصيغة DOCX أو PDF نصي أو نص عادي. تتم المعالجة على هذا الخادم بمكتبات محلية مجانية. مساعدة الذكاء الاصطناعي الاختيارية معطلة افتراضيًا ولا تحل محل مراجعتك.",
   ),
   common: {
     backToAssessments: bi("Back to assessments", "العودة إلى الاختبارات"),
@@ -40,16 +40,16 @@ export const importsUi = {
     optional: bi("Optional", "اختياري"),
     chooseFile: bi("Choose a file", "اختر ملفًا"),
     questionFileHint: bi(
-      "DOCX, text-based PDF or TXT. Up to 4 MB.",
-      "DOCX أو PDF نصي أو TXT. بحد أقصى 4 ميجابايت.",
+      "DOCX, text-based PDF or TXT. The size limit is shown below.",
+      "DOCX أو PDF نصي أو TXT. يظهر حد الحجم أدناه.",
     ),
     answerFileHint: bi(
-      "DOCX, text-based PDF or TXT. Up to 4 MB. Never shown to students.",
-      "DOCX أو PDF نصي أو TXT. بحد أقصى 4 ميجابايت. لا يظهر للطلاب إطلاقًا.",
+      "DOCX, text-based PDF or TXT. Never shown to students.",
+      "DOCX أو PDF نصي أو TXT. لا يظهر للطلاب إطلاقًا.",
     ),
     limits: bi(
-      "Limits: 4 MB per file, 8 MB total, and 200,000 extracted characters. Image-only PDFs need OCR and are not supported in this version.",
-      "الحدود: 4 ميجابايت لكل ملف، و8 ميجابايت إجمالًا، و200000 حرف مستخرج. ملفات PDF المصورة تحتاج OCR وغير مدعومة في هذه النسخة.",
+      "Files upload directly to private storage, so large papers are supported. Image-only PDFs need OCR and are not supported in this version.",
+      "تُرفع الملفات مباشرة إلى تخزين خاص، لذا تُدعم الأوراق الكبيرة. ملفات PDF المصورة تحتاج OCR وغير مدعومة في هذه النسخة.",
     ),
     privacy: bi(
       "Files go to a private temporary folder, are deleted when you save or cancel, and expire automatically after 24 hours.",
@@ -61,6 +61,17 @@ export const importsUi = {
     ),
     submit: bi("Extract and review", "استخراج ومراجعة"),
     submitting: bi("Extracting", "جارٍ الاستخراج"),
+    preparing: bi("Preparing a secure upload", "جارٍ تجهيز رفع آمن"),
+    uploading: bi("Uploading files", "جارٍ رفع الملفات"),
+    processing: bi("Parsing on the server", "جارٍ التحليل على الخادم"),
+    progressLabel: bi("Upload progress", "تقدم الرفع"),
+    maxFile: bi("Maximum per file", "الحد الأقصى لكل ملف"),
+    totalMax: bi("Maximum total", "الحد الأقصى الإجمالي"),
+    selectedSize: bi("Selected size", "الحجم المحدد"),
+    uploadFailed: bi(
+      "The upload did not finish. Nothing was saved; try again.",
+      "لم يكتمل الرفع. لم يُحفظ أي شيء؛ حاول مرة أخرى.",
+    ),
     localOnly: bi("Local processing", "معالجة محلية"),
     recentTitle: bi("Drafts awaiting review", "مسودات بانتظار المراجعة"),
     recentHint: bi(
@@ -213,6 +224,47 @@ export const importsUi = {
     ),
     cancel: bi("Cancel import", "إلغاء الاستيراد"),
     cancelling: bi("Cancelling", "جارٍ الإلغاء"),
+    parserConfidence: bi("Parser confidence", "ثقة المحلل"),
+    reviewCount: bi("Need review", "تحتاج مراجعة"),
+    reviewed: bi("Reviewed", "تمت مراجعته"),
+    notReviewed: bi("Not reviewed", "لم تتم مراجعته"),
+    filters: bi("Filter questions", "تصفية الأسئلة"),
+    filterAll: bi("All", "الكل"),
+    filterReview: bi("Needs review", "تحتاج مراجعة"),
+    filterLow: bi("Low confidence", "ثقة منخفضة"),
+    filterWarnings: bi("Has warnings", "لديها تحذيرات"),
+    noMatchingQuestions: bi(
+      "No questions match this filter.",
+      "لا توجد أسئلة تطابق هذا التصفية.",
+    ),
+    evidence: bi("Detected from", "اكتُشف من"),
+    aiTitle: bi("Optional AI check", "فحص اختياري بالذكاء الاصطناعي"),
+    aiHint: bi(
+      "Sends only question text and choices to an external AI provider. No student names or files are sent. Every change stays pending until you accept it.",
+      "يرسل نص الأسئلة والخيارات فقط إلى مزود ذكاء اصطناعي خارجي. لا تُرسل أسماء طلاب أو ملفات. يبقى كل تغيير معلقًا حتى تقبله.",
+    ),
+    aiRun: bi("Ask AI to check the parse", "اطلب من الذكاء الاصطناعي فحص التحليل"),
+    aiRunning: bi("Checking with AI", "جارٍ الفحص بالذكاء الاصطناعي"),
+    aiDone: bi(
+      "AI check finished. Review each suggestion before accepting it.",
+      "انتهى فحص الذكاء الاصطناعي. راجع كل اقتراح قبل قبوله.",
+    ),
+    aiNoSuggestions: bi(
+      "The AI check found nothing to change.",
+      "لم يجد فحص الذكاء الاصطناعي ما يستدعي التغيير.",
+    ),
+    aiBefore: bi("Current parse", "التحليل الحالي"),
+    aiAfter: bi("Suggested", "المقترح"),
+    aiAccept: bi("Accept", "قبول"),
+    aiReject: bi("Reject", "رفض"),
+    aiAccepted: bi("Accepted", "مقبول"),
+    aiRejected: bi("Rejected", "مرفوض"),
+    aiUnsafe: bi(
+      "This suggestion is incomplete and cannot be applied safely.",
+      "هذا الاقتراح غير مكتمل ولا يمكن تطبيقه بأمان.",
+    ),
+    aiRemaining: bi("AI requests remaining", "طلبات الذكاء الاصطناعي المتبقية"),
+    aiModel: bi("Model", "النموذج"),
   },
   answerStatus: {
     matched: bi("Matched", "مطابق"),
@@ -272,6 +324,30 @@ export const importWarningCopy: Record<ImportWarningCode, Bilingual> = {
   answer_mismatch: bi(
     "The answer text does not match any detected choice. Check the question or type the answer manually.",
     "نص الإجابة لا يطابق أي خيار مستخرج. تحقق من السؤال أو اكتب الإجابة يدويًا.",
+  ),
+  answer_text_mismatch: bi(
+    "The answer key prints a letter and text that disagree. The letter was applied; check the choice.",
+    "يعرض مفتاح الإجابة حرفًا ونصًا متعارضين. طُبّق الحرف؛ تحقق من الخيار.",
+  ),
+  unsupported_question_type: bi(
+    "This question did not match a supported type. Confirm the type before saving.",
+    "لم يطابق هذا السؤال نوعًا مدعومًا. أكّد النوع قبل الحفظ.",
+  ),
+  section_marks_distributed: bi(
+    "The section total does not divide evenly across its questions. Check the marks.",
+    "لا تتوزع درجات القسم بالتساوي على أسئلته. تحقق من الدرجات.",
+  ),
+  ai_partial: bi(
+    "AI suggestions covered only part of the paper. Deterministic results remain for the rest.",
+    "غطّت اقتراحات الذكاء الاصطناعي جزءًا من الورقة فقط. تبقى النتائج المحلية لبقية الأسئلة.",
+  ),
+  ai_invalid_response: bi(
+    "The AI service returned an unusable response. Nothing was changed.",
+    "أعادت خدمة الذكاء الاصطناعي استجابة غير صالحة. لم يتغير شيء.",
+  ),
+  ai_unavailable: bi(
+    "AI assistance is unavailable. The deterministic parse is still complete.",
+    "مساعدة الذكاء الاصطناعي غير متاحة. التحليل المحلي ما زال مكتملًا.",
   ),
   matching_answer_not_applied: bi(
     "This matching answer could not be mapped to every pair. Check the pairs manually.",
@@ -341,8 +417,12 @@ export const importErrorCopy: Record<ImportErrorCode, Bilingual> = {
     "استخدم ملف DOCX أو PDF نصي أو TXT. لا تُدعم ملفات PDF المصورة.",
   ),
   file_too_large: bi(
-    "Each file must be 4 MB or smaller, with 8 MB total.",
-    "يجب أن يكون كل ملف 4 ميجابايت أو أقل، والإجمالي 8 ميجابايت.",
+    "This file is larger than the configured limit.",
+    "حجم هذا الملف يتجاوز الحد المسموح به.",
+  ),
+  file_name_invalid: bi(
+    "That file name is not allowed. Rename it without paths, symbols or an executable extension.",
+    "اسم الملف غير مسموح. أعد تسميته دون مسارات أو رموز أو امتداد تنفيذي.",
   ),
   file_empty: bi(
     "The file is empty.",
@@ -374,6 +454,14 @@ export const importErrorCopy: Record<ImportErrorCode, Bilingual> = {
     "Private storage is not configured on the server.",
     "مساحة التخزين الخاصة غير مهيأة على الخادم.",
   ),
+  ai_disabled: bi(
+    "AI assistance is turned off on this server. The local parser is still available.",
+    "مساعدة الذكاء الاصطناعي معطلة على هذا الخادم. المحلل المحلي ما زال متاحًا.",
+  ),
+  ai_limit_reached: bi(
+    "This import reached its AI request limit. Review the existing suggestions or save the draft.",
+    "وصل هذا الاستيراد إلى حد طلبات الذكاء الاصطناعي. راجع الاقتراحات الحالية أو احفظ المسودة.",
+  ),
   save_failed: bi(
     "The draft assessment could not be saved. No partial assessment was kept.",
     "تعذّر حفظ مسودة الاختبار. لم يُحتفظ بأي اختبار جزئي.",
@@ -383,3 +471,30 @@ export const importErrorCopy: Record<ImportErrorCode, Bilingual> = {
     "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
   ),
 };
+
+/** Human-readable MiB label, e.g. 50 MB. */
+export function formatImportBytes(bytes: number): string {
+  const mb = bytes / (1024 * 1024);
+  const rounded = mb >= 10 ? Math.round(mb) : Math.round(mb * 10) / 10;
+  return `${rounded} MB`;
+}
+
+/** Bilingual, size-aware message used by the upload form and server errors. */
+export function importFileTooLargeCopy(maxBytes: number): Bilingual {
+  const size = formatImportBytes(maxBytes);
+
+  return bi(
+    `Each file must be ${size} or smaller.`,
+    `يجب أن يكون حجم كل ملف ${size} أو أقل.`,
+  );
+}
+
+/** Total-request limit message for a two-file upload. */
+export function importTotalTooLargeCopy(maxTotalBytes: number): Bilingual {
+  const size = formatImportBytes(maxTotalBytes);
+
+  return bi(
+    `The files together must be ${size} or smaller.`,
+    `يجب أن يكون مجموع الملفات ${size} أو أقل.`,
+  );
+}

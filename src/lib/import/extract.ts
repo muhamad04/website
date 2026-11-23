@@ -50,6 +50,7 @@ export async function extractImportFile(input: {
   fileName: string;
   mimeType: string;
   bytes: Uint8Array;
+  maxBytes?: number;
 }): Promise<ImportExtractResult> {
   const kind = detectImportFileKind(input);
 

@@ -21,15 +21,21 @@ export const IMPORT_WARNING_CODES = [
   "duplicate_answer_number",
   "ambiguous_answer",
   "answer_mismatch",
+  "answer_text_mismatch",
   "matching_answer_not_applied",
   "manual_type_answer_ignored",
   "low_confidence_type",
+  "unsupported_question_type",
   "multiple_choice_missing_options",
   "matching_incomplete",
   "marks_defaulted",
+  "section_marks_distributed",
   "answer_key_in_question_file",
   "text_truncated",
   "file_empty",
+  "ai_partial",
+  "ai_invalid_response",
+  "ai_unavailable",
 ] as const;
 
 export type ImportWarningCode = (typeof IMPORT_WARNING_CODES)[number];
@@ -64,6 +70,10 @@ export type ImportQuestionDraft = {
   marks: number;
   /** `false` only when the parser could not infer a type confidently. */
   confidence: ImportConfidence;
+  /** 0–1 score behind the confidence label. */
+  confidenceScore?: number;
+  /** Short, human-readable evidence used by the detector. */
+  evidence?: string[];
   gradingMethod: GradingMethod;
   options: ImportOptionDraft[];
   pairs: ImportPairDraft[];
@@ -73,6 +83,8 @@ export type ImportQuestionDraft = {
   warnings: ImportWarningCode[];
   /** Original block, shown on the review screen for verification. */
   raw: string;
+  /** Set by the teacher in the review editor. */
+  reviewed?: boolean;
 };
 
 export type ImportSectionDraft = {
@@ -80,6 +92,8 @@ export type ImportSectionDraft = {
   titleEn: string;
   titleAr: string;
   instructionsEn: string;
+  /** Section-level marks printed in the heading, when clearly specified. */
+  marks?: number | null;
   questions: ImportQuestionDraft[];
 };
 
@@ -94,10 +108,44 @@ export type ImportAnswerEntry = {
   number: string;
   raw: string;
   answers: string[];
+  /** Detected letter, when the key prints one. */
+  letter: string | null;
+  /** Text printed after the letter, when present. */
+  answerText: string | null;
   status: ImportAnswerStatus;
   questionKey?: string;
   questionNumber?: string;
   warnings: ImportWarningCode[];
+};
+
+export type ImportAiQuestionSnapshot = {
+  type: QuestionType;
+  promptEn: string;
+  marks: number;
+  options: ImportOptionDraft[];
+  correctValue: "true" | "false" | null;
+  accepted: string[];
+  explanationEn: string;
+};
+
+export type ImportAiSuggestion = {
+  id: string;
+  questionKey: string;
+  sourceNumber: string;
+  before: ImportAiQuestionSnapshot;
+  after: ImportAiQuestionSnapshot;
+  safe: boolean;
+  status: "pending" | "accepted" | "rejected";
+  reason: string;
+};
+
+export type ImportAiState = {
+  status: "idle" | "running" | "completed" | "failed" | "partial";
+  model: string;
+  requestCount: number;
+  suggestions: ImportAiSuggestion[];
+  warnings: ImportWarningCode[];
+  completedAt: string | null;
 };
 
 /** Assessment-level settings chosen or confirmed by the teacher. */
@@ -123,6 +171,7 @@ export type ImportDraft = {
   warnings: ImportWarning[];
   sourceText: string;
   answerText: string;
+  ai?: ImportAiState;
   stats: {
     sectionCount: number;
     questionCount: number;
@@ -130,6 +179,10 @@ export type ImportDraft = {
     warningCount: number;
     matchedAnswers: number;
     unmatchedAnswers: number;
+    /** Questions the teacher still needs to check. */
+    reviewCount: number;
+    /** 0–1 confidence in the deterministic parse. */
+    parserConfidence: number;
   };
 };
 

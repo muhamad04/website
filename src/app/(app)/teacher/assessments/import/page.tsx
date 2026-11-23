@@ -11,6 +11,7 @@ import { requireTeacher } from "@/lib/auth/dal";
 import { listRecentImportDrafts } from "@/lib/data/imports";
 import { listGradeOptions } from "@/lib/data/students";
 import { cleanupExpiredImports } from "@/lib/import/cleanup";
+import { getImportMaxBytes, getImportMaxTotalBytes } from "@/lib/import/config";
 import { importsUi } from "@/lib/i18n/imports";
 import { formatAdminDateTime } from "@/lib/students/format";
 import { cn } from "@/lib/utils";
@@ -69,7 +70,11 @@ export default async function AssessmentImportPage() {
           </p>
         </div>
 
-        <ImportUploadForm grades={grades} />
+        <ImportUploadForm
+          grades={grades}
+          maxBytes={getImportMaxBytes()}
+          maxTotalBytes={getImportMaxTotalBytes()}
+        />
       </section>
 
       <section className="space-y-3">

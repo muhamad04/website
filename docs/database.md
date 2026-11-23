@@ -21,6 +21,7 @@ The schema lives in `supabase/migrations/` and is applied in filename order.
 | `20261116140000_staff_management.sql` | Staff audit log, admin-only RLS and the last-admin / self-protection trigger |
 | `20261116150000_assessment_import.sql` | Private assessment-import staging table, owner/path guard trigger, private `assessment-imports` bucket and four import audit actions |
 | `20261119120000_strict_exam_mode.sql` | Strict exam settings, submission reasons, heartbeat/suspicious-event counters, stale-attempt sweep, seeded question/option randomisation and the `attempt_auto_submitted` audit action |
+| `20261123120000_assessment_import_50mb.sql` | Raises the private `assessment-imports` bucket limit to 50 MiB and pins the allowed import MIME types. No table, policy or auth changes; apply only with explicit approval |
 
 ## Tables
 
@@ -328,9 +329,16 @@ client before inserting the row. Viewers receive short-lived signed URLs created
 with the signed-in user's session, so Storage RLS still applies.
 
 The `assessment-imports` bucket is private and much stricter: only PDF,
-`text/plain` and DOCX are allowed, each file is capped at 4 MB, and both the
-application and the storage bucket reject anything else. Objects live under the
-uploading staff member's UUID, and the storage policy only permits that folder
+`text/plain` and DOCX are allowed. Each file is capped at 50 MiB
+(`ASSESSMENT_IMPORT_MAX_BYTES=52428800`) and the bucket enforces the same
+backstop through `20261123120000_assessment_import_50mb.sql` (apply with
+explicit approval); both the application and Storage reject anything else.
+Uploads never pass through a Vercel Function body: the browser asks
+`/teacher/assessments/import/upload/init` for short-lived signed upload URLs,
+uploads directly, and `/upload/finalize` verifies ownership and the object's
+real size before downloading once for parsing. `/upload/abort` removes an
+abandoned folder. Objects live under the uploading staff member's UUID, and the
+storage policy only permits that folder
 (`(storage.foldername(name))[1] = auth.uid()`), with admins allowed to clean any
 folder. Students have no access at all.
 
@@ -385,8 +393,13 @@ stores the extracted text, the parsed draft JSON and the private object paths.
   removing each private object first.
 - Import audit uses four extra `assessment_admin_events` actions:
   `import_started`, `import_draft_created`, `import_draft_edited` and
-  `import_published`. Their `detail` contains counts and booleans only — never
-  question text, answers, file names or private URLs.
+  `import_published`. Their `detail` contains safe metadata only — counts,
+  booleans, file name/size, status, AI model and request counts — never question
+  text, answers, API keys, headers, passwords or private URLs.
+- Optional AI assistance is server-only and off by default. When enabled, the
+  route sends question text and choices to OpenRouter, validates the response
+  with Zod and stores pending suggestions on the draft. Nothing is applied until
+  the teacher accepts it, and AI failures leave the deterministic draft intact.
 
 ## Adding a migration
 

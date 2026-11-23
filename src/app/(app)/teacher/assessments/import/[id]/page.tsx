@@ -12,6 +12,7 @@ import { requireTeacher } from "@/lib/auth/dal";
 import { getAssessmentImport } from "@/lib/data/imports";
 import { listGradeOptions } from "@/lib/data/students";
 import { cleanupExpiredImports } from "@/lib/import/cleanup";
+import { isImportAiConfigured } from "@/lib/import/ai";
 import { isImportDueForCleanup } from "@/lib/import/retention";
 import type { ImportDraft } from "@/lib/import/types";
 import { importErrorCopy, importsUi } from "@/lib/i18n/imports";
@@ -175,6 +176,7 @@ export default async function ImportReviewPage({
         importId={row.id}
         initialDraft={row.draft}
         grades={grades}
+        aiEnabled={isImportAiConfigured()}
       />
     </div>
   );

@@ -99,7 +99,7 @@ describe("import retention", () => {
 });
 
 describe("import audit privacy", () => {
-  it("keeps only counts, kinds and booleans", () => {
+  it("keeps only safe metadata, never content, paths or secrets", () => {
     expect(
       sanitiseImportAuditDetail({
         import_id: "import-1",
@@ -112,9 +112,13 @@ describe("import audit privacy", () => {
         prompt: "What is the answer?",
         answer_text: "B",
         file_name: "unit-3-answer-key.docx",
+        file_size: 1024,
+        model: "openrouter/free",
+        ai_request_count: 2,
         source_path: "uid/import/questions.docx",
         url: "https://private.example/object",
         service_role_key: "secret",
+        authorization: "Bearer secret",
       }),
     ).toEqual({
       import_id: "import-1",
@@ -123,6 +127,10 @@ describe("import audit privacy", () => {
       has_answer_key: true,
       source_kind: "docx",
       status: "saved",
+      file_name: "unit-3-answer-key.docx",
+      file_size: 1024,
+      model: "openrouter/free",
+      ai_request_count: 2,
     });
   });
 

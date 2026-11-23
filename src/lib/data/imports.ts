@@ -77,12 +77,16 @@ export async function listRecentImportDrafts(
     .eq("status", "draft")
     .gt("expires_at", new Date().toISOString())
     .order("created_at", { ascending: false })
-    .limit(limit);
+    .limit(Math.max(limit * 3, limit));
 
   if (error) {
     console.error("assessment import list failed", error.message);
     return [];
   }
 
-  return (data ?? []) as unknown as AssessmentImportRow[];
+  // Rows created by the signed-upload init step exist before parsing finishes.
+  // Hide them until a real draft is stored.
+  return ((data ?? []) as unknown as AssessmentImportRow[])
+    .filter((row) => Array.isArray(row.draft?.sections))
+    .slice(0, limit);
 }

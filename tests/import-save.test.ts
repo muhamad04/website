@@ -47,6 +47,9 @@ function question(
     helpTextEn: "",
     marks: 2,
     confidence: "high",
+    confidenceScore: 0.9,
+    evidence: [],
+    reviewed: true,
     gradingMethod: "automatic",
     options: [
       { text: "cat", correct: true },

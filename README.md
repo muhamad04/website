@@ -208,42 +208,54 @@ only ever see their own grade, their own attempts and their own results.
 - Public registration remains disabled, the existing admin account is untouched,
   and student login/recovery continues to use Student ID only.
 
-## What works in Phase 6 — free, local assessment import
+## What works in Phase 6 — assessment import
 
 - `/teacher/assessments/import`: upload a typed question paper (DOCX, text-based
   PDF or `.txt`) and an optional answer key. The importer also accepts pasted
-  text. Teachers and admins only; students are redirected and every server action
-  repeats the staff check.
-- Parsing runs entirely on this server with free libraries — `mammoth` for DOCX
-  and `unpdf` (PDF.js) for PDF text. There is no OpenAI/Gemini/Claude/OCR call,
-  no per-use service and no file content leaves the machine. Image-only/scanned
-  PDFs are rejected instead of being guessed at.
+  text. Teachers and admins only; students are redirected and every route and
+  server action repeats the staff check.
+- Files stream directly from the browser to the private `assessment-imports`
+  bucket with short-lived signed upload URLs, so the upload itself never crosses
+  a Vercel Function body. The server verifies ownership and object size, then
+  downloads the object once only when parsing. The limit is
+  `ASSESSMENT_IMPORT_MAX_BYTES=52428800` (50 MiB per file) and is enforced in the
+  browser, the init/finalize routes and the bucket itself.
+- Parsing runs on this server with free libraries — `mammoth` for DOCX and
+  `unpdf` (PDF.js) for PDF text. The deterministic parser needs no external
+  service. Image-only/scanned PDFs are rejected instead of being guessed at.
 - The parser detects sections, numbered questions, lettered or numbered choices,
-  marks, instructions, explanations and the eight supported question types.
-  Uncertain types become reviewable drafts with warnings and a manual type
-  selector; nothing is silently invented.
-- Answer keys such as `1. B`, `2. True`, `3. played`, `1-b, 2-a` and accepted-answer
-  lists are parsed and matched by question number. Unmatched, duplicate and
-  ambiguous keys are reported, never assigned silently. Questions with no
-  reliable key default to manual grading, and every key stays editable.
-- `/teacher/assessments/import/[id]`: bilingual review editor. Edit settings,
-  warnings and answer keys; add, delete and reorder sections, questions, choices
-  and matching pairs. “Save review progress” keeps the staging row for 24 hours;
-  “Save draft assessment” writes a real assessment with `is_published = false`
-  into the existing assessment system.
+  marks (including Arabic-Indic digits and section totals), instructions,
+  explanations and the eight supported question types. Each question stores its
+  detected type, confidence score, evidence, warnings and raw source block.
+- Answer keys such as `1. B`, `1. B. dog`, `2. True`, `3. played`, `1-b, 2-a` and
+  accepted-answer lists are parsed and matched by question number. A letter and
+  text that agree produce no warning; a genuine disagreement is flagged. Unmatched,
+  duplicate and ambiguous keys are reported, never assigned silently. Questions
+  with no reliable key default to manual grading, and every key stays editable.
+- `/teacher/assessments/import/[id]`: bilingual review editor with summary cards,
+  filters, per-question confidence/evidence, warnings and answer keys. Edit
+  settings; add, delete and reorder sections, questions, choices and matching
+  pairs. “Save review progress” keeps the staging row for 24 hours; “Save draft
+  assessment” writes a real assessment with `is_published = false`.
+- Optional OpenRouter assistance is **off by default**. When
+  `ASSESSMENT_IMPORT_AI_ENABLED=true` and `OPENROUTER_API_KEY` are set, a
+  server-only route sends only question text and choices (never student names,
+  files, cookies or headers), validates structured JSON with Zod, caps requests
+  per import and shows a before/after diff. Every suggestion must be accepted or
+  rejected by the teacher, and any AI failure leaves the deterministic draft
+  untouched.
 - Importing never publishes. The draft has to be reviewed and published through
   the existing explicit publish action, which also writes the `import_published`
   audit event.
-- Privacy and file safety: the `assessment-imports` bucket is private, files are
-  stored under `<owner uuid>/<import id>/…`, extension/MIME/magic bytes are
-  checked, limits are 4 MB per file, 8 MB per request and 200,000 extracted
-  characters, and temporary files are deleted on save/cancel plus a lazy cleanup
-  sweep. Arabic content that the source file does not contain is left empty — it
-  is never machine-translated.
+- Privacy and file safety: the bucket is private, files are stored under
+  `<owner uuid>/<import id>/…`, suspicious names/executables, extension/MIME/magic
+  byte mismatches and oversize files are rejected, and temporary files are deleted
+  on save/cancel/abort plus a lazy cleanup sweep. Arabic content that the source
+  file does not contain is left empty — it is never machine-translated.
 - `assessment_imports` is staff-only and owner-scoped through RLS; an owner/path
   trigger keeps `created_by` immutable and every object inside the owner's
-  folder. Audit details contain counts and booleans only — no question text,
-  answers, file names or private URLs.
+  folder. Audit details contain safe metadata only — file name, size, status,
+  model and counts — never keys, headers, passwords, full text or private URLs.
 
 ## Stack
 
@@ -427,6 +439,13 @@ confirmed.
 | `GOOGLE_SHEETS_SPREADSHEET_ID`  | Phase 4  | **Server only** | Target spreadsheet |
 | `GOOGLE_SHEETS_SHEET_NAME`      | Phase 4  | **Server only** | Tab name, e.g. `Results` |
 | `CRON_SECRET`                   | Optional | **Server only** | Bearer token for manual/external calls to `GET /api/assessments/sweep`; not required on Vercel Hobby, where lazy cleanup and server signals handle stale attempts |
+| `ASSESSMENT_IMPORT_MAX_BYTES`   | Optional | **Server only** | Per-file importer limit, default and maximum `52428800` (50 MiB). Only the numeric limit is passed to the form; also enforced by the private bucket |
+| `ASSESSMENT_IMPORT_AI_ENABLED`  | Optional | **Server only** | `true` enables the optional OpenRouter check. Off by default; the deterministic parser never needs it |
+| `OPENROUTER_API_KEY`            | Optional | **Server only** | OpenRouter key. Never logged, never sent to the browser, never prefixed `NEXT_PUBLIC_` |
+| `OPENROUTER_MODEL`              | Optional | **Server only** | Model ID, default `openrouter/free` |
+| `OPENROUTER_MAX_REQUESTS_PER_IMPORT` | Optional | **Server only** | Per-import request cap, default `3` |
+| `OPENROUTER_MAX_OUTPUT_TOKENS`  | Optional | **Server only** | Output token cap per request, default `12000` |
+| `OPENROUTER_TIMEOUT_MS`         | Optional | **Server only** | Request timeout, default `30000` |
 
 Server secrets are only read in `src/lib/env.server.ts`, which imports
 `server-only`. If a Client Component ever imports it, the build fails.
