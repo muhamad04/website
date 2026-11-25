@@ -7,11 +7,14 @@ import {
   AlertTriangle,
   ArrowDown,
   ArrowUp,
+  Check,
   CheckCircle2,
   FileText,
   Plus,
   Save,
+  Sparkles,
   Trash2,
+  X,
 } from "lucide-react";
 import { Bi } from "@/components/bilingual";
 import { FormField as Field } from "@/components/form-field";
@@ -34,6 +37,9 @@ import type {
   ResultsVisibility,
 } from "@/lib/domain/types";
 import type {
+  ImportAiQuestionSnapshot,
+  ImportAiState,
+  ImportAiSuggestion,
   ImportConfidence,
   ImportDraft,
   ImportQuestionDraft,
@@ -56,7 +62,10 @@ import {
   importWarningCopy,
   importsUi,
 } from "@/lib/i18n/imports";
-import type { ImportActionResult } from "@/lib/import/validation";
+import type {
+  ImportActionResult,
+  ImportAiRouteResult,
+} from "@/lib/import/validation";
 import { cn } from "@/lib/utils";
 
 type ReviewOption = { text: string; correct: boolean };
@@ -67,17 +76,18 @@ type ReviewQuestion = {
   sourceNumber: string;
   type: QuestionType;
   promptEn: string;
-  promptAr: string;
   helpTextEn: string;
   marks: string;
   confidence: ImportConfidence;
+  confidenceScore: number;
+  evidence: string[];
+  reviewed: boolean;
   gradingMethod: GradingMethod;
   options: ReviewOption[];
   pairs: ReviewPair[];
   accepted: string[];
   correctValue: "true" | "false" | null;
   explanationEn: string;
-  explanationAr: string;
   warnings: ImportWarningCode[];
   raw: string;
 };
@@ -85,18 +95,18 @@ type ReviewQuestion = {
 type ReviewSection = {
   key: string;
   titleEn: string;
-  titleAr: string;
   instructionsEn: string;
+  marks: number | null;
   questions: ReviewQuestion[];
 };
+
+type QuestionFilter = "all" | "review" | "low" | "warnings";
 
 type ReviewSettings = {
   type: AssessmentType;
   gradeId: string;
   titleEn: string;
-  titleAr: string;
   instructionsEn: string;
-  instructionsAr: string;
   timeLimitMinutes: string;
   resultsVisibility: ResultsVisibility;
   allowRetakes: boolean;
@@ -135,17 +145,18 @@ function questionFromDraft(question: ImportQuestionDraft): ReviewQuestion {
     sourceNumber: question.sourceNumber,
     type: question.type,
     promptEn: question.promptEn,
-    promptAr: question.promptAr,
     helpTextEn: question.helpTextEn,
     marks: String(question.marks),
     confidence: question.confidence,
+    confidenceScore: question.confidenceScore ?? 0.5,
+    evidence: [...(question.evidence ?? [])],
+    reviewed: question.reviewed ?? false,
     gradingMethod: question.gradingMethod,
     options: question.options.map((option) => ({ ...option })),
     pairs: question.pairs.map((pair) => ({ ...pair })),
     accepted: [...question.accepted],
     correctValue: question.correctValue,
     explanationEn: question.explanationEn,
-    explanationAr: "",
     warnings: [...question.warnings],
     raw: question.raw,
   };
@@ -157,17 +168,18 @@ function newQuestion(): ReviewQuestion {
     sourceNumber: "",
     type: "short_answer",
     promptEn: "",
-    promptAr: "",
     helpTextEn: "",
     marks: "1",
     confidence: "low",
+    confidenceScore: 0.25,
+    evidence: [],
+    reviewed: false,
     gradingMethod: "manual",
     options: [],
     pairs: [],
     accepted: [],
     correctValue: null,
     explanationEn: "",
-    explanationAr: "",
     warnings: [],
     raw: "",
   };
@@ -177,8 +189,8 @@ function newSection(): ReviewSection {
   return {
     key: `section-${Math.random().toString(36).slice(2, 9)}`,
     titleEn: "Questions",
-    titleAr: "",
     instructionsEn: "",
+    marks: null,
     questions: [],
   };
 }
@@ -188,9 +200,7 @@ function settingsFromDraft(draft: ImportDraft): ReviewSettings {
     type: draft.settings.type,
     gradeId: draft.settings.gradeId,
     titleEn: draft.settings.titleEn,
-    titleAr: draft.settings.titleAr,
     instructionsEn: draft.settings.instructionsEn,
-    instructionsAr: draft.settings.instructionsAr,
     timeLimitMinutes: String(draft.settings.timeLimitMinutes),
     resultsVisibility: draft.settings.resultsVisibility,
     allowRetakes: draft.settings.allowRetakes,
@@ -215,6 +225,35 @@ function adjustmentForType(
   return current;
 }
 
+function describeSnapshot(snapshot: ImportAiQuestionSnapshot): string[] {
+  const lines = [
+    `${snapshot.type} · ${snapshot.marks} marks`,
+    snapshot.promptEn || "—",
+  ];
+
+  if (snapshot.options.length > 0) {
+    lines.push(
+      snapshot.options
+        .map((option) => `${option.correct ? "*" : "-"} ${option.text}`)
+        .join(" | "),
+    );
+  }
+
+  if (snapshot.correctValue) {
+    lines.push(`answer: ${snapshot.correctValue}`);
+  }
+
+  if (snapshot.accepted.length > 0) {
+    lines.push(`accepted: ${snapshot.accepted.join(", ")}`);
+  }
+
+  if (snapshot.explanationEn) {
+    lines.push(`explanation: ${snapshot.explanationEn}`);
+  }
+
+  return lines;
+}
+
 function ErrorAlert({ error }: { error: string }) {
   const copy =
     importErrorCopy[error as keyof typeof importErrorCopy] ??
@@ -231,10 +270,12 @@ export function ImportReview({
   importId,
   initialDraft,
   grades,
+  aiEnabled,
 }: {
   importId: string;
   initialDraft: ImportDraft;
   grades: GradeSummary[];
+  aiEnabled: boolean;
 }) {
   const router = useRouter();
   const [settings, setSettings] = useState<ReviewSettings>(() =>
@@ -244,14 +285,17 @@ export function ImportReview({
     initialDraft.sections.map((section) => ({
       key: section.key,
       titleEn: section.titleEn,
-      titleAr: section.titleAr,
       instructionsEn: section.instructionsEn,
+      marks: section.marks ?? null,
       questions: section.questions.map(questionFromDraft),
     })),
   );
+  const [ai, setAi] = useState<ImportAiState | null>(initialDraft.ai ?? null);
+  const [aiPending, setAiPending] = useState(false);
+  const [filter, setFilter] = useState<QuestionFilter>("all");
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const [notice, setNotice] = useState<string | null>(null);
+  const [notice, setNotice] = useState<{ en: string; ar: string } | null>(null);
   const [pending, setPending] = useState<"none" | "progress" | "save" | "cancel">(
     "none",
   );
@@ -261,6 +305,23 @@ export function ImportReview({
     (sum, question) => sum + (Number(question.marks) || 0),
     0,
   );
+  const reviewCount = questions.filter(
+    (question) =>
+      !question.reviewed ||
+      question.confidence === "low" ||
+      question.warnings.length > 0,
+  ).length;
+  const parserConfidence =
+    questions.length === 0
+      ? 0
+      : Math.round(
+          (questions.reduce(
+            (sum, question) => sum + (question.confidenceScore ?? 0.5),
+            0,
+          ) /
+            questions.length) *
+            100,
+        );
   const busy = pending !== "none";
   const automaticCount = questions.filter(
     (question) => question.gradingMethod === "automatic",
@@ -349,9 +410,7 @@ export function ImportReview({
       type: settings.type,
       gradeId: settings.gradeId,
       titleEn: settings.titleEn,
-      titleAr: settings.titleAr,
       instructionsEn: settings.instructionsEn,
-      instructionsAr: settings.instructionsAr,
       timeLimitMinutes: Number(settings.timeLimitMinutes),
       resultsVisibility: settings.resultsVisibility,
       allowRetakes: settings.allowRetakes,
@@ -364,28 +423,36 @@ export function ImportReview({
     sections: sections.map((section) => ({
       key: section.key,
       titleEn: section.titleEn,
-      titleAr: section.titleAr,
       instructionsEn: section.instructionsEn,
+      marks: section.marks,
       questions: section.questions.map((question) => ({
         key: question.key,
         sourceNumber: question.sourceNumber,
         type: question.type,
         promptEn: question.promptEn,
-        promptAr: question.promptAr,
         helpTextEn: question.helpTextEn,
         marks: Number(question.marks),
         confidence: question.confidence,
+        confidenceScore: question.confidenceScore,
+        evidence: question.evidence,
+        reviewed: question.reviewed,
         gradingMethod: question.gradingMethod,
         options: question.options,
         pairs: question.pairs,
         accepted: question.accepted.filter((answer) => answer.trim() !== ""),
         correctValue: question.correctValue,
         explanationEn: question.explanationEn,
-        explanationAr: question.explanationAr,
         warnings: question.warnings,
         raw: question.raw,
       })),
     })),
+    ai_decisions:
+      ai?.suggestions
+        .filter((suggestion) => suggestion.status !== "pending")
+        .map((suggestion) => ({
+          id: suggestion.id,
+          status: suggestion.status,
+        })) ?? [],
   });
 
   const handleResult = (result: ImportActionResult): boolean => {
@@ -399,6 +466,137 @@ export function ImportReview({
     return false;
   };
 
+  const matchesFilter = (question: ReviewQuestion): boolean => {
+    if (filter === "low") {
+      return question.confidence === "low";
+    }
+
+    if (filter === "warnings") {
+      return question.warnings.length > 0;
+    }
+
+    if (filter === "review") {
+      return (
+        !question.reviewed ||
+        question.confidence === "low" ||
+        question.warnings.length > 0
+      );
+    }
+
+    return true;
+  };
+
+  const applySnapshot = (
+    question: ReviewQuestion,
+    snapshot: ImportAiQuestionSnapshot,
+  ): ReviewQuestion => {
+    const type = snapshot.type;
+
+    return {
+      ...question,
+      type,
+      promptEn: snapshot.promptEn,
+      marks: String(snapshot.marks),
+      options: snapshot.options.map((option) => ({ ...option })),
+      correctValue: snapshot.correctValue,
+      accepted: [...snapshot.accepted],
+      explanationEn: snapshot.explanationEn,
+      gradingMethod: isManualOnlyType(type)
+        ? "manual"
+        : isAutoGradableType(type)
+          ? "automatic"
+          : "manual",
+      confidence: "high",
+      confidenceScore: 1,
+      evidence: [...question.evidence, "ai:accepted"],
+      reviewed: true,
+      warnings: question.warnings.filter(
+        (code) =>
+          code !== "low_confidence_type" &&
+          code !== "unsupported_question_type" &&
+          code !== "multiple_choice_missing_options" &&
+          code !== "missing_answer" &&
+          code !== "answer_mismatch" &&
+          code !== "answer_text_mismatch" &&
+          code !== "ambiguous_answer" &&
+          code !== "matching_incomplete",
+      ),
+    };
+  };
+
+  const decideSuggestion = (
+    suggestion: ImportAiSuggestion,
+    status: "accepted" | "rejected",
+  ) => {
+    if (status === "accepted") {
+      setSections((previous) =>
+        previous.map((section) => ({
+          ...section,
+          questions: section.questions.map((question) =>
+            question.key === suggestion.questionKey
+              ? applySnapshot(question, suggestion.after)
+              : question,
+          ),
+        })),
+      );
+    }
+
+    setAi((previous) =>
+      previous
+        ? {
+            ...previous,
+            suggestions: previous.suggestions.map((candidate) =>
+              candidate.id === suggestion.id
+                ? { ...candidate, status }
+                : candidate,
+            ),
+          }
+        : previous,
+    );
+  };
+
+  const runAi = async () => {
+    setError(null);
+    setNotice(null);
+    setAiPending(true);
+
+    try {
+      // Persist the current edits first so AI suggestions match what the
+      // teacher is looking at.
+      const saved = await updateImportDraftAction(buildPayload());
+
+      if (!handleResult(saved)) {
+        return;
+      }
+
+      const response = await fetch("/teacher/assessments/import/ai", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ import_id: importId }),
+      });
+      const result = (await response.json().catch(() => ({
+        ok: false,
+        error: "unknown",
+      }))) as ImportAiRouteResult;
+
+      if (!result.ok || !result.ai) {
+        setError(result.error ?? "unknown");
+        return;
+      }
+
+      setAi(result.ai);
+      setNotice(importsUi.review.aiDone);
+    } catch {
+      setError("unknown");
+    } finally {
+      setAiPending(false);
+    }
+  };
+
+  const pendingSuggestions =
+    ai?.suggestions.filter((suggestion) => suggestion.status === "pending") ??
+    [];
+
   const saveProgress = async () => {
     setError(null);
     setNotice(null);
@@ -408,7 +606,7 @@ export function ImportReview({
       const result = await updateImportDraftAction(buildPayload());
 
       if (handleResult(result)) {
-        setNotice(importsUi.review.savedProgress.en);
+        setNotice(importsUi.review.savedProgress);
       }
     } catch {
       setError("unknown");
@@ -478,14 +676,11 @@ export function ImportReview({
 
       {notice ? (
         <Alert variant="success">
-          <Bi
-            en={importsUi.review.savedProgress.en}
-            ar={importsUi.review.savedProgress.ar}
-          />
+          <Bi en={notice.en} ar={notice.ar} />
         </Alert>
       ) : null}
 
-      <section className="grid gap-3 rounded-xl border border-border bg-card p-4 shadow-xs sm:grid-cols-2 lg:grid-cols-5">
+      <section className="grid gap-3 rounded-xl border border-border bg-card p-4 shadow-xs sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
         <Stat
           label={
             <Bi
@@ -531,6 +726,24 @@ export function ImportReview({
           }
           value={initialDraft.stats.matchedAnswers}
         />
+        <Stat
+          label={
+            <Bi
+              en={importsUi.review.reviewCount.en}
+              ar={importsUi.review.reviewCount.ar}
+            />
+          }
+          value={reviewCount}
+        />
+        <Stat
+          label={
+            <Bi
+              en={importsUi.review.parserConfidence.en}
+              ar={importsUi.review.parserConfidence.ar}
+            />
+          }
+          value={parserConfidence}
+        />
       </section>
 
       {initialDraft.warnings.length > 0 ? (
@@ -570,6 +783,217 @@ export function ImportReview({
         </Alert>
       )}
 
+      {aiEnabled || ai ? (
+        <section className="space-y-3 rounded-xl border border-border bg-card p-5 shadow-xs">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="space-y-1">
+              <h2 className="flex items-center gap-2 text-base font-semibold">
+                <Sparkles aria-hidden="true" className="size-4 text-primary" />
+                <Bi
+                  en={importsUi.review.aiTitle.en}
+                  ar={importsUi.review.aiTitle.ar}
+                />
+              </h2>
+              <p className="max-w-2xl text-sm text-muted-foreground">
+                <Bi
+                  en={importsUi.review.aiHint.en}
+                  ar={importsUi.review.aiHint.ar}
+                />
+              </p>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={runAi}
+              disabled={busy || aiPending}
+            >
+              <Sparkles aria-hidden="true" />
+              <Bi
+                en={
+                  aiPending
+                    ? importsUi.review.aiRunning.en
+                    : importsUi.review.aiRun.en
+                }
+                ar={
+                  aiPending
+                    ? importsUi.review.aiRunning.ar
+                    : importsUi.review.aiRun.ar
+                }
+              />
+            </Button>
+          </div>
+
+        {ai ? (
+          <div className="space-y-3">
+            <p className="text-xs text-muted-foreground">
+              <Bi
+                en={importsUi.review.aiModel.en}
+                ar={importsUi.review.aiModel.ar}
+              />
+              : {ai.model} · {ai.requestCount} requests
+            </p>
+
+            {ai.warnings.length > 0 ? (
+              <ul className="space-y-1 rounded-lg bg-warning/5 p-2 text-xs text-muted-foreground">
+                {ai.warnings.map((code, index) => (
+                  <li key={`${code}-${index}`}>
+                    <Bi
+                      en={importWarningCopy[code].en}
+                      ar={importWarningCopy[code].ar}
+                    />
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+
+            {ai.suggestions.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                <Bi
+                  en={importsUi.review.aiNoSuggestions.en}
+                  ar={importsUi.review.aiNoSuggestions.ar}
+                />
+              </p>
+            ) : (
+              <ul className="space-y-3">
+                {ai.suggestions.map((suggestion) => (
+                  <li
+                    key={suggestion.id}
+                    className="space-y-2 rounded-lg border border-border p-3"
+                  >
+                    <div className="flex flex-wrap items-center gap-2 text-sm">
+                      <span className="font-semibold">
+                        #{suggestion.sourceNumber || "—"}
+                      </span>
+                      <Badge variant="outline">
+                        {suggestion.status === "accepted" ? (
+                          <Bi
+                            en={importsUi.review.aiAccepted.en}
+                            ar={importsUi.review.aiAccepted.ar}
+                          />
+                        ) : suggestion.status === "rejected" ? (
+                          <Bi
+                            en={importsUi.review.aiRejected.en}
+                            ar={importsUi.review.aiRejected.ar}
+                          />
+                        ) : (
+                          <Bi
+                            en={importsUi.review.aiAfter.en}
+                            ar={importsUi.review.aiAfter.ar}
+                          />
+                        )}
+                      </Badge>
+                      {!suggestion.safe ? (
+                        <span className="text-xs text-warning">
+                          <Bi
+                            en={importsUi.review.aiUnsafe.en}
+                            ar={importsUi.review.aiUnsafe.ar}
+                          />
+                        </span>
+                      ) : null}
+                      {suggestion.reason ? (
+                        <span className="text-xs text-muted-foreground">
+                          {suggestion.reason}
+                        </span>
+                      ) : null}
+                    </div>
+
+                    <div className="grid gap-2 text-xs sm:grid-cols-2">
+                      <div className="space-y-1 rounded-md bg-secondary/40 p-2">
+                        <p className="font-semibold">
+                          <Bi
+                            en={importsUi.review.aiBefore.en}
+                            ar={importsUi.review.aiBefore.ar}
+                          />
+                        </p>
+                        {describeSnapshot(suggestion.before).map((line) => (
+                          <p key={line}>{line}</p>
+                        ))}
+                      </div>
+                      <div className="space-y-1 rounded-md bg-primary/5 p-2">
+                        <p className="font-semibold">
+                          <Bi
+                            en={importsUi.review.aiAfter.en}
+                            ar={importsUi.review.aiAfter.ar}
+                          />
+                        </p>
+                        {describeSnapshot(suggestion.after).map((line) => (
+                          <p key={line}>{line}</p>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        type="button"
+                        size="sm"
+                        disabled={
+                          busy ||
+                          suggestion.status !== "pending" ||
+                          !suggestion.safe
+                        }
+                        onClick={() => decideSuggestion(suggestion, "accepted")}
+                      >
+                        <Check aria-hidden="true" />
+                        <Bi
+                          en={importsUi.review.aiAccept.en}
+                          ar={importsUi.review.aiAccept.ar}
+                        />
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        disabled={busy || suggestion.status !== "pending"}
+                        onClick={() => decideSuggestion(suggestion, "rejected")}
+                      >
+                        <X aria-hidden="true" />
+                        <Bi
+                          en={importsUi.review.aiReject.en}
+                          ar={importsUi.review.aiReject.ar}
+                        />
+                      </Button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        ) : null}
+        </section>
+      ) : null}
+
+      <section className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-card p-3 shadow-xs">
+        <span className="text-sm font-semibold">
+          <Bi
+            en={importsUi.review.filters.en}
+            ar={importsUi.review.filters.ar}
+          />
+        </span>
+        {(
+          [
+            ["all", importsUi.review.filterAll],
+            ["review", importsUi.review.filterReview],
+            ["low", importsUi.review.filterLow],
+            ["warnings", importsUi.review.filterWarnings],
+          ] as const
+        ).map(([value, copy]) => (
+          <Button
+            key={value}
+            type="button"
+            size="sm"
+            variant={filter === value ? "default" : "outline"}
+            onClick={() => setFilter(value)}
+          >
+            <Bi en={copy.en} ar={copy.ar} />
+          </Button>
+        ))}
+        <span className="ms-auto text-xs text-muted-foreground">
+          {pendingSuggestions.length > 0
+            ? `${pendingSuggestions.length} AI`
+            : `${reviewCount}/${questions.length}`}
+        </span>
+      </section>
+
       <section className="space-y-4 rounded-xl border border-border bg-card p-5 shadow-xs">
         <div className="space-y-1">
           <h2 className="text-base font-semibold">
@@ -595,19 +1019,6 @@ export function ImportReview({
               disabled={busy}
               onChange={(event) =>
                 setSettings({ ...settings, titleEn: event.target.value })
-              }
-            />
-          </Field>
-          <Field id="settings-title-ar" label={importsUi.review.titleAr}>
-            <Input
-              id="settings-title-ar"
-              dir="rtl"
-              lang="ar"
-              value={settings.titleAr}
-              maxLength={200}
-              disabled={busy}
-              onChange={(event) =>
-                setSettings({ ...settings, titleAr: event.target.value })
               }
             />
           </Field>
@@ -656,19 +1067,6 @@ export function ImportReview({
               disabled={busy}
               onChange={(event) =>
                 setSettings({ ...settings, instructionsEn: event.target.value })
-              }
-            />
-          </Field>
-          <Field id="settings-instructions-ar" label={importsUi.review.instructionsAr}>
-            <Textarea
-              id="settings-instructions-ar"
-              dir="rtl"
-              lang="ar"
-              value={settings.instructionsAr}
-              maxLength={4000}
-              disabled={busy}
-              onChange={(event) =>
-                setSettings({ ...settings, instructionsAr: event.target.value })
               }
             />
           </Field>
@@ -942,24 +1340,6 @@ export function ImportReview({
                     />
                   </Field>
                   <Field
-                    id={`section-${sectionIndex}-title-ar`}
-                    label={importsUi.review.titleAr}
-                  >
-                    <Input
-                      id={`section-${sectionIndex}-title-ar`}
-                      dir="rtl"
-                      lang="ar"
-                      value={section.titleAr}
-                      maxLength={200}
-                      disabled={busy}
-                      onChange={(event) =>
-                        updateSection(sectionIndex, {
-                          titleAr: event.target.value,
-                        })
-                      }
-                    />
-                  </Field>
-                  <Field
                     id={`section-${sectionIndex}-instructions`}
                     label={importsUi.review.sectionInstructions}
                     className="sm:col-span-2"
@@ -1057,7 +1437,13 @@ export function ImportReview({
               ) : null}
 
               <ul className="space-y-3">
-                {section.questions.map((question, questionIndex) => (
+                {section.questions
+                  .map((question, questionIndex) => ({
+                    question,
+                    questionIndex,
+                  }))
+                  .filter(({ question }) => matchesFilter(question))
+                  .map(({ question, questionIndex }) => (
                   <li key={question.key}>
                     <details
                       className="rounded-lg border border-border bg-card p-3"
@@ -1110,6 +1496,37 @@ export function ImportReview({
                             ))}
                           </ul>
                         ) : null}
+
+                        {question.evidence.length > 0 ? (
+                          <p className="text-xs text-muted-foreground">
+                            <span className="font-semibold">
+                              <Bi
+                                en={importsUi.review.evidence.en}
+                                ar={importsUi.review.evidence.ar}
+                              />
+                              :{" "}
+                            </span>
+                            {question.evidence.join(", ")}
+                          </p>
+                        ) : null}
+
+                        <label className="flex items-center gap-2 text-xs font-medium">
+                          <input
+                            type="checkbox"
+                            className="size-4 rounded border-border"
+                            checked={question.reviewed}
+                            disabled={busy}
+                            onChange={(event) =>
+                              updateQuestion(sectionIndex, questionIndex, {
+                                reviewed: event.target.checked,
+                              })
+                            }
+                          />
+                          <Bi
+                            en={importsUi.review.reviewed.en}
+                            ar={importsUi.review.reviewed.ar}
+                          />
+                        </label>
 
                         <div className="grid gap-3 sm:grid-cols-2">
                           <Field
@@ -1176,25 +1593,6 @@ export function ImportReview({
                               onChange={(event) =>
                                 updateQuestion(sectionIndex, questionIndex, {
                                   promptEn: event.target.value,
-                                })
-                              }
-                            />
-                          </Field>
-                          <Field
-                            id={`q-${sectionIndex}-${questionIndex}-prompt-ar`}
-                            label={importsUi.review.promptAr}
-                            className="sm:col-span-2"
-                          >
-                            <Textarea
-                              id={`q-${sectionIndex}-${questionIndex}-prompt-ar`}
-                              dir="rtl"
-                              lang="ar"
-                              value={question.promptAr}
-                              maxLength={4000}
-                              disabled={busy}
-                              onChange={(event) =>
-                                updateQuestion(sectionIndex, questionIndex, {
-                                  promptAr: event.target.value,
                                 })
                               }
                             />
@@ -1539,24 +1937,6 @@ export function ImportReview({
                               }
                             />
                           </Field>
-                          <Field
-                            id={`q-${sectionIndex}-${questionIndex}-explanation-ar`}
-                            label={importsUi.review.explanationAr}
-                          >
-                            <Textarea
-                              id={`q-${sectionIndex}-${questionIndex}-explanation-ar`}
-                              dir="rtl"
-                              lang="ar"
-                              value={question.explanationAr}
-                              maxLength={2000}
-                              disabled={busy}
-                              onChange={(event) =>
-                                updateQuestion(sectionIndex, questionIndex, {
-                                  explanationAr: event.target.value,
-                                })
-                              }
-                            />
-                          </Field>
                         </div>
 
                         {question.raw ? (
@@ -1629,6 +2009,14 @@ export function ImportReview({
                   </li>
                 ))}
               </ul>
+              {filter !== "all" && !section.questions.some(matchesFilter) ? (
+                <p className="text-sm text-muted-foreground">
+                  <Bi
+                    en={importsUi.review.noMatchingQuestions.en}
+                    ar={importsUi.review.noMatchingQuestions.ar}
+                  />
+                </p>
+              ) : null}
             </li>
           ))}
         </ul>

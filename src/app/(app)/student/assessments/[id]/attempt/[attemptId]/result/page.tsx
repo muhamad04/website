@@ -158,7 +158,7 @@ export default async function StudentResultPage({
   );
 
   return (
-    <div className="space-y-5">
+    <div translate="no" className="space-y-5">
       <PageHeader
         eyebrow={
           <Bi
@@ -166,7 +166,7 @@ export default async function StudentResultPage({
             ar={assessmentTypeCopy[result.type].ar}
           />
         }
-        title={<Bi en={result.title_en} ar={result.title_ar} />}
+        title={<Bi en={result.title_en} ar="" hideSeparator />}
         description={
           <Bi
             en={`${assessmentsUi.student.attemptNumber.en} #${result.attempt_number} · ${assessmentsUi.student.submittedAt.en} ${formatAdminDateTime(result.submitted_at)}`}
@@ -288,7 +288,11 @@ export default async function StudentResultPage({
             {(result.sections ?? []).map((section) => (
               <section key={section.id} className="space-y-3">
                 <h2 className="rounded-xl border border-border bg-secondary/40 p-4 text-base font-bold text-foreground">
-                  <Bi en={section.title_en} ar={section.title_ar} />
+                  <Bi
+                    en={section.title_en}
+                    ar=""
+                    hideSeparator
+                  />
                 </h2>
 
                 <ol className="space-y-3">
@@ -334,7 +338,8 @@ export default async function StudentResultPage({
                             </span>
                             <Bi
                               en={question.prompt_en}
-                              ar={question.prompt_ar ?? question.prompt_en}
+                              ar=""
+                              hideSeparator
                             />
                           </p>
                           <div className="flex flex-wrap items-center gap-1.5">
@@ -391,11 +396,8 @@ export default async function StudentResultPage({
                                   options.get(selectedOptionId)?.text_en ??
                                   selectedOptionId
                                 }
-                                ar={
-                                  options.get(selectedOptionId)?.text_ar ??
-                                  options.get(selectedOptionId)?.text_en ??
-                                  selectedOptionId
-                                }
+                                ar=""
+                                hideSeparator
                               />
                             </p>
                           ) : null}
@@ -424,7 +426,8 @@ export default async function StudentResultPage({
                                   <li key={leftId} className="text-foreground">
                                     <Bi
                                       en={`${pair?.left_en ?? leftId} → ${right?.right_en ?? rightKey}`}
-                                      ar={`${pair?.left_ar ?? pair?.left_en ?? leftId} ← ${right?.right_ar ?? right?.right_en ?? rightKey}`}
+                                      ar=""
+                                      hideSeparator
                                     />
                                   </li>
                                 );

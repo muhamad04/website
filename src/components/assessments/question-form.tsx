@@ -34,25 +34,20 @@ import {
   isManualOnlyType,
 } from "@/lib/validation/assessments";
 
-type OptionDraft = { text_en: string; text_ar: string };
+type OptionDraft = { text_en: string };
 type PairDraft = {
   left_text_en: string;
-  left_text_ar: string;
   right_text_en: string;
-  right_text_ar: string;
 };
 
 type Values = {
   type: QuestionType;
   prompt_en: string;
-  prompt_ar: string;
   help_text_en: string;
-  help_text_ar: string;
   marks: string;
   is_required: boolean;
   grading_method: "automatic" | "manual";
   explanation_en: string;
-  explanation_ar: string;
   options: OptionDraft[];
   correct_index: number;
   correct_value: "true" | "false";
@@ -90,15 +85,12 @@ function initialValues(
     .sort((a, b) => a.position - b.position)
     .map((option) => ({
       text_en: option.text_en,
-      text_ar: option.text_ar ?? "",
     }));
   const pairs = [...(question?.pairs ?? [])]
     .sort((a, b) => a.position - b.position)
     .map((pair) => ({
       left_text_en: pair.left_text_en,
-      left_text_ar: pair.left_text_ar ?? "",
       right_text_en: pair.right_text_en,
-      right_text_ar: pair.right_text_ar ?? "",
     }));
   const correctIndex = Math.max(
     0,
@@ -115,9 +107,7 @@ function initialValues(
   return {
     type: question?.type ?? "multiple_choice",
     prompt_en: question?.prompt_en ?? "",
-    prompt_ar: question?.prompt_ar ?? "",
     help_text_en: question?.help_text_en ?? "",
-    help_text_ar: question?.help_text_ar ?? "",
     marks: String(question?.marks ?? 1),
     is_required: question?.is_required ?? true,
     grading_method:
@@ -126,16 +116,15 @@ function initialValues(
         ? "manual"
         : defaultMethod),
     explanation_en: question?.explanation_en ?? "",
-    explanation_ar: question?.explanation_ar ?? "",
     options: options.length >= 2 ? options : [
-      { text_en: "", text_ar: "" },
-      { text_en: "", text_ar: "" },
+      { text_en: "" },
+      { text_en: "" },
     ],
     correct_index: correctIndex,
     correct_value: trueFalseKey ? "true" : "false",
     pairs: pairs.length >= 2 ? pairs : [
-      { left_text_en: "", left_text_ar: "", right_text_en: "", right_text_ar: "" },
-      { left_text_en: "", left_text_ar: "", right_text_en: "", right_text_ar: "" },
+      { left_text_en: "", right_text_en: "" },
+      { left_text_en: "", right_text_en: "" },
     ],
     accepted: key.accepted,
     case_sensitive: key.caseSensitive,
@@ -212,14 +201,11 @@ export function QuestionForm({
     const payload = {
       type: values.type,
       prompt_en: values.prompt_en,
-      prompt_ar: values.prompt_ar,
       help_text_en: values.help_text_en,
-      help_text_ar: values.help_text_ar,
       marks: values.marks,
       is_required: values.is_required,
       grading_method: values.grading_method,
       explanation_en: values.explanation_en,
-      explanation_ar: values.explanation_ar,
       options: values.type === "multiple_choice" ? values.options : undefined,
       correct_index:
         values.type === "multiple_choice" ? values.correct_index : undefined,
@@ -312,24 +298,6 @@ export function QuestionForm({
           </Field>
 
           <Field
-            id="prompt_ar"
-            label={assessmentsUi.questionForm.promptAr}
-            error={errors.prompt_ar}
-            errorCopy={assessmentErrorCopy}
-          >
-            <Textarea
-              id="prompt_ar"
-              dir="rtl"
-              className="font-arabic"
-              value={values.prompt_ar}
-              onChange={(event) => update("prompt_ar", event.target.value)}
-              maxLength={4000}
-            />
-          </Field>
-        </div>
-
-        <div className="grid gap-5 sm:grid-cols-2">
-          <Field
             id="help_text_en"
             label={assessmentsUi.questionForm.helpEn}
             error={errors.help_text_en}
@@ -339,22 +307,6 @@ export function QuestionForm({
               id="help_text_en"
               value={values.help_text_en}
               onChange={(event) => update("help_text_en", event.target.value)}
-              maxLength={1000}
-            />
-          </Field>
-
-          <Field
-            id="help_text_ar"
-            label={assessmentsUi.questionForm.helpAr}
-            error={errors.help_text_ar}
-            errorCopy={assessmentErrorCopy}
-          >
-            <Input
-              id="help_text_ar"
-              dir="rtl"
-              className="font-arabic"
-              value={values.help_text_ar}
-              onChange={(event) => update("help_text_ar", event.target.value)}
               maxLength={1000}
             />
           </Field>
@@ -473,15 +425,6 @@ export function QuestionForm({
                   updateOption(index, "text_en", event.target.value)
                 }
               />
-              <Input
-                className="min-w-40 flex-1 font-arabic"
-                dir="rtl"
-                placeholder={assessmentsUi.questionForm.option.ar}
-                value={option.text_ar}
-                onChange={(event) =>
-                  updateOption(index, "text_ar", event.target.value)
-                }
-              />
               <Button
                 type="button"
                 variant="ghost"
@@ -522,7 +465,7 @@ export function QuestionForm({
             onClick={() =>
               setValues((previous) => ({
                 ...previous,
-                options: [...previous.options, { text_en: "", text_ar: "" }],
+                options: [...previous.options, { text_en: "" }],
               }))
             }
           >
@@ -606,24 +549,6 @@ export function QuestionForm({
                   updatePair(index, "right_text_en", event.target.value)
                 }
               />
-              <Input
-                dir="rtl"
-                className="font-arabic"
-                placeholder={assessmentsUi.questionForm.left.ar}
-                value={pair.left_text_ar}
-                onChange={(event) =>
-                  updatePair(index, "left_text_ar", event.target.value)
-                }
-              />
-              <Input
-                dir="rtl"
-                className="font-arabic"
-                placeholder={assessmentsUi.questionForm.right.ar}
-                value={pair.right_text_ar}
-                onChange={(event) =>
-                  updatePair(index, "right_text_ar", event.target.value)
-                }
-              />
               <div className="sm:col-span-2">
                 <Button
                   type="button"
@@ -668,9 +593,7 @@ export function QuestionForm({
                   ...previous.pairs,
                   {
                     left_text_en: "",
-                    left_text_ar: "",
                     right_text_en: "",
-                    right_text_ar: "",
                   },
                 ],
               }))
@@ -736,7 +659,7 @@ export function QuestionForm({
       {(values.type === "essay" ||
         values.type === "file_upload" ||
         textBased) && (
-        <div className="grid gap-5 rounded-xl border border-border bg-card p-5 shadow-xs sm:grid-cols-2">
+        <div className="rounded-xl border border-border bg-card p-5 shadow-xs">
           <Field
             id="explanation_en"
             label={assessmentsUi.questionForm.explanationEn}
@@ -749,22 +672,6 @@ export function QuestionForm({
               value={values.explanation_en}
               onChange={(event) =>
                 update("explanation_en", event.target.value)
-              }
-            />
-          </Field>
-          <Field
-            id="explanation_ar"
-            label={assessmentsUi.questionForm.explanationAr}
-            error={errors.explanation_ar}
-            errorCopy={assessmentErrorCopy}
-          >
-            <Textarea
-              id="explanation_ar"
-              dir="rtl"
-              className="font-arabic"
-              value={values.explanation_ar}
-              onChange={(event) =>
-                update("explanation_ar", event.target.value)
               }
             />
           </Field>

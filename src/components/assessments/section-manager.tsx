@@ -37,15 +37,12 @@ import type { AssessmentErrorCode } from "@/lib/validation/assessments";
 type SectionView = {
   id: string;
   title_en: string;
-  title_ar: string;
   instructions_en: string | null;
-  instructions_ar: string | null;
   position: number;
   questions: Array<{
     id: string;
     type: QuestionType;
     prompt_en: string;
-    prompt_ar: string | null;
     marks: number;
     position: number;
   }>;
@@ -65,15 +62,11 @@ export function SectionManager({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState({
     title_en: "",
-    title_ar: "",
     instructions_en: "",
-    instructions_ar: "",
   });
   const [createDraft, setCreateDraft] = useState({
     title_en: "",
-    title_ar: "",
     instructions_en: "",
-    instructions_ar: "",
   });
 
   const run = (action: () => Promise<{ ok: boolean; error?: AssessmentErrorCode }>) => {
@@ -134,9 +127,7 @@ export function SectionManager({
       if (outcome.ok) {
         setCreateDraft({
           title_en: "",
-          title_ar: "",
           instructions_en: "",
-          instructions_ar: "",
         });
         setShowCreate(false);
       }
@@ -149,9 +140,7 @@ export function SectionManager({
     setEditingId(section.id);
     setDraft({
       title_en: section.title_en,
-      title_ar: section.title_ar,
       instructions_en: section.instructions_en ?? "",
-      instructions_ar: section.instructions_ar ?? "",
     });
   };
 
@@ -202,7 +191,7 @@ export function SectionManager({
               <div className="min-w-0 flex-1">
                 {editingId === section.id ? (
                   <div className="space-y-2">
-                    <div className="grid gap-2 sm:grid-cols-2">
+                    <div className="space-y-2">
                       <Input
                         value={draft.title_en}
                         aria-label={assessmentsUi.builder.sectionTitle.en}
@@ -213,20 +202,6 @@ export function SectionManager({
                           }))
                         }
                       />
-                      <Input
-                        dir="rtl"
-                        className="font-arabic"
-                        value={draft.title_ar}
-                        aria-label={assessmentsUi.builder.sectionTitle.ar}
-                        onChange={(event) =>
-                          setDraft((previous) => ({
-                            ...previous,
-                            title_ar: event.target.value,
-                          }))
-                        }
-                      />
-                    </div>
-                    <div className="grid gap-2 sm:grid-cols-2">
                       <Textarea
                         value={draft.instructions_en}
                         aria-label={assessmentsUi.builder.sectionInstructions.en}
@@ -234,18 +209,6 @@ export function SectionManager({
                           setDraft((previous) => ({
                             ...previous,
                             instructions_en: event.target.value,
-                          }))
-                        }
-                      />
-                      <Textarea
-                        dir="rtl"
-                        className="font-arabic"
-                        value={draft.instructions_ar}
-                        aria-label={assessmentsUi.builder.sectionInstructions.ar}
-                        onChange={(event) =>
-                          setDraft((previous) => ({
-                            ...previous,
-                            instructions_ar: event.target.value,
                           }))
                         }
                       />
@@ -281,7 +244,7 @@ export function SectionManager({
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
                       <h3 className="text-base font-bold text-foreground">
-                        <Bi en={section.title_en} ar={section.title_ar} />
+                        {section.title_en}
                       </h3>
                       <Badge variant="muted">
                         <Bi
@@ -290,12 +253,9 @@ export function SectionManager({
                         />
                       </Badge>
                     </div>
-                    {section.instructions_en || section.instructions_ar ? (
+                    {section.instructions_en ? (
                       <p className="mt-1 text-sm text-muted-foreground">
-                        <Bi
-                          en={section.instructions_en ?? ""}
-                          ar={section.instructions_ar ?? ""}
-                        />
+                        {section.instructions_en}
                       </p>
                     ) : null}
                   </div>
@@ -378,10 +338,7 @@ export function SectionManager({
                     </span>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium text-foreground">
-                        <Bi
-                          en={question.prompt_en}
-                          ar={question.prompt_ar ?? question.prompt_en}
-                        />
+                        {question.prompt_en}
                       </p>
                       <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground">
                         <span>
@@ -487,7 +444,7 @@ export function SectionManager({
           onSubmit={createSection}
           className="space-y-3 rounded-xl border border-border bg-card p-4 shadow-xs sm:p-5"
         >
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="space-y-3">
             <Input
               placeholder={assessmentsUi.builder.sectionTitle.en}
               value={createDraft.title_en}
@@ -498,18 +455,6 @@ export function SectionManager({
                 }))
               }
             />
-            <Input
-              dir="rtl"
-              className="font-arabic"
-              placeholder={assessmentsUi.builder.sectionTitle.ar}
-              value={createDraft.title_ar}
-              onChange={(event) =>
-                setCreateDraft((previous) => ({
-                  ...previous,
-                  title_ar: event.target.value,
-                }))
-              }
-            />
             <Textarea
               placeholder={assessmentsUi.builder.sectionInstructions.en}
               value={createDraft.instructions_en}
@@ -517,18 +462,6 @@ export function SectionManager({
                 setCreateDraft((previous) => ({
                   ...previous,
                   instructions_en: event.target.value,
-                }))
-              }
-            />
-            <Textarea
-              dir="rtl"
-              className="font-arabic"
-              placeholder={assessmentsUi.builder.sectionInstructions.ar}
-              value={createDraft.instructions_ar}
-              onChange={(event) =>
-                setCreateDraft((previous) => ({
-                  ...previous,
-                  instructions_ar: event.target.value,
                 }))
               }
             />

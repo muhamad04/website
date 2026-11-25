@@ -6,8 +6,10 @@
  */
 
 export const IMPORT_BUCKET = "assessment-imports";
-export const IMPORT_MAX_FILE_BYTES = 4 * 1024 * 1024;
-export const IMPORT_MAX_TOTAL_BYTES = 8 * 1024 * 1024;
+/** 50 MiB. The server may override this with ASSESSMENT_IMPORT_MAX_BYTES. */
+export const IMPORT_DEFAULT_MAX_FILE_BYTES = 50 * 1024 * 1024;
+export const IMPORT_MAX_FILE_BYTES = IMPORT_DEFAULT_MAX_FILE_BYTES;
+export const IMPORT_MAX_TOTAL_BYTES = 100 * 1024 * 1024;
 export const IMPORT_MAX_TEXT_CHARS = 200_000;
 export const IMPORT_RETENTION_HOURS = 24;
 export const IMPORT_SAVED_RETENTION_DAYS = 7;
@@ -27,7 +29,101 @@ export type ImportFileError =
   | "file_required"
   | "file_type_invalid"
   | "file_too_large"
-  | "file_empty";
+  | "file_empty"
+  | "file_name_invalid";
+
+export const IMPORT_ALLOWED_EXTENSIONS = [".docx", ".pdf", ".txt"] as const;
+
+const EXECUTABLE_EXTENSIONS = new Set([
+  "exe",
+  "com",
+  "bat",
+  "cmd",
+  "msi",
+  "scr",
+  "pif",
+  "cpl",
+  "dll",
+  "vbs",
+  "vbe",
+  "js",
+  "jse",
+  "wsf",
+  "wsh",
+  "ps1",
+  "psm1",
+  "sh",
+  "bash",
+  "jar",
+  "apk",
+  "app",
+  "dmg",
+  "iso",
+  "lnk",
+  "reg",
+  "hta",
+]);
+
+/** Rejects path traversal, control characters, hidden files and executables. */
+export function isSuspiciousImportFileName(name: string): boolean {
+  if (!name || name.length > 240 || name !== name.trim()) {
+    return true;
+  }
+
+  if (/[\\/]/.test(name) || name.includes("..") || /[\u0000-\u001f]/.test(name)) {
+    return true;
+  }
+
+  if (name.startsWith(".") || name.includes(":")) {
+    return true;
+  }
+
+  const segments = name.toLowerCase().split(".");
+  const extension = segments.pop() ?? "";
+
+  if (EXECUTABLE_EXTENSIONS.has(extension)) {
+    return true;
+  }
+
+  return segments.some((segment) => EXECUTABLE_EXTENSIONS.has(segment));
+}
+
+export function isAllowedImportMime(mime: string): boolean {
+  const normalised = mime.trim().toLowerCase().split(";")[0]?.trim() ?? "";
+  return Object.values(IMPORT_MIME_TYPES).some((types) =>
+    (types as readonly string[]).includes(normalised),
+  );
+}
+
+/**
+ * Cheap pre-upload check: extension and declared MIME must agree. Magic bytes
+ * are verified after the object lands in Storage and before parsing.
+ */
+export function importKindForFile(input: {
+  fileName: string;
+  mimeType: string;
+}): ImportFileKind | null {
+  if (isSuspiciousImportFileName(input.fileName)) {
+    return null;
+  }
+
+  const extension = extensionOf(input.fileName);
+  const mime = input.mimeType.trim().toLowerCase().split(";")[0]?.trim() ?? "";
+
+  if (extension === "docx" && IMPORT_MIME_TYPES.docx.some((type) => type === mime)) {
+    return "docx";
+  }
+
+  if (extension === "pdf" && IMPORT_MIME_TYPES.pdf.some((type) => type === mime)) {
+    return "pdf";
+  }
+
+  if (extension === "txt" && IMPORT_MIME_TYPES.txt.some((type) => type === mime)) {
+    return "txt";
+  }
+
+  return null;
+}
 
 export function extensionOf(name: string): string {
   const base = name.split(/[\\/]/).pop() ?? "";
@@ -107,17 +203,28 @@ export function detectImportFileKind(input: {
   fileName: string;
   mimeType: string;
   bytes: Uint8Array;
+  maxBytes?: number;
 }): { ok: true; kind: ImportFileKind } | { ok: false; error: ImportFileError } {
+  if (isSuspiciousImportFileName(input.fileName)) {
+    return { ok: false, error: "file_name_invalid" };
+  }
+
   if (input.bytes.length === 0) {
     return { ok: false, error: "file_empty" };
   }
 
-  if (input.bytes.length > IMPORT_MAX_FILE_BYTES) {
+  const maxBytes = input.maxBytes ?? IMPORT_MAX_FILE_BYTES;
+
+  if (input.bytes.length > maxBytes) {
     return { ok: false, error: "file_too_large" };
   }
 
   const extension = extensionOf(input.fileName);
   const mime = input.mimeType.trim().toLowerCase().split(";")[0]?.trim() ?? "";
+
+  if (!isAllowedImportMime(mime)) {
+    return { ok: false, error: "file_type_invalid" };
+  }
 
   if (extension === "docx") {
     const allowed = IMPORT_MIME_TYPES.docx.some((type) => type === mime);

@@ -275,7 +275,8 @@ export default async function StudentAssessmentsPage({
                       >
                         <Bi
                           en={assessment.title_en}
-                          ar={assessment.title_ar}
+                          ar=""
+                          hideSeparator
                         />
                       </Link>
                       <Badge

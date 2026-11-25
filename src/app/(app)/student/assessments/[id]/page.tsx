@@ -102,7 +102,7 @@ export default async function StudentAssessmentIntroPage({
   });
 
   return (
-    <div className="space-y-5">
+    <div translate="no" className="space-y-5">
       <PageHeader
         eyebrow={
           <Bi
@@ -110,13 +110,10 @@ export default async function StudentAssessmentIntroPage({
             ar={assessmentTypeCopy[assessment.type].ar}
           />
         }
-        title={<Bi en={assessment.title_en} ar={assessment.title_ar} />}
+        title={<Bi en={assessment.title_en} ar="" hideSeparator />}
         description={
-          assessment.instructions_en || assessment.instructions_ar ? (
-            <Bi
-              en={assessment.instructions_en ?? ""}
-              ar={assessment.instructions_ar ?? ""}
-            />
+          assessment.instructions_en ? (
+            <Bi en={assessment.instructions_en} ar="" hideSeparator />
           ) : (
             <Bi
               en={assessmentsUi.student.autoSubmit.en}

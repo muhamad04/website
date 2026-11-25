@@ -127,7 +127,8 @@ export function ManualGradingForm({
                 <p className="text-sm font-semibold text-foreground">
                   <Bi
                     en={row.prompt_en}
-                    ar={row.prompt_ar ?? row.prompt_en}
+                    ar=""
+                    hideSeparator
                   />
                 </p>
                 <span className="text-xs text-muted-foreground">

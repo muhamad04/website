@@ -94,15 +94,16 @@ export default async function StudentAttemptPage({
         title={
           <Bi
             en={payload.assessment.title_en}
-            ar={payload.assessment.title_ar}
+            ar=""
+            hideSeparator
           />
         }
         description={
-          payload.assessment.instructions_en ||
-          payload.assessment.instructions_ar ? (
+          payload.assessment.instructions_en ? (
             <Bi
-              en={payload.assessment.instructions_en ?? ""}
-              ar={payload.assessment.instructions_ar ?? ""}
+              en={payload.assessment.instructions_en}
+              ar=""
+              hideSeparator
             />
           ) : (
             <Bi

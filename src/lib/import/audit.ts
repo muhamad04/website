@@ -19,6 +19,14 @@ const SAFE_KEYS = new Set([
   "answer_kind",
   "status",
   "cancelled",
+  "file_name",
+  "file_size",
+  "model",
+  "ai_request_count",
+  "ai_warning_count",
+  "ai_suggestion_count",
+  "parser_confidence",
+  "review_count",
 ]);
 
 export function sanitiseImportAuditDetail(

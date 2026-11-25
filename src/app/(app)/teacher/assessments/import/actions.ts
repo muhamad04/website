@@ -94,9 +94,7 @@ function mapWriteError(message: string): ImportErrorCode {
 function normalisedSettings(settings: ImportSettingsInput): ImportDraft["settings"] {
   return {
     ...settings,
-    titleAr: settings.titleAr ?? "",
     instructionsEn: settings.instructionsEn ?? "",
-    instructionsAr: settings.instructionsAr ?? "",
     availableFrom: settings.availableFrom ?? "",
     availableUntil: settings.availableUntil ?? "",
   };
@@ -169,6 +167,7 @@ function buildDraftFromReview(options: {
   row: { draft: ImportDraft };
   settings: ImportSettingsInput;
   sections: ImportSectionInput[];
+  aiDecisions?: Array<{ id: string; status: "accepted" | "rejected" }>;
 }): ImportDraft {
   const settings = normalisedSettings(options.settings);
   const warnings = collectWarnings(
@@ -180,17 +179,19 @@ function buildDraftFromReview(options: {
     (section, sectionIndex) => ({
       key: section.key ?? `s-${sectionIndex + 1}`,
       titleEn: section.titleEn,
-      titleAr: section.titleAr ?? "",
       instructionsEn: section.instructionsEn ?? "",
+      marks: section.marks ?? null,
       questions: section.questions.map((question, questionIndex) => ({
         key: question.key ?? `q-${sectionIndex + 1}-${questionIndex + 1}`,
         sourceNumber: question.sourceNumber ?? "",
         type: question.type,
         promptEn: question.promptEn,
-        promptAr: question.promptAr ?? "",
         helpTextEn: question.helpTextEn ?? "",
         marks: question.marks,
         confidence: question.confidence,
+        confidenceScore: question.confidenceScore,
+        evidence: [...question.evidence],
+        reviewed: question.reviewed,
         gradingMethod: question.gradingMethod,
         options: question.options.map((option) => ({ ...option })),
         pairs: question.pairs.map((pair) => ({ ...pair })),
@@ -203,6 +204,24 @@ function buildDraftFromReview(options: {
     }),
   );
 
+  const allQuestions = sections.flatMap((section) => section.questions);
+  const storedAi = options.row.draft?.ai;
+  const ai =
+    storedAi && options.aiDecisions && options.aiDecisions.length > 0
+      ? {
+          ...storedAi,
+          suggestions: storedAi.suggestions.map((suggestion) => {
+            const decision = options.aiDecisions?.find(
+              (candidate) => candidate.id === suggestion.id,
+            );
+
+            return decision
+              ? { ...suggestion, status: decision.status }
+              : suggestion;
+          }),
+        }
+      : storedAi;
+
   return {
     settings,
     sections,
@@ -210,6 +229,7 @@ function buildDraftFromReview(options: {
     warnings,
     sourceText: options.row.draft?.sourceText ?? "",
     answerText: options.row.draft?.answerText ?? "",
+    ai,
     stats: {
       sectionCount: sections.length,
       questionCount: questions.length,
@@ -221,6 +241,21 @@ function buildDraftFromReview(options: {
       unmatchedAnswers: (options.row.draft?.answerKey ?? []).filter(
         (entry) => entry.status !== "matched",
       ).length,
+      reviewCount: allQuestions.filter(
+        (question) =>
+          question.confidence === "low" || question.warnings.length > 0,
+      ).length,
+      parserConfidence:
+        allQuestions.length === 0
+          ? 0
+          : Math.round(
+              (allQuestions.reduce(
+                (sum, question) => sum + (question.confidenceScore ?? 0.5),
+                0,
+              ) /
+                allQuestions.length) *
+                100,
+            ) / 100,
     },
   };
 }
@@ -279,6 +314,7 @@ export async function updateImportDraftAction(
     row: loaded.row,
     settings: parsed.data.settings,
     sections: parsed.data.sections,
+    aiDecisions: parsed.data.ai_decisions,
   });
   const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
   const supabase = await createClient();

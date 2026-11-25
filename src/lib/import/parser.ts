@@ -34,12 +34,15 @@ type RawQuestion = {
   warnings: ImportWarningCode[];
   inlineAnswer: string;
   explanation: string;
+  /** Last option was a bare label and its text is on the next line. */
+  pendingOption: boolean;
 };
 
 type RawSection = {
   titleEn: string;
   instructions: string[];
   explicit: boolean;
+  marks: number | null;
   questions: ImportQuestionDraft[];
 };
 
@@ -57,13 +60,22 @@ export type ParsedAnswerKey = {
 };
 
 const QUESTION_MARKER =
-  /^(?:Q(?:uestion)?\s*)?(\d{1,3})\s*[.)\]:\-]\s*(.+)$/i;
-const QUESTION_MARKER_SPACE = /^(?:Q(?:uestion)?\s*)?(\d{1,3})\s{1,3}(.+)$/i;
-const LETTER_OPTION = /^\(?([A-Ha-h])\)?\s*[.)\]:\-]\s+(.+)$/;
-const NUMBERED_OPTION = /^\(?(\d{1,2})\)\s+(.+)$/;
+  /^(?:q(?:uestion)?\s*)?([0-9]{1,3})\s*[.)\]:\-–—]\s*(.*)$/i;
+const QUESTION_MARKER_PAREN =
+  /^(?:q(?:uestion)?\s*)?\(([0-9]{1,3})\)\s*(.*)$/i;
+const QUESTION_MARKER_SPACE =
+  /^(?:q(?:uestion)?\s+)([0-9]{1,3})\s+(.+)$/i;
+const QUESTION_NUMBER_ONLY =
+  /^(?:q(?:uestion)?\s*)?([0-9]{1,3})\s*[.)\]:\-–—]?$/i;
+const LETTER_OPTION =
+  /^\(?([A-Ha-h])\)?\s*[.)\]:\-–—]\s*(.*)$/;
+const OPTION_LABEL_ONLY = /^\(?([A-Ha-h])\)?[.)\]:\-–—]$/;
+const NUMBERED_OPTION = /^\(?([0-9]{1,2})\)\s+(.+)$/;
 const SECTION_MARKER =
   /^(?:section|part)\s+([A-Za-z0-9\u0600-\u06ff]+)\s*(?:[:.\-–—]\s*)?(.*)$/i;
 const SECTION_MARKER_AR = /^(?:القسم|الجزء)\s+([^\s:：.\-–—]+)\s*(?:[:.\-–—]\s*)?(.*)$/;
+const SECTION_INSTRUCTION =
+  /^(?:choose|select|pick|answer|complete|match|true\s*(?:\/|or|-)\s*false|write|read|rewrite|find|fill|circle|underline|اختر|أجب|أكمل|طابق|صح|اكتب|اقرأ|أعد|اكتشف|املأ)/i;
 const METADATA_LINE =
   /^(?:name|student name|class|date|time|time allowed|duration|total marks|total|marks|grade|subject|teacher|school|اسم|الصف|الفصل|التاريخ|الوقت|الزمن|الدرجة الكلية|المادة|المعلم)\s*[:：]/i;
 const INSTRUCTION_START =
@@ -84,6 +96,19 @@ const ANSWER_LINE =
   /^(?:answer|correct answer|answer key|key|الإجابة|الجواب)\s*[:：\-–—]\s*(.+)$/i;
 const EXPLANATION_LINE =
   /^(?:explanation|reason|التفسير|التوضيح)\s*[:：\-–—]\s*(.+)$/i;
+
+const ARABIC_DIGITS = "٠١٢٣٤٥٦٧٨٩";
+const PERSIAN_DIGITS = "۰۱۲۳۴۵۶۷۸۹";
+
+/** Converts Arabic-Indic and Persian digits to ASCII without touching text. */
+export function asciiDigits(value: string): string {
+  return value.replace(/[٠-٩۰-۹]/g, (digit) => {
+    const arabic = ARABIC_DIGITS.indexOf(digit);
+    const persian = PERSIAN_DIGITS.indexOf(digit);
+    const index = arabic >= 0 ? arabic : persian;
+    return index >= 0 ? String(index) : digit;
+  });
+}
 
 function unique<T>(values: T[]): T[] {
   return [...new Set(values)];
@@ -107,7 +132,7 @@ function shortHash(value: string): string {
   return hash.toString(36);
 }
 
-function isSectionHeading(line: string): boolean {
+function isSectionHeading(line: string, nextLine = ""): boolean {
   if (SECTION_MARKER.test(line) || SECTION_MARKER_AR.test(line)) {
     return true;
   }
@@ -116,8 +141,23 @@ function isSectionHeading(line: string): boolean {
     return false;
   }
 
-  if (QUESTION_MARKER.test(line) || LETTER_OPTION.test(line)) {
+  if (
+    QUESTION_MARKER.test(line) ||
+    QUESTION_MARKER_PAREN.test(line) ||
+    LETTER_OPTION.test(line)
+  ) {
     return false;
+  }
+
+  const nextStartsQuestion = isQuestionStart(nextLine, true) !== null;
+
+  // Standalone instruction paragraphs such as "Choose the correct answer" are
+  // section headings when a question follows them.
+  if (
+    nextStartsQuestion &&
+    (SECTION_INSTRUCTION.test(line) || INSTRUCTION_START.test(line))
+  ) {
+    return line.length <= 80;
   }
 
   if (INSTRUCTION_START.test(line)) {
@@ -133,65 +173,98 @@ function isSectionHeading(line: string): boolean {
     return true;
   }
 
-  return endsWithColon && line.length <= 60;
+  if (endsWithColon && line.length <= 60) {
+    return true;
+  }
+
+  // A short standalone paragraph immediately before a question is treated as a
+  // heading even when it is title case (common in DOCX exports).
+  return (
+    nextStartsQuestion &&
+    line.length <= 60 &&
+    !endsLikeSentence &&
+    !/_{2,}/.test(line)
+  );
 }
 
 function sectionTitleFromLine(line: string): string {
-  const arabic = line.match(SECTION_MARKER_AR);
+  const withoutMarks = extractMarks(line).text;
+  const arabic = withoutMarks.match(SECTION_MARKER_AR);
   if (arabic) {
     const rest = arabic[2]?.trim() ?? "";
     return rest || `${arabic[1]}`;
   }
 
-  const english = line.match(SECTION_MARKER);
+  const english = withoutMarks.match(SECTION_MARKER);
   if (english) {
     const rest = english[2]?.trim() ?? "";
     return rest || `Section ${english[1]}`;
   }
 
-  return line.replace(/:\s*$/, "").trim() || "Questions";
+  return withoutMarks.replace(/:\s*$/, "").trim() || "Questions";
 }
 
-function isQuestionStart(line: string): { number: string; text: string } | null {
-  const marked = line.match(QUESTION_MARKER) ?? line.match(QUESTION_MARKER_SPACE);
+function sectionMarksFromLine(line: string): number | null {
+  return extractMarks(line).marks;
+}
 
-  if (!marked) {
-    return null;
+function isQuestionStart(
+  line: string,
+  allowEmpty = false,
+): { number: string; text: string } | null {
+  const normalised = asciiDigits(line);
+  const marked =
+    normalised.match(QUESTION_MARKER) ??
+    normalised.match(QUESTION_MARKER_PAREN) ??
+    normalised.match(QUESTION_MARKER_SPACE);
+
+  if (marked) {
+    const text = marked[2]?.trim() ?? "";
+
+    if (!text && !allowEmpty) {
+      return null;
+    }
+
+    return { number: marked[1], text };
   }
 
-  const text = marked[2]?.trim() ?? "";
+  const only = normalised.match(QUESTION_NUMBER_ONLY);
 
-  if (!text) {
-    return null;
+  if (
+    only &&
+    (/^(?:q(?:uestion)?)\b/i.test(normalised) || /[.)\]:\-–—]\s*$/.test(normalised))
+  ) {
+    return { number: only[1], text: "" };
   }
 
-  return { number: marked[1], text };
+  return null;
 }
 
 function parseOptionLine(
   line: string,
 ): { label: string; text: string; correct: boolean } | null {
-  const match = line.match(LETTER_OPTION);
+  const match = line.match(LETTER_OPTION) ?? line.match(OPTION_LABEL_ONLY);
 
   if (!match) {
     return null;
   }
 
-  let text = match[2].trim();
-
-  if (!text) {
-    return null;
-  }
-
+  let text = (match[2] ?? "").trim();
   let correct = false;
-  const marked = text.match(/(?:\s*[\*✓✔]|\s*\((?:correct|answer)\)|\s*\[(?:correct|answer)\])\s*$/i);
+  const marked = text.match(
+    /(?:\s*[\*✓✔]|\s*\((?:correct|answer)\)|\s*\[(?:correct|answer)\])\s*$/i,
+  );
 
   if (marked) {
     correct = true;
     text = text.slice(0, marked.index).trim();
   }
 
-  return { label: match[1].toUpperCase(), text, correct: correct && text !== "" };
+  return {
+    label: match[1].toUpperCase(),
+    text,
+    correct: correct && text !== "",
+  };
 }
 
 function hasChooseCue(question: RawQuestion): boolean {
@@ -278,13 +351,15 @@ function isMatchingQuestion(question: RawQuestion): boolean {
 }
 
 function extractMarks(text: string): { text: string; marks: number | null } {
-  let result = text;
+  let result = asciiDigits(text);
   let marks: number | null = null;
 
-  const patterns = [
-    /(?:\(|\[)\s*(\d+(?:\.\d+)?)\s*(?:marks?|points?|درجات?|درجة)\s*(?:\)|\])/i,
+  const patterns: Array<RegExp> = [
+    /(?:\(|\[)\s*(\d+(?:\.\d+)?)\s*(?:marks?|points?|درجات?|درجة|درجتان)\s*(?:\)|\])/i,
+    /(?:^|\s)(\d+(?:\.\d+)?)\s*(?:marks?|points?|درجات?|درجة|درجتان)(?=\s|$)/i,
     /[-–—]\s*(\d+(?:\.\d+)?)\s*(?:marks?|points?)\s*$/im,
     /(?:^|\s)\[\s*(\d+(?:\.\d+)?)\s*\]\s*$/m,
+    /(?:^|\s)درجتان(?=\s|$)/,
   ];
 
   for (const pattern of patterns) {
@@ -294,7 +369,7 @@ function extractMarks(text: string): { text: string; marks: number | null } {
       continue;
     }
 
-    const value = Number(match[1]);
+    const value = match[1] ? Number(match[1]) : 2;
 
     if (Number.isFinite(value) && value >= 0.01 && value <= 100) {
       marks = value;
@@ -335,56 +410,138 @@ function normaliseAccepted(value: string): string[] {
   );
 }
 
-function inferType(
-  question: RawQuestion,
-  prompt: string,
-): { type: QuestionType; confidence: ImportConfidence; warnings: ImportWarningCode[] } {
+function inferType(question: RawQuestion, prompt: string): {
+  type: QuestionType;
+  confidence: ImportConfidence;
+  confidenceScore: number;
+  evidence: string[];
+  warnings: ImportWarningCode[];
+} {
   const warnings: ImportWarningCode[] = [];
+  const evidence: string[] = [];
 
   if (isMatchingQuestion(question)) {
+    evidence.push(`pairs:${question.pairs.length}`);
+
     if (question.pairs.length < 2) {
       warnings.push("matching_incomplete");
-      return { type: "matching", confidence: "low", warnings };
+      return {
+        type: "matching",
+        confidence: "low",
+        confidenceScore: 0.35,
+        evidence,
+        warnings,
+      };
     }
 
-    return { type: "matching", confidence: "medium", warnings };
+    return {
+      type: "matching",
+      confidence: "medium",
+      confidenceScore: 0.72,
+      evidence,
+      warnings,
+    };
   }
 
   if (question.options.length >= 2) {
-    return { type: "multiple_choice", confidence: "high", warnings };
+    evidence.push(`options:${question.options.length}`);
+    return {
+      type: "multiple_choice",
+      confidence: "high",
+      confidenceScore: 0.95,
+      evidence,
+      warnings,
+    };
   }
 
   if (MCQ_CUE.test(prompt)) {
+    evidence.push("cue:choose");
     warnings.push("multiple_choice_missing_options");
-    return { type: "multiple_choice", confidence: "low", warnings };
+    return {
+      type: "multiple_choice",
+      confidence: "low",
+      confidenceScore: 0.3,
+      evidence,
+      warnings,
+    };
   }
 
   if (TRUE_FALSE_CUE.test(prompt)) {
-    return { type: "true_false", confidence: "high", warnings };
+    evidence.push("cue:true-false");
+    return {
+      type: "true_false",
+      confidence: "high",
+      confidenceScore: 0.92,
+      evidence,
+      warnings,
+    };
   }
 
   if (FILE_UPLOAD_CUE.test(prompt)) {
-    return { type: "file_upload", confidence: "medium", warnings };
+    evidence.push("cue:file-upload");
+    return {
+      type: "file_upload",
+      confidence: "medium",
+      confidenceScore: 0.7,
+      evidence,
+      warnings,
+    };
   }
 
   if (FIND_MISTAKE_CUE.test(prompt)) {
-    return { type: "find_the_mistake", confidence: "medium", warnings };
+    evidence.push("cue:find-mistake");
+    return {
+      type: "find_the_mistake",
+      confidence: "medium",
+      confidenceScore: 0.7,
+      evidence,
+      warnings,
+    };
   }
 
   if (REWRITE_CUE.test(prompt)) {
-    return { type: "rewrite", confidence: "medium", warnings };
+    evidence.push("cue:rewrite");
+    return {
+      type: "rewrite",
+      confidence: "medium",
+      confidenceScore: 0.7,
+      evidence,
+      warnings,
+    };
   }
 
   if (ESSAY_CUE.test(prompt)) {
-    return { type: "essay", confidence: "medium", warnings };
+    evidence.push("cue:essay");
+    return {
+      type: "essay",
+      confidence: "medium",
+      confidenceScore: 0.7,
+      evidence,
+      warnings,
+    };
   }
 
   if (/_{2,}/.test(prompt)) {
-    return { type: "short_answer", confidence: "high", warnings };
+    evidence.push("blank:underscores");
+    return {
+      type: "short_answer",
+      confidence: "high",
+      confidenceScore: 0.85,
+      evidence,
+      warnings,
+    };
   }
 
   warnings.push("low_confidence_type");
-  return { type: "short_answer", confidence: "low", warnings };
+  warnings.push("unsupported_question_type");
+  evidence.push("no-type-cue");
+  return {
+    type: "short_answer",
+    confidence: "low",
+    confidenceScore: 0.25,
+    evidence,
+    warnings,
+  };
 }
 
 function applyInlineAnswer(
@@ -491,10 +648,11 @@ function buildQuestion(raw: RawQuestion, index: number): ImportQuestionDraft {
     sourceNumber: raw.sourceNumber,
     type: inferred.type,
     promptEn: prompt,
-    promptAr: "",
     helpTextEn: "",
     marks: marks.marks ?? 1,
     confidence: inferred.confidence,
+    confidenceScore: inferred.confidenceScore,
+    evidence: inferred.evidence,
     gradingMethod:
       inferred.type === "essay" ||
       inferred.type === "file_upload" ||
@@ -510,6 +668,7 @@ function buildQuestion(raw: RawQuestion, index: number): ImportQuestionDraft {
     explanationEn: raw.explanation,
     warnings: unique(warnings),
     raw: raw.lines.join("\n").trim(),
+    reviewed: false,
   };
 
   if (answerLinePresent(raw)) {
@@ -540,8 +699,24 @@ function finaliseRawQuestion(
 }
 
 function isAnswerKeyHeading(line: string): boolean {
-  return /^(?:answer\s*key|answers?|marking scheme|مفتاح الإجابة|الإجابات|نموذج الإجابة)\s*[:：]?\s*$/i.test(
-    line,
+  const trimmed = line.trim();
+
+  if (
+    /^(?:answer\s*key|answers?|marking scheme|مفتاح الإجابة|الإجابات|نموذج الإجابة)\s*[:：]?\s*$/i.test(
+      trimmed,
+    )
+  ) {
+    return true;
+  }
+
+  // Titles such as "Conditionals Quiz — Answer Key" are headings, not answers.
+  // A numbered question that merely ends with the words "answer key" is not.
+  return (
+    trimmed.length <= 100 &&
+    !/^\(?\d+[).:\-]/.test(trimmed) &&
+    /(?:answer\s*key|marking scheme|مفتاح الإجابة|نموذج الإجابة)\s*[:：]?\s*$/i.test(
+      trimmed,
+    )
   );
 }
 
@@ -562,6 +737,7 @@ export function parseQuestionDocument(
         titleEn: "Questions",
         instructions: [],
         explicit: false,
+        marks: null,
         questions: [],
       };
       rawSections.push(currentSection);
@@ -580,18 +756,34 @@ export function parseQuestionDocument(
     currentQuestion = null;
   };
 
-  const startSection = (title: string) => {
+  const startSection = (title: string, marks: number | null = null) => {
     finishQuestion();
     currentSection = {
       titleEn: title,
       instructions: [],
       explicit: true,
+      marks,
       questions: [],
     };
     rawSections.push(currentSection);
   };
 
-  for (const line of lines) {
+  const nextNonEmpty = (from: number): string => {
+    for (let index = from + 1; index < lines.length; index += 1) {
+      if (lines[index].trim() !== "") {
+        return lines[index];
+      }
+    }
+
+    return "";
+  };
+
+  const addOption = (question: RawQuestion, text: string, correct = false) => {
+    question.options.push({ text, correct });
+    question.pendingOption = false;
+  };
+
+  for (const [lineIndex, line] of lines.entries()) {
     if (line.trim() === "") {
       if (currentQuestion) {
         currentQuestion.lines.push("");
@@ -603,12 +795,43 @@ export function parseQuestionDocument(
       continue;
     }
 
-    if (isSectionHeading(line)) {
-      startSection(sectionTitleFromLine(line));
+    if (isSectionHeading(line, nextNonEmpty(lineIndex))) {
+      startSection(sectionTitleFromLine(line), sectionMarksFromLine(line));
       continue;
     }
 
     if (currentQuestion) {
+      // A DOCX table row can contain several choices, or a matching pair.
+      const cells = line
+        .split(/\s*\|\s*/)
+        .map((cell) => cell.trim())
+        .filter(Boolean);
+
+      if (cells.length > 1) {
+        let handled = false;
+
+        for (const cell of cells) {
+          const option = parseOptionLine(cell);
+
+          if (option) {
+            addOption(currentQuestion, option.text, option.correct);
+            handled = true;
+            continue;
+          }
+
+          const pair = parsePairLine(cell);
+
+          if (pair) {
+            currentQuestion.pairs.push(pair);
+            handled = true;
+          }
+        }
+
+        if (handled) {
+          continue;
+        }
+      }
+
       const matchingPair =
         isMatchingQuestion(currentQuestion) && parsePairLine(line);
       if (matchingPair) {
@@ -631,26 +854,27 @@ export function parseQuestionDocument(
           }
 
           if (choiceText) {
-            currentQuestion.options.push({ text: choiceText, correct });
+            addOption(currentQuestion, choiceText, correct);
             continue;
           }
         }
       }
     }
 
-    const start = isQuestionStart(line);
+    const start = isQuestionStart(line, true);
 
     if (start) {
       finishQuestion();
       ensureSection();
       currentQuestion = {
         sourceNumber: start.number,
-        lines: [start.text],
+        lines: start.text ? [start.text] : [],
         options: [],
         pairs: [],
         warnings: [],
         inlineAnswer: "",
         explanation: "",
+        pendingOption: false,
       };
       continue;
     }
@@ -670,10 +894,26 @@ export function parseQuestionDocument(
 
       const option = parseOptionLine(line);
       if (option) {
-        currentQuestion.options.push({
-          text: option.text,
-          correct: option.correct,
-        });
+        addOption(currentQuestion, option.text, option.correct);
+
+        if (!option.text) {
+          currentQuestion.pendingOption = true;
+        }
+
+        continue;
+      }
+
+      if (currentQuestion.pendingOption && currentQuestion.options.length > 0) {
+        const last = currentQuestion.options[currentQuestion.options.length - 1];
+        last.text = `${last.text} ${line}`.trim();
+        currentQuestion.pendingOption = false;
+        continue;
+      }
+
+      // Choices often wrap onto a second line in DOCX exports.
+      if (currentQuestion.options.length > 0 && !/[?:]$/.test(line)) {
+        const last = currentQuestion.options[currentQuestion.options.length - 1];
+        last.text = `${last.text} ${line}`.replace(/\s+/g, " ").trim();
         continue;
       }
 
@@ -696,10 +936,39 @@ export function parseQuestionDocument(
     .map((section, sectionIndex) => ({
       key: `s-${sectionIndex + 1}`,
       titleEn: section.titleEn,
-      titleAr: "",
       instructionsEn: section.instructions.join("\n").trim(),
+      marks: section.marks,
       questions: section.questions,
     }));
+
+  // When a section heading prints a total (e.g. "Section A (10 marks)") and the
+  // questions carry no explicit marks, distribute the total evenly.
+  for (const section of sections) {
+    if (!section.marks || section.questions.length === 0) {
+      continue;
+    }
+
+    const sum = section.questions.reduce((total, question) => total + question.marks, 0);
+    const allDefault = section.questions.every((question) => question.marks === 1);
+
+    if (!allDefault || sum === section.marks) {
+      continue;
+    }
+
+    const count = section.questions.length;
+    const share = section.marks / count;
+
+    if (Number.isInteger(share) && share > 0) {
+      for (const question of section.questions) {
+        question.marks = share;
+      }
+    } else {
+      section.questions[0].warnings = unique([
+        ...section.questions[0].warnings,
+        "section_marks_distributed",
+      ]);
+    }
+  }
 
   const questionCount = sections.reduce(
     (sum, section) => sum + section.questions.length,
@@ -855,6 +1124,38 @@ function splitAnswers(raw: string): string[] {
   return [stripped];
 }
 
+function parseAnswerValue(raw: string): {
+  letter: string | null;
+  answerText: string | null;
+  answers: string[];
+} {
+  const value = raw.trim();
+
+  // "B. dog", "B) dog", "(B) dog", "B - dog"
+  const labelled = value.match(/^\(?([A-Ha-h])\)?\s*[.):\-–—]\s*(.+)$/);
+
+  if (labelled) {
+    return {
+      letter: labelled[1].toUpperCase(),
+      answerText: labelled[2].trim() || null,
+      answers: [labelled[1].toUpperCase()],
+    };
+  }
+
+  // Bare letter: "B", "b.", "(B)"
+  const bare = value.match(/^\(?([A-Ha-h])\)?[.)]?$/);
+
+  if (bare) {
+    return {
+      letter: bare[1].toUpperCase(),
+      answerText: null,
+      answers: [bare[1].toUpperCase()],
+    };
+  }
+
+  return { letter: null, answerText: value || null, answers: splitAnswers(value) };
+}
+
 export function parseAnswerKey(text: string): ParsedAnswerKey {
   const lines = normaliseLines(text);
   const entries: ImportAnswerEntry[] = [];
@@ -883,6 +1184,8 @@ export function parseAnswerKey(text: string): ParsedAnswerKey {
         number: "",
         raw: line.trim(),
         answers,
+        letter: null,
+        answerText: line.trim(),
         status: "unmatched",
         warnings: [],
       });
@@ -896,13 +1199,16 @@ export function parseAnswerKey(text: string): ParsedAnswerKey {
     if (leading) {
       const number = leading[1];
       const raw = leading[2].trim();
-      const answers = splitAnswers(raw);
+      const value = parseAnswerValue(raw);
+      const answers = value.answers;
 
       entries.push({
         key: `a-${entries.length + 1}-${shortHash(`${number}:${raw}`)}`,
         number,
         raw,
         answers,
+        letter: value.letter,
+        answerText: value.answerText,
         status: "unmatched",
         warnings:
           answers.length > 1 &&
@@ -927,6 +1233,8 @@ export function parseAnswerKey(text: string): ParsedAnswerKey {
         number: "",
         raw: line.trim(),
         answers,
+        letter: null,
+        answerText: line.trim(),
         status: "unmatched",
         warnings: ["matching_answer_not_applied"],
       });
@@ -1027,15 +1335,25 @@ function applyEntry(
   }
 
   if (question.type === "multiple_choice") {
-    if (entry.answers.length !== 1) {
+    const letterToken =
+      entry.letter ??
+      (entry.answers.length === 1
+        ? entry.answers[0].trim().match(/^\(?([A-Ha-h])\)?[.)]?$/)?.[1] ?? null
+        : null);
+
+    if (entry.answers.length !== 1 && !letterToken) {
       return { status: "ambiguous", warnings: ["ambiguous_answer"] };
     }
 
-    const token = entry.answers[0].trim();
-    const letter = token.match(/^\(?([A-Ha-h])\)?[.)]?$/);
+    const normaliseOption = (value: string) =>
+      value
+        .toLowerCase()
+        .replace(/[“”"'’.,;:!?()[\]{}]/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
 
-    if (letter) {
-      const label = letter[1].toUpperCase();
+    if (letterToken) {
+      const label = letterToken.toUpperCase();
       const index = question.options.findIndex(
         (_, optionIndex) => String.fromCharCode(65 + optionIndex) === label,
       );
@@ -1044,12 +1362,30 @@ function applyEntry(
         return { status: "matched", warnings: ["answer_mismatch"] };
       }
 
+      // A key may print both the letter and the option text. When both are
+      // present and they genuinely disagree, flag it; when they agree, stay
+      // silent. The letter remains authoritative.
+      if (entry.answerText) {
+        const expected = normaliseOption(entry.answerText);
+        const actual = normaliseOption(question.options[index].text);
+
+        if (
+          expected &&
+          actual &&
+          expected !== actual &&
+          !actual.includes(expected) &&
+          !expected.includes(actual)
+        ) {
+          warnings.push("answer_text_mismatch");
+        }
+      }
+
       const existing = question.options
         .map((option, optionIndex) => (option.correct ? optionIndex : -1))
         .filter((optionIndex) => optionIndex >= 0);
 
       if (existing.length > 0 && (existing.length > 1 || existing[0] !== index)) {
-        return { status: "ambiguous", warnings: ["ambiguous_answer"] };
+        return { status: "ambiguous", warnings: unique([...warnings, "ambiguous_answer"]) };
       }
 
       question.options = question.options.map((option, optionIndex) => ({
@@ -1058,6 +1394,12 @@ function applyEntry(
       }));
       question.gradingMethod = "automatic";
       return { status: "matched", warnings };
+    }
+
+    const token = entry.answers[0]?.trim() ?? "";
+
+    if (!token) {
+      return { status: "unmatched", warnings: ["unmatched_answer"] };
     }
 
     const index = question.options.findIndex(
@@ -1312,13 +1654,27 @@ function buildQuestionStats(sections: ImportSectionDraft[]): {
   sectionCount: number;
   questionCount: number;
   totalMarks: number;
+  reviewCount: number;
+  parserConfidence: number;
 } {
   const questions = sections.flatMap((section) => section.questions);
+  const reviewCount = questions.filter(
+    (question) => question.confidence === "low" || question.warnings.length > 0,
+  ).length;
+  const parserConfidence =
+    questions.length === 0
+      ? 0
+      : questions.reduce(
+          (sum, question) => sum + (question.confidenceScore ?? 0.5),
+          0,
+        ) / questions.length;
 
   return {
     sectionCount: sections.length,
     questionCount: questions.length,
     totalMarks: questions.reduce((sum, question) => sum + question.marks, 0),
+    reviewCount,
+    parserConfidence: Math.round(parserConfidence * 100) / 100,
   };
 }
 

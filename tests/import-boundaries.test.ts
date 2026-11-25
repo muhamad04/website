@@ -101,6 +101,33 @@ describe("no external AI or OCR services", () => {
   });
 });
 
+describe("OpenRouter boundary", () => {
+  it("keeps the API key out of client components and NEXT_PUBLIC variables", () => {
+    const clientSources = readSourceFiles(
+      join(root, "src", "components"),
+    ).map((file) => file.source);
+    const allSources = readSourceFiles(join(root, "src"));
+
+    for (const source of clientSources) {
+      expect(source).not.toContain("OPENROUTER_API_KEY");
+      expect(source).not.toContain("openrouter.ai/api");
+    }
+
+    for (const file of allSources) {
+      expect(file.source, file.path).not.toMatch(/NEXT_PUBLIC_OPENROUTER/);
+    }
+  });
+
+  it("runs the AI client through the server-only guard", () => {
+    const source = readFileSync(join(importLibDir, "ai.ts"), "utf-8");
+
+    expect(source).toMatch(/^import "server-only";/m);
+    expect(source).not.toMatch(
+      /console\.(?:log|error|warn)\([^)]*apiKey/i,
+    );
+  });
+});
+
 describe("import save boundaries", () => {
   it("hard-codes unpublished inserts and never publishes inline", () => {
     const source = readFileSync(join(importLibDir, "save.ts"), "utf-8");
