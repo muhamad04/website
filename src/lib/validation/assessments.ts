@@ -149,9 +149,7 @@ const acceptedList = z.preprocess(
 const assessmentBaseSchema = z.object({
   type: z.enum(["quiz", "exam"], { error: "type_invalid" }),
   title_en: requiredText(200, "title_required"),
-  title_ar: requiredText(200, "title_required"),
   instructions_en: trimmed(4000),
-  instructions_ar: trimmed(4000),
   grade_id: z.uuid({ error: "grade_required" }),
   time_limit_minutes: z.coerce
     .number({ error: "time_limit_invalid" })
@@ -248,9 +246,7 @@ export const setAssessmentPublishedSchema = z.object({
 
 const sectionBaseSchema = z.object({
   title_en: requiredText(200, "section_title_required"),
-  title_ar: requiredText(200, "section_title_required"),
   instructions_en: trimmed(2000),
-  instructions_ar: trimmed(2000),
 });
 
 export const createSectionSchema = sectionBaseSchema.extend({
@@ -322,7 +318,6 @@ const optionInputSchema = z.object({
     .trim()
     .min(1, { error: "question_option_required" })
     .max(500, { error: "question_options_invalid" }),
-  text_ar: trimmed(500),
 });
 
 const pairInputSchema = z.object({
@@ -331,21 +326,17 @@ const pairInputSchema = z.object({
     .trim()
     .min(1, { error: "question_pairs_invalid" })
     .max(500, { error: "question_pairs_invalid" }),
-  left_text_ar: trimmed(500),
   right_text_en: z
     .string()
     .trim()
     .min(1, { error: "question_pairs_invalid" })
     .max(500, { error: "question_pairs_invalid" }),
-  right_text_ar: trimmed(500),
 });
 
 const questionBaseSchema = z.object({
   type: z.enum(QUESTION_TYPES, { error: "question_type_invalid" }),
   prompt_en: requiredText(4000, "question_prompt_required"),
-  prompt_ar: trimmed(4000),
   help_text_en: trimmed(1000),
-  help_text_ar: trimmed(1000),
   marks: z.coerce
     .number({ error: "question_marks_invalid" })
     .min(0.01, { error: "question_marks_invalid" })
@@ -358,7 +349,6 @@ const questionBaseSchema = z.object({
     error: "grading_method_invalid",
   }),
   explanation_en: trimmed(2000),
-  explanation_ar: trimmed(2000),
   options: z.array(optionInputSchema).max(10).optional(),
   correct_index: z.coerce.number().int().min(0).max(9).optional(),
   correct_value: z.enum(["true", "false"]).optional(),

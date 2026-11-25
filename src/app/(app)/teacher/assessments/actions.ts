@@ -132,9 +132,11 @@ export async function createAssessmentAction(
       grade_id: data.grade_id,
       type: data.type,
       title_en: data.title_en,
-      title_ar: data.title_ar,
+      // Assessments are authored in English only now, but the legacy column is
+      // still NOT NULL. New rows mirror the English title; updates below omit
+      // the Arabic column so existing Arabic data is never overwritten.
+      title_ar: data.title_en,
       instructions_en: data.instructions_en ?? null,
-      instructions_ar: data.instructions_ar ?? null,
       time_limit_minutes: data.time_limit_minutes,
       results_visibility: data.results_visibility,
       grading_mode: data.grading_mode,
@@ -197,9 +199,7 @@ export async function updateAssessmentAction(
       grade_id: data.grade_id,
       type: data.type,
       title_en: data.title_en,
-      title_ar: data.title_ar,
       instructions_en: data.instructions_en ?? null,
-      instructions_ar: data.instructions_ar ?? null,
       time_limit_minutes: data.time_limit_minutes,
       results_visibility: data.results_visibility,
       grading_mode: data.grading_mode,
@@ -387,9 +387,10 @@ export async function createSectionAction(
     .insert({
       assessment_id: assessment.id,
       title_en: parsed.data.title_en,
-      title_ar: parsed.data.title_ar,
+      // Legacy NOT NULL column: mirror the English title for new sections.
+      // Section updates omit it, preserving any Arabic already stored.
+      title_ar: parsed.data.title_en,
       instructions_en: parsed.data.instructions_en ?? null,
-      instructions_ar: parsed.data.instructions_ar ?? null,
       position,
     })
     .select("id")
@@ -436,9 +437,7 @@ export async function updateSectionAction(
     .from("assessment_sections")
     .update({
       title_en: parsed.data.title_en,
-      title_ar: parsed.data.title_ar,
       instructions_en: parsed.data.instructions_en ?? null,
-      instructions_ar: parsed.data.instructions_ar ?? null,
     })
     .eq("id", section.id);
 
@@ -581,13 +580,11 @@ async function insertQuestionChildren(
   questionId: string,
   input: {
     type: string;
-    options?: Array<{ text_en: string; text_ar?: string }>;
+    options?: Array<{ text_en: string }>;
     correct_index?: number;
     pairs?: Array<{
       left_text_en: string;
-      left_text_ar?: string;
       right_text_en: string;
-      right_text_ar?: string;
     }>;
   },
 ): Promise<string | null> {
@@ -596,7 +593,6 @@ async function insertQuestionChildren(
       question_id: questionId,
       label: optionLabel(index),
       text_en: option.text_en,
-      text_ar: option.text_ar ?? null,
       is_correct: index === input.correct_index,
       position: index,
     }));
@@ -609,9 +605,7 @@ async function insertQuestionChildren(
     const rows = (input.pairs ?? []).map((pair, index) => ({
       question_id: questionId,
       left_text_en: pair.left_text_en,
-      left_text_ar: pair.left_text_ar ?? null,
       right_text_en: pair.right_text_en,
-      right_text_ar: pair.right_text_ar ?? null,
       position: index,
     }));
 
@@ -674,16 +668,13 @@ export async function createQuestionAction(
       section_id: section.id,
       type: data.type,
       prompt_en: data.prompt_en,
-      prompt_ar: data.prompt_ar ?? null,
       help_text_en: data.help_text_en ?? null,
-      help_text_ar: data.help_text_ar ?? null,
       marks: data.marks,
       is_required: data.is_required,
       position,
       correct_answer: answerKeyForQuestion(data),
       grading_method: data.grading_method,
       explanation_en: data.explanation_en ?? null,
-      explanation_ar: data.explanation_ar ?? null,
     })
     .select("id")
     .single();
@@ -775,15 +766,12 @@ export async function updateQuestionAction(
     .update({
       type: data.type,
       prompt_en: data.prompt_en,
-      prompt_ar: data.prompt_ar ?? null,
       help_text_en: data.help_text_en ?? null,
-      help_text_ar: data.help_text_ar ?? null,
       marks: data.marks,
       is_required: data.is_required,
       correct_answer: answerKeyForQuestion(data),
       grading_method: data.grading_method,
       explanation_en: data.explanation_en ?? null,
-      explanation_ar: data.explanation_ar ?? null,
     })
     .eq("id", question.id);
 

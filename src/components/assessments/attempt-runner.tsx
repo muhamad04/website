@@ -613,7 +613,11 @@ export function AttemptRunner({
                 }
                 className="mt-0.5 size-4"
               />
-              <Bi en={option.text_en} ar={option.text_ar ?? option.text_en} />
+              <Bi
+                en={option.text_en}
+                ar=""
+                hideSeparator
+              />
             </label>
           ))}
         </div>
@@ -667,7 +671,11 @@ export function AttemptRunner({
               className="grid gap-2 rounded-lg border border-border/70 bg-background/60 p-3 sm:grid-cols-2 sm:items-center"
             >
               <div className="text-sm font-medium">
-                <Bi en={left.text_en} ar={left.text_ar ?? left.text_en} />
+                <Bi
+                  en={left.text_en}
+                  ar=""
+                  hideSeparator
+                />
               </div>
               <Select
                 aria-label={`${left.text_en} match`}
@@ -692,7 +700,6 @@ export function AttemptRunner({
                 {question.right_items.map((right) => (
                   <option key={right.id} value={right.id}>
                     {right.text_en}
-                    {right.text_ar ? ` · ${right.text_ar}` : ""}
                   </option>
                 ))}
               </Select>
@@ -788,7 +795,8 @@ export function AttemptRunner({
 
   return (
     <div
-      className="space-y-5"
+      translate="no"
+      className="space-y-5 notranslate"
       onCopy={strictExamMode ? (event) => event.preventDefault() : undefined}
       onCut={strictExamMode ? (event) => event.preventDefault() : undefined}
       onPaste={strictExamMode ? (event) => event.preventDefault() : undefined}
@@ -940,13 +948,18 @@ export function AttemptRunner({
         <section key={section.id} className="space-y-3">
           <div className="rounded-xl border border-border bg-secondary/40 p-4">
             <h2 className="text-base font-bold text-foreground">
-              <Bi en={section.title_en} ar={section.title_ar} />
+              <Bi
+                en={section.title_en}
+                ar=""
+                hideSeparator
+              />
             </h2>
-            {section.instructions_en || section.instructions_ar ? (
+            {section.instructions_en ? (
               <p className="mt-1 text-sm text-muted-foreground">
                 <Bi
-                  en={section.instructions_en ?? ""}
-                  ar={section.instructions_ar ?? ""}
+                  en={section.instructions_en}
+                  ar=""
+                  hideSeparator
                 />
               </p>
             ) : null}
@@ -966,14 +979,16 @@ export function AttemptRunner({
                       </span>
                       <Bi
                         en={question.prompt_en}
-                        ar={question.prompt_ar ?? question.prompt_en}
+                        ar=""
+                        hideSeparator
                       />
                     </p>
-                    {question.help_text_en || question.help_text_ar ? (
+                    {question.help_text_en ? (
                       <p className="mt-1 ps-8 text-xs text-muted-foreground">
                         <Bi
-                          en={question.help_text_en ?? ""}
-                          ar={question.help_text_ar ?? ""}
+                          en={question.help_text_en}
+                          ar=""
+                          hideSeparator
                         />
                       </p>
                     ) : null}

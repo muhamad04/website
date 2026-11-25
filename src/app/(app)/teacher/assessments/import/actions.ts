@@ -94,9 +94,7 @@ function mapWriteError(message: string): ImportErrorCode {
 function normalisedSettings(settings: ImportSettingsInput): ImportDraft["settings"] {
   return {
     ...settings,
-    titleAr: settings.titleAr ?? "",
     instructionsEn: settings.instructionsEn ?? "",
-    instructionsAr: settings.instructionsAr ?? "",
     availableFrom: settings.availableFrom ?? "",
     availableUntil: settings.availableUntil ?? "",
   };
@@ -181,7 +179,6 @@ function buildDraftFromReview(options: {
     (section, sectionIndex) => ({
       key: section.key ?? `s-${sectionIndex + 1}`,
       titleEn: section.titleEn,
-      titleAr: section.titleAr ?? "",
       instructionsEn: section.instructionsEn ?? "",
       marks: section.marks ?? null,
       questions: section.questions.map((question, questionIndex) => ({
@@ -189,7 +186,6 @@ function buildDraftFromReview(options: {
         sourceNumber: question.sourceNumber ?? "",
         type: question.type,
         promptEn: question.promptEn,
-        promptAr: question.promptAr ?? "",
         helpTextEn: question.helpTextEn ?? "",
         marks: question.marks,
         confidence: question.confidence,

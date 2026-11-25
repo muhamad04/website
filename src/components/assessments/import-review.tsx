@@ -76,7 +76,6 @@ type ReviewQuestion = {
   sourceNumber: string;
   type: QuestionType;
   promptEn: string;
-  promptAr: string;
   helpTextEn: string;
   marks: string;
   confidence: ImportConfidence;
@@ -89,7 +88,6 @@ type ReviewQuestion = {
   accepted: string[];
   correctValue: "true" | "false" | null;
   explanationEn: string;
-  explanationAr: string;
   warnings: ImportWarningCode[];
   raw: string;
 };
@@ -97,7 +95,6 @@ type ReviewQuestion = {
 type ReviewSection = {
   key: string;
   titleEn: string;
-  titleAr: string;
   instructionsEn: string;
   marks: number | null;
   questions: ReviewQuestion[];
@@ -109,9 +106,7 @@ type ReviewSettings = {
   type: AssessmentType;
   gradeId: string;
   titleEn: string;
-  titleAr: string;
   instructionsEn: string;
-  instructionsAr: string;
   timeLimitMinutes: string;
   resultsVisibility: ResultsVisibility;
   allowRetakes: boolean;
@@ -150,7 +145,6 @@ function questionFromDraft(question: ImportQuestionDraft): ReviewQuestion {
     sourceNumber: question.sourceNumber,
     type: question.type,
     promptEn: question.promptEn,
-    promptAr: question.promptAr,
     helpTextEn: question.helpTextEn,
     marks: String(question.marks),
     confidence: question.confidence,
@@ -163,7 +157,6 @@ function questionFromDraft(question: ImportQuestionDraft): ReviewQuestion {
     accepted: [...question.accepted],
     correctValue: question.correctValue,
     explanationEn: question.explanationEn,
-    explanationAr: "",
     warnings: [...question.warnings],
     raw: question.raw,
   };
@@ -175,7 +168,6 @@ function newQuestion(): ReviewQuestion {
     sourceNumber: "",
     type: "short_answer",
     promptEn: "",
-    promptAr: "",
     helpTextEn: "",
     marks: "1",
     confidence: "low",
@@ -188,7 +180,6 @@ function newQuestion(): ReviewQuestion {
     accepted: [],
     correctValue: null,
     explanationEn: "",
-    explanationAr: "",
     warnings: [],
     raw: "",
   };
@@ -198,7 +189,6 @@ function newSection(): ReviewSection {
   return {
     key: `section-${Math.random().toString(36).slice(2, 9)}`,
     titleEn: "Questions",
-    titleAr: "",
     instructionsEn: "",
     marks: null,
     questions: [],
@@ -210,9 +200,7 @@ function settingsFromDraft(draft: ImportDraft): ReviewSettings {
     type: draft.settings.type,
     gradeId: draft.settings.gradeId,
     titleEn: draft.settings.titleEn,
-    titleAr: draft.settings.titleAr,
     instructionsEn: draft.settings.instructionsEn,
-    instructionsAr: draft.settings.instructionsAr,
     timeLimitMinutes: String(draft.settings.timeLimitMinutes),
     resultsVisibility: draft.settings.resultsVisibility,
     allowRetakes: draft.settings.allowRetakes,
@@ -297,7 +285,6 @@ export function ImportReview({
     initialDraft.sections.map((section) => ({
       key: section.key,
       titleEn: section.titleEn,
-      titleAr: section.titleAr,
       instructionsEn: section.instructionsEn,
       marks: section.marks ?? null,
       questions: section.questions.map(questionFromDraft),
@@ -423,9 +410,7 @@ export function ImportReview({
       type: settings.type,
       gradeId: settings.gradeId,
       titleEn: settings.titleEn,
-      titleAr: settings.titleAr,
       instructionsEn: settings.instructionsEn,
-      instructionsAr: settings.instructionsAr,
       timeLimitMinutes: Number(settings.timeLimitMinutes),
       resultsVisibility: settings.resultsVisibility,
       allowRetakes: settings.allowRetakes,
@@ -438,7 +423,6 @@ export function ImportReview({
     sections: sections.map((section) => ({
       key: section.key,
       titleEn: section.titleEn,
-      titleAr: section.titleAr,
       instructionsEn: section.instructionsEn,
       marks: section.marks,
       questions: section.questions.map((question) => ({
@@ -446,7 +430,6 @@ export function ImportReview({
         sourceNumber: question.sourceNumber,
         type: question.type,
         promptEn: question.promptEn,
-        promptAr: question.promptAr,
         helpTextEn: question.helpTextEn,
         marks: Number(question.marks),
         confidence: question.confidence,
@@ -459,7 +442,6 @@ export function ImportReview({
         accepted: question.accepted.filter((answer) => answer.trim() !== ""),
         correctValue: question.correctValue,
         explanationEn: question.explanationEn,
-        explanationAr: question.explanationAr,
         warnings: question.warnings,
         raw: question.raw,
       })),
@@ -1040,19 +1022,6 @@ export function ImportReview({
               }
             />
           </Field>
-          <Field id="settings-title-ar" label={importsUi.review.titleAr}>
-            <Input
-              id="settings-title-ar"
-              dir="rtl"
-              lang="ar"
-              value={settings.titleAr}
-              maxLength={200}
-              disabled={busy}
-              onChange={(event) =>
-                setSettings({ ...settings, titleAr: event.target.value })
-              }
-            />
-          </Field>
           <Field id="settings-grade" label={importsUi.review.grade}>
             <Select
               id="settings-grade"
@@ -1098,19 +1067,6 @@ export function ImportReview({
               disabled={busy}
               onChange={(event) =>
                 setSettings({ ...settings, instructionsEn: event.target.value })
-              }
-            />
-          </Field>
-          <Field id="settings-instructions-ar" label={importsUi.review.instructionsAr}>
-            <Textarea
-              id="settings-instructions-ar"
-              dir="rtl"
-              lang="ar"
-              value={settings.instructionsAr}
-              maxLength={4000}
-              disabled={busy}
-              onChange={(event) =>
-                setSettings({ ...settings, instructionsAr: event.target.value })
               }
             />
           </Field>
@@ -1384,24 +1340,6 @@ export function ImportReview({
                     />
                   </Field>
                   <Field
-                    id={`section-${sectionIndex}-title-ar`}
-                    label={importsUi.review.titleAr}
-                  >
-                    <Input
-                      id={`section-${sectionIndex}-title-ar`}
-                      dir="rtl"
-                      lang="ar"
-                      value={section.titleAr}
-                      maxLength={200}
-                      disabled={busy}
-                      onChange={(event) =>
-                        updateSection(sectionIndex, {
-                          titleAr: event.target.value,
-                        })
-                      }
-                    />
-                  </Field>
-                  <Field
                     id={`section-${sectionIndex}-instructions`}
                     label={importsUi.review.sectionInstructions}
                     className="sm:col-span-2"
@@ -1655,25 +1593,6 @@ export function ImportReview({
                               onChange={(event) =>
                                 updateQuestion(sectionIndex, questionIndex, {
                                   promptEn: event.target.value,
-                                })
-                              }
-                            />
-                          </Field>
-                          <Field
-                            id={`q-${sectionIndex}-${questionIndex}-prompt-ar`}
-                            label={importsUi.review.promptAr}
-                            className="sm:col-span-2"
-                          >
-                            <Textarea
-                              id={`q-${sectionIndex}-${questionIndex}-prompt-ar`}
-                              dir="rtl"
-                              lang="ar"
-                              value={question.promptAr}
-                              maxLength={4000}
-                              disabled={busy}
-                              onChange={(event) =>
-                                updateQuestion(sectionIndex, questionIndex, {
-                                  promptAr: event.target.value,
                                 })
                               }
                             />
@@ -2014,24 +1933,6 @@ export function ImportReview({
                               onChange={(event) =>
                                 updateQuestion(sectionIndex, questionIndex, {
                                   explanationEn: event.target.value,
-                                })
-                              }
-                            />
-                          </Field>
-                          <Field
-                            id={`q-${sectionIndex}-${questionIndex}-explanation-ar`}
-                            label={importsUi.review.explanationAr}
-                          >
-                            <Textarea
-                              id={`q-${sectionIndex}-${questionIndex}-explanation-ar`}
-                              dir="rtl"
-                              lang="ar"
-                              value={question.explanationAr}
-                              maxLength={2000}
-                              disabled={busy}
-                              onChange={(event) =>
-                                updateQuestion(sectionIndex, questionIndex, {
-                                  explanationAr: event.target.value,
                                 })
                               }
                             />

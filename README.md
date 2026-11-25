@@ -94,7 +94,7 @@ only ever see their own grade, their own attempts and their own results.
 - `/teacher/assessments`: bilingual list of quizzes and exams with search,
   grade/type/status filters, pagination, publish state, retake policy and a
   per-assessment results link.
-- `/teacher/assessments/new` and `/teacher/assessments/[id]/edit`: bilingual
+- `/teacher/assessments/new` and `/teacher/assessments/[id]/edit`: English
   title and instructions, grade, quiz/exam type, 1–600 minute limit, results
   visibility (`immediately`, `after_review`, `hidden`), grading mode
   (`automatic`, `manual`, `mixed`), retakes (exams default to none), an optional
@@ -112,6 +112,15 @@ only ever see their own grade, their own attempts and their own results.
   randomisation, copy/paste blocking and a disabled context menu while the
   runner is open. Focus loss is counted but never submits on its own, so
   accessibility tools and keyboard navigation are not blocked.
+- Browser auto-translation is discouraged on assessment pages. The
+  `/student/assessments/[id]` shell (pre-start confirmation, runner, timer,
+  questions, choices, instructions, warnings, submission messages and visible
+  results) opts out with `translate="no"`, the `notranslate` class and
+  `<meta name="google" content="notranslate" />`. Assessment content is authored
+  and rendered in English only, while the surrounding interface chrome stays
+  bilingual and the student's interface language and direction are unchanged.
+  Students can still force translation through browser extensions or browser
+  controls, which a website cannot completely prevent.
 - `/api/assessments/sweep` exposes the idempotent stale-attempt sweep for
   manual or future external schedulers (`CRON_SECRET` bearer token) or a
   signed-in teacher. Vercel Hobby has no minute-level cron, so normal operation

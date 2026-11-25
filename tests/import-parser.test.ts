@@ -13,9 +13,7 @@ const settings: ImportSettings = {
   type: "quiz",
   gradeId: "11000000-0000-4000-8000-000000000001",
   titleEn: "",
-  titleAr: "",
   instructionsEn: "",
-  instructionsAr: "",
   timeLimitMinutes: 30,
   resultsVisibility: "after_review",
   allowRetakes: false,
@@ -286,8 +284,6 @@ small - tiny
     );
 
     expect(parsed.sections[0].titleEn).toBe("الخيارات");
-    expect(parsed.sections[0].titleAr).toBe("");
-    expect(parsed.sections[0].questions[0].promptAr).toBe("");
   });
 });
 

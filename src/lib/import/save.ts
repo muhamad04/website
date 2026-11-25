@@ -7,15 +7,17 @@ import type {
 
 /**
  * Pure mapping from reviewed draft fields to the existing assessment tables.
- * Nothing here publishes anything: `is_published` is always false, and the
- * teacher must use the normal publish action afterwards.
+ * Content is English-only, but the legacy Arabic title columns are still NOT
+ * NULL, so new rows mirror the English title there. Nothing here publishes
+ * anything: `is_published` is always false, and the teacher must use the normal
+ * publish action afterwards.
  */
 
 export type ImportQuestionWrite = {
   section_id: string;
   type: ImportQuestionInput["type"];
   prompt_en: string;
-  prompt_ar: string | null;
+  prompt_ar: null;
   help_text_en: string | null;
   help_text_ar: null;
   marks: number;
@@ -24,7 +26,7 @@ export type ImportQuestionWrite = {
   correct_answer: Record<string, unknown> | null;
   grading_method: "automatic" | "manual";
   explanation_en: string | null;
-  explanation_ar: string | null;
+  explanation_ar: null;
 };
 
 export type ImportOptionWrite = {
@@ -86,9 +88,8 @@ export function buildAssessmentWrite(options: {
     grade_id: options.settings.gradeId,
     type: options.settings.type,
     title_en: options.settings.titleEn,
-    title_ar: options.settings.titleAr ?? "",
+    title_ar: options.settings.titleEn,
     instructions_en: blankToNull(options.settings.instructionsEn),
-    instructions_ar: blankToNull(options.settings.instructionsAr),
     time_limit_minutes: options.settings.timeLimitMinutes,
     results_visibility: options.settings.resultsVisibility,
     grading_mode: options.gradingMode,
@@ -111,9 +112,8 @@ export function buildSectionWrite(options: {
   return {
     assessment_id: options.assessmentId,
     title_en: options.section.titleEn,
-    title_ar: options.section.titleAr ?? "",
+    title_ar: options.section.titleEn,
     instructions_en: options.section.instructionsEn ?? null,
-    instructions_ar: null,
     position: options.position,
   };
 }
@@ -155,7 +155,7 @@ export function buildQuestionWrite(options: {
     section_id: options.sectionId,
     type: question.type,
     prompt_en: question.promptEn,
-    prompt_ar: blankToNull(question.promptAr),
+    prompt_ar: null,
     help_text_en: blankToNull(question.helpTextEn),
     help_text_ar: null,
     marks: question.marks,
@@ -164,7 +164,7 @@ export function buildQuestionWrite(options: {
     correct_answer: answerKeyForImportedQuestion(question),
     grading_method: question.gradingMethod,
     explanation_en: blankToNull(question.explanationEn),
-    explanation_ar: blankToNull(question.explanationAr),
+    explanation_ar: null,
   };
 }
 

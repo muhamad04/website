@@ -124,7 +124,8 @@ export default async function AssessmentImportPage() {
                         draft.draft?.settings?.titleEn ||
                         draft.source_file_name
                       }
-                      ar={draft.draft?.settings?.titleAr || "مسودة مستوردة"}
+                      ar=""
+                      hideSeparator
                     />
                   </p>
                   <p className="mt-1 text-xs text-muted-foreground">

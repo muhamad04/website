@@ -65,7 +65,6 @@ export type ImportQuestionDraft = {
   sourceNumber: string;
   type: QuestionType;
   promptEn: string;
-  promptAr: string;
   helpTextEn: string;
   marks: number;
   /** `false` only when the parser could not infer a type confidently. */
@@ -90,7 +89,6 @@ export type ImportQuestionDraft = {
 export type ImportSectionDraft = {
   key: string;
   titleEn: string;
-  titleAr: string;
   instructionsEn: string;
   /** Section-level marks printed in the heading, when clearly specified. */
   marks?: number | null;
@@ -153,9 +151,7 @@ export type ImportSettings = {
   type: AssessmentType;
   gradeId: string;
   titleEn: string;
-  titleAr: string;
   instructionsEn: string;
-  instructionsAr: string;
   timeLimitMinutes: number;
   resultsVisibility: ResultsVisibility;
   allowRetakes: boolean;

@@ -192,9 +192,7 @@ export const importSettingsSchema = z
     type: z.enum(["quiz", "exam"], { error: "type_invalid" }),
     gradeId: z.uuid({ error: "grade_required" }),
     titleEn: requiredText(200, "title_required"),
-    titleAr: optionalText(200, "title_too_long"),
     instructionsEn: optionalText(4000, "instructions_too_long"),
-    instructionsAr: optionalText(4000, "instructions_too_long"),
     timeLimitMinutes: z.coerce
       .number({ error: "time_limit_invalid" })
       .int({ error: "time_limit_invalid" })
@@ -272,7 +270,6 @@ export const importQuestionSchema = z
     sourceNumber: z.string().trim().max(20).optional(),
     type: z.enum(QUESTION_TYPES, { error: "question_type_invalid" }),
     promptEn: requiredText(4000, "question_prompt_required"),
-    promptAr: optionalText(4000),
     helpTextEn: optionalText(1000),
     marks: z.coerce
       .number({ error: "question_marks_invalid" })
@@ -293,7 +290,6 @@ export const importQuestionSchema = z
     accepted: acceptedList,
     correctValue: z.enum(["true", "false"]).nullable().optional(),
     explanationEn: optionalText(2000),
-    explanationAr: optionalText(2000),
     warnings: z.array(z.enum(IMPORT_WARNING_CODES)).max(30).default([]),
     raw: z.string().max(20_000).optional(),
   })
@@ -379,7 +375,6 @@ export type ImportQuestionInput = z.infer<typeof importQuestionSchema>;
 export const importSectionSchema = z.object({
   key: z.string().trim().max(80).optional(),
   titleEn: requiredText(200, "section_title_required"),
-  titleAr: optionalText(200),
   instructionsEn: optionalText(2000),
   marks: z.coerce.number().min(0).max(1000).nullable().optional(),
   questions: z.array(importQuestionSchema).max(200).default([]),

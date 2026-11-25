@@ -29,9 +29,7 @@ import type {
 type Values = {
   type: "quiz" | "exam";
   title_en: string;
-  title_ar: string;
   instructions_en: string;
-  instructions_ar: string;
   grade_id: string;
   time_limit_minutes: string;
   results_visibility: "immediately" | "after_review" | "hidden";
@@ -77,9 +75,7 @@ function initialValues(
   return {
     type,
     title_en: assessment?.title_en ?? "",
-    title_ar: assessment?.title_ar ?? "",
     instructions_en: assessment?.instructions_en ?? "",
-    instructions_ar: assessment?.instructions_ar ?? "",
     grade_id: assessment?.grade_id ?? defaultGradeId ?? grades[0]?.id ?? "",
     time_limit_minutes: String(assessment?.time_limit_minutes ?? 30),
     results_visibility: assessment?.results_visibility ?? "after_review",
@@ -188,9 +184,7 @@ export function AssessmentForm({
     const payload = {
       type: values.type,
       title_en: values.title_en,
-      title_ar: values.title_ar,
       instructions_en: values.instructions_en,
-      instructions_ar: values.instructions_ar,
       grade_id: values.grade_id,
       time_limit_minutes: values.time_limit_minutes,
       results_visibility: values.results_visibility,
@@ -311,25 +305,6 @@ export function AssessmentForm({
           </Field>
 
           <Field
-            id="title_ar"
-            label={assessmentsUi.form.titleAr}
-            error={errors.title_ar}
-            errorCopy={assessmentErrorCopy}
-          >
-            <Input
-              id="title_ar"
-              dir="rtl"
-              className="font-arabic"
-              value={values.title_ar}
-              aria-invalid={Boolean(errors.title_ar)}
-              onChange={(event) => update("title_ar", event.target.value)}
-              maxLength={200}
-            />
-          </Field>
-        </div>
-
-        <div className="grid gap-5 sm:grid-cols-2">
-          <Field
             id="instructions_en"
             label={assessmentsUi.form.instructionsEn}
             error={errors.instructions_en}
@@ -339,22 +314,6 @@ export function AssessmentForm({
               id="instructions_en"
               value={values.instructions_en}
               onChange={(event) => update("instructions_en", event.target.value)}
-              maxLength={4000}
-            />
-          </Field>
-
-          <Field
-            id="instructions_ar"
-            label={assessmentsUi.form.instructionsAr}
-            error={errors.instructions_ar}
-            errorCopy={assessmentErrorCopy}
-          >
-            <Textarea
-              id="instructions_ar"
-              dir="rtl"
-              className="font-arabic"
-              value={values.instructions_ar}
-              onChange={(event) => update("instructions_ar", event.target.value)}
               maxLength={4000}
             />
           </Field>

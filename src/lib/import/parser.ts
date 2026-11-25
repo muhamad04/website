@@ -648,7 +648,6 @@ function buildQuestion(raw: RawQuestion, index: number): ImportQuestionDraft {
     sourceNumber: raw.sourceNumber,
     type: inferred.type,
     promptEn: prompt,
-    promptAr: "",
     helpTextEn: "",
     marks: marks.marks ?? 1,
     confidence: inferred.confidence,
@@ -937,7 +936,6 @@ export function parseQuestionDocument(
     .map((section, sectionIndex) => ({
       key: `s-${sectionIndex + 1}`,
       titleEn: section.titleEn,
-      titleAr: "",
       instructionsEn: section.instructions.join("\n").trim(),
       marks: section.marks,
       questions: section.questions,

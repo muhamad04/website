@@ -24,9 +24,7 @@ const settings: ImportSettingsInput = {
   type: "exam",
   gradeId: GRADE_ID,
   titleEn: "Unit 3 exam",
-  titleAr: "",
   instructionsEn: "Answer all questions.",
-  instructionsAr: "",
   timeLimitMinutes: 45,
   resultsVisibility: "hidden",
   allowRetakes: true,
@@ -43,7 +41,6 @@ function question(
     sourceNumber: "1",
     type: "multiple_choice",
     promptEn: "Choose the correct answer.",
-    promptAr: "",
     helpTextEn: "",
     marks: 2,
     confidence: "high",
@@ -59,7 +56,6 @@ function question(
     accepted: [],
     correctValue: null,
     explanationEn: "",
-    explanationAr: "",
     warnings: [],
     raw: "",
     ...overrides,
@@ -78,9 +74,9 @@ describe("imported assessment mapping", () => {
       grade_id: GRADE_ID,
       type: "exam",
       title_en: "Unit 3 exam",
-      title_ar: "",
+      // The legacy NOT NULL Arabic column mirrors the English title.
+      title_ar: "Unit 3 exam",
       instructions_en: "Answer all questions.",
-      instructions_ar: null,
       time_limit_minutes: 45,
       results_visibility: "hidden",
       allow_retakes: true,
@@ -103,11 +99,10 @@ describe("imported assessment mapping", () => {
     expect(computeTotalMarks([automatic, { ...manual, marks: 3.5 }])).toBe(5.5);
   });
 
-  it("maps sections in order with empty Arabic fields", () => {
+  it("maps sections in order with the English title mirrored for the legacy column", () => {
     const section: ImportSectionInput = {
       key: "s-1",
       titleEn: "Multiple choice",
-      titleAr: "",
       instructionsEn: "Choose one.",
       questions: [],
     };
@@ -117,9 +112,8 @@ describe("imported assessment mapping", () => {
     ).toEqual({
       assessment_id: ASSESSMENT_ID,
       title_en: "Multiple choice",
-      title_ar: "",
+      title_ar: "Multiple choice",
       instructions_en: "Choose one.",
-      instructions_ar: null,
       position: 2,
     });
   });
@@ -150,7 +144,6 @@ describe("imported assessment mapping", () => {
     const write = buildQuestionWrite({
       question: question({
         explanationEn: "Because it is a pet.",
-        explanationAr: "",
       }),
       sectionId: SECTION_ID,
       position: 1,
