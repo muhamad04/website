@@ -79,6 +79,19 @@ describe("assessment sweep route", () => {
     expect(mocks.finalizeStaleAttempts).not.toHaveBeenCalled();
   });
 
+  it("rejects a same-length but different token", async () => {
+    process.env.CRON_SECRET = "cron-test-secret";
+
+    // Same byte length, so this exercises the constant-time comparison path
+    // rather than the cheaper length check.
+    const response = await GET(
+      sweepRequest({ authorization: "Bearer xron-test-secret" }),
+    );
+
+    expect(response.status).toBe(401);
+    expect(mocks.finalizeStaleAttempts).not.toHaveBeenCalled();
+  });
+
   it("uses the signed-in teacher fallback only when CRON_SECRET is absent", async () => {
     delete process.env.CRON_SECRET;
     mocks.finalizeStaleAttempts.mockResolvedValue({ ok: true, finalized: 1 });

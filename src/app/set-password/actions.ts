@@ -37,6 +37,8 @@ export async function setPasswordAction(
     const error: PasswordErrorCode =
       first === "password_mismatch" ||
       first === "password_short" ||
+      first === "password_too_long" ||
+      first === "password_weak" ||
       first === "password_required"
         ? first
         : "unknown";
@@ -60,8 +62,8 @@ export async function setPasswordAction(
   if (error.code === "weak_password") {
     return {
       ok: false,
-      error: "password_short",
-      fieldErrors: { password: "password_short" },
+      error: "password_weak",
+      fieldErrors: { password: "password_weak" },
     };
   }
 
@@ -69,6 +71,6 @@ export async function setPasswordAction(
     return { ok: false, error: "session_expired" };
   }
 
-  console.error("password update failed", error.code ?? "", error.message);
+  console.error("password update failed", error.code ?? "unknown");
   return { ok: false, error: "unknown" };
 }

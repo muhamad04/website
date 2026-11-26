@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL(next, url.origin));
     }
 
-    console.error("Auth code exchange failed", error.message);
+    console.error("Auth code exchange failed", error.code ?? "unknown");
   } else if (tokenHash && type) {
     const { error } = await supabase.auth.verifyOtp({
       token_hash: tokenHash,
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL(next, url.origin));
     }
 
-    console.error("Auth token verification failed", error.message);
+    console.error("Auth token verification failed", error.code ?? "unknown");
   }
 
   return NextResponse.redirect(

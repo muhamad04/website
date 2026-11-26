@@ -6,10 +6,16 @@
  * browser is trusted beyond the shape parsed here.
  */
 
-import { isUuid } from "@/lib/search";
+import {
+  buildIlikeOrFilter,
+  escapePostgrestFilterValue,
+  isUuid,
+} from "@/lib/search";
 
 export const REPORTING_PAGE_SIZE = 20;
 export const EXPORT_ROW_LIMIT = 5000;
+/** Maximum accepted free-text search length, before any filter grammar. */
+export const REPORT_SEARCH_MAX_LENGTH = 80;
 
 export const REPORT_TYPE_FILTERS = ["all", "quiz", "exam"] as const;
 export type ReportTypeFilter = (typeof REPORT_TYPE_FILTERS)[number];
@@ -82,7 +88,7 @@ export function normaliseDateValue(value: string): string | null {
 
 export function parseReportFilters(params: RawParams): ReportFilters {
   const page = Number.parseInt(first(params.page), 10);
-  const search = first(params.q).trim().slice(0, 80);
+  const search = first(params.q).trim().slice(0, REPORT_SEARCH_MAX_LENGTH);
   let from = normaliseDateValue(first(params.from));
   let to = normaliseDateValue(first(params.to));
 
@@ -108,6 +114,25 @@ export function parseReportFilters(params: RawParams): ReportFilters {
     search: search.length > 0 ? search : null,
     page: Number.isFinite(page) && page > 0 ? Math.min(page, 10_000) : 1,
   };
+}
+
+/**
+ * Escapes a value for a PostgREST filter expression. Re-exported so reporting
+ * callers and tests share one implementation with the list screens.
+ */
+export { escapePostgrestFilterValue };
+
+/**
+ * Builds the only free-text filter the reporting queries use. The four columns
+ * are fixed, the value is quoted as one literal, and the caller still scopes
+ * the query to `role = 'student'` before applying it.
+ */
+export function buildStudentSearchFilter(search: string): string {
+  return buildIlikeOrFilter(
+    ["full_name_en", "full_name_ar", "email", "student_number"],
+    search,
+    REPORT_SEARCH_MAX_LENGTH,
+  );
 }
 
 export function hasReportFilters(filters: ReportFilters): boolean {

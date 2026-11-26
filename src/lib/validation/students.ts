@@ -7,6 +7,7 @@ import {
   canonicalStudentId,
   isValidStudentId,
 } from "@/lib/validation/student-id";
+import { newPasswordIssue } from "@/lib/validation/password";
 import { slugify } from "@/lib/slug";
 
 export { fieldErrorsFrom, slugify };
@@ -106,7 +107,16 @@ const optionalEmail = z.preprocess(
 const initialPassword = z.preprocess(
   (value) =>
     typeof value === "string" && value.trim() === "" ? undefined : value,
-  z.string().min(8, { error: "password_short" }).optional(),
+  z
+    .string()
+    .superRefine((value, context) => {
+      const issue = newPasswordIssue(value);
+
+      if (issue) {
+        context.addIssue({ code: "custom", message: issue });
+      }
+    })
+    .optional(),
 );
 
 export const createStudentSchema = z
@@ -223,6 +233,8 @@ export type ClassInput = z.infer<typeof classSchema>;
 export const PASSWORD_ERROR_CODES = [
   "password_required",
   "password_short",
+  "password_too_long",
+  "password_weak",
   "password_mismatch",
   "session_expired",
   "rate_limited",
@@ -233,10 +245,13 @@ export type PasswordErrorCode = (typeof PASSWORD_ERROR_CODES)[number];
 
 export const setPasswordSchema = z
   .object({
-    password: z
-      .string()
-      .min(1, { error: "password_required" })
-      .min(8, { error: "password_short" }),
+    password: z.string().superRefine((value, context) => {
+      const issue = newPasswordIssue(value);
+
+      if (issue) {
+        context.addIssue({ code: "custom", message: issue });
+      }
+    }),
     confirm_password: z
       .string()
       .min(1, { error: "password_required" }),

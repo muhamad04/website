@@ -1,7 +1,24 @@
+import { timingSafeEqual } from "node:crypto";
 import { requireTeacher } from "@/lib/auth/dal";
 import { finalizeStaleAttempts } from "@/lib/assessments/finalize";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
+function bearerMatches(header: string | null, secret: string): boolean {
+  if (!header) {
+    return false;
+  }
+
+  const expected = Buffer.from(`Bearer ${secret}`);
+  const actual = Buffer.from(header);
+
+  if (actual.length !== expected.length) {
+    return false;
+  }
+
+  return timingSafeEqual(actual, expected);
+}
 
 /**
  * Maintenance endpoint for manual or external scheduler calls. Set the optional
@@ -13,7 +30,7 @@ export async function GET(request: Request): Promise<Response> {
   const secret = process.env.CRON_SECRET;
 
   if (secret) {
-    if (request.headers.get("authorization") !== `Bearer ${secret}`) {
+    if (!bearerMatches(request.headers.get("authorization"), secret)) {
       return Response.json({ ok: false, error: "forbidden" }, { status: 401 });
     }
   } else {

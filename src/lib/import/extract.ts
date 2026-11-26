@@ -1,12 +1,16 @@
 import mammoth from "mammoth";
 import { extractText } from "unpdf";
 import { htmlToStructuredText } from "@/lib/import/html";
+import { inspectDocxArchive } from "@/lib/import/docx";
+import { runWithTimeout } from "@/lib/import/timeout";
 import {
   IMPORT_MAX_TEXT_CHARS,
   detectImportFileKind,
   type ImportFileError,
   type ImportFileKind,
 } from "@/lib/import/files";
+
+export const IMPORT_PARSE_TIMEOUT_MS = 20_000;
 
 export type ImportExtractError = ImportFileError | "no_text_extracted" | "parse_failed";
 
@@ -62,22 +66,52 @@ export async function extractImportFile(input: {
 
   try {
     if (kind.kind === "docx") {
-      const converted = await mammoth.convertToHtml({
-        buffer: Buffer.from(input.bytes),
-      });
-      raw = htmlToStructuredText(converted.value);
+      const inspection = inspectDocxArchive(input.bytes);
 
-      if (raw.trim() === "") {
-        const fallback = await mammoth.extractRawText({
-          buffer: Buffer.from(input.bytes),
-        });
-        raw = fallback.value;
+      if (!inspection.ok) {
+        return inspection;
       }
+
+      const parsed = await runWithTimeout(
+        (async () => {
+          const converted = await mammoth.convertToHtml({
+            buffer: Buffer.from(input.bytes),
+          });
+          let value = htmlToStructuredText(converted.value);
+
+          if (value.trim() === "") {
+            const fallback = await mammoth.extractRawText({
+              buffer: Buffer.from(input.bytes),
+            });
+            value = fallback.value;
+          }
+
+          return value;
+        })(),
+        IMPORT_PARSE_TIMEOUT_MS,
+      );
+
+      if (parsed.kind !== "value") {
+        return { ok: false, error: "parse_failed" };
+      }
+
+      raw = parsed.value;
     } else if (kind.kind === "pdf") {
-      const extracted = await extractText(new Uint8Array(input.bytes), {
-        mergePages: true,
-      });
-      raw = extracted.text;
+      const parsed = await runWithTimeout(
+        (async () => {
+          const extracted = await extractText(new Uint8Array(input.bytes), {
+            mergePages: true,
+          });
+          return extracted.text;
+        })(),
+        IMPORT_PARSE_TIMEOUT_MS,
+      );
+
+      if (parsed.kind !== "value") {
+        return { ok: false, error: "parse_failed" };
+      }
+
+      raw = parsed.value;
     } else {
       raw = new TextDecoder("utf-8", { fatal: false }).decode(input.bytes);
     }

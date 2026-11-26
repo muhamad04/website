@@ -17,6 +17,7 @@ import {
 } from "@/lib/assessments/grading";
 import type { AssessmentErrorCode } from "@/lib/validation/assessments";
 import { requestAttemptSync } from "@/lib/reporting/sync";
+import { cleanupUnreferencedSubmissionFiles } from "@/lib/assessments/storage";
 
 export type FinalizeOutcome =
   | {
@@ -265,10 +266,16 @@ export async function finalizeAttempt(options: {
     pending_review: boolean;
   };
 
-  // Reporting is best-effort and runs after the response. A Google outage can
-  // never fail or slow down the student's submission.
+  // Reporting and abandoned-upload cleanup are best-effort and run after the
+  // response. Neither can fail or slow down the student's submission.
   try {
     after(() => requestAttemptSync(options.attemptId));
+    after(() =>
+      cleanupUnreferencedSubmissionFiles({
+        attemptId: options.attemptId,
+        studentId: attempt.student_id,
+      }),
+    );
   } catch {
     // Called outside a request scope (for example a maintenance script).
   }

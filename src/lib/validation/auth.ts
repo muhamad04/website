@@ -40,7 +40,6 @@ export const AUTH_ERROR_CODES = [
   "invalid_credentials",
   "email_not_confirmed",
   "rate_limited",
-  "inactive_account",
   "profile_missing",
   "config_missing",
   "unknown",

@@ -18,7 +18,7 @@ import {
   ASSESSMENTS_PAGE_SIZE,
   type AssessmentFilters,
 } from "@/lib/assessments/filters";
-import { clampPage } from "@/lib/search";
+import { buildIlikeOrFilter, clampPage } from "@/lib/search";
 
 const ASSESSMENT_SELECT = `
   id,
@@ -73,14 +73,11 @@ async function runList(
     .select(ASSESSMENT_SELECT, { count: "exact" });
 
   if (filters.search) {
-    const term = `%${filters.search}%`;
     query = query.or(
-      [
-        `title_en.ilike.${term}`,
-        `title_ar.ilike.${term}`,
-        `instructions_en.ilike.${term}`,
-        `instructions_ar.ilike.${term}`,
-      ].join(","),
+      buildIlikeOrFilter(
+        ["title_en", "title_ar", "instructions_en", "instructions_ar"],
+        filters.search,
+      ),
     );
   }
 

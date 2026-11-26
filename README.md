@@ -850,6 +850,14 @@ environment variables is in [`docs/google-sheets.md`](docs/google-sheets.md).
 | **6 — done** | Free, local assessment import: DOCX/text-PDF/plain-text extraction, deterministic question/answer-key parsing, bilingual review editor and unpublished draft creation |
 | 7 | Seed polish, end-to-end runs, deployment hardening |
 
+## Security
+
+The security model, strict-exam limits, upload rules, signed-URL behaviour,
+login throttling, AI privacy and rollout steps are documented in
+[`docs/security.md`](docs/security.md). The hardening migration
+`supabase/migrations/20261126120000_security_hardening.sql` is included in the
+repository but **has not been applied to the hosted project**.
+
 ### Phase 5 starting points
 
 - Reuse `requireTeacher()`, the bilingual form primitives and the

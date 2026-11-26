@@ -58,7 +58,7 @@ function mapAuthError(error: {
     return "service_unavailable";
   }
 
-  console.error("staff auth operation failed", error.code ?? "", message);
+  console.error("staff auth operation failed", error.code ?? "unknown");
   return "unknown";
 }
 
@@ -74,7 +74,7 @@ function mapProfileWriteError(message: string): StaffErrorCode {
     return "forbidden";
   }
 
-  console.error("staff profile write failed", message);
+  console.error("staff profile write failed");
   return "unknown";
 }
 
@@ -110,8 +110,7 @@ async function generateRecoveryLink(
   if (error || !token) {
     console.error(
       "staff recovery link generation failed",
-      error?.code ?? "",
-      error?.message ?? "missing hashed_token",
+      error?.code ?? "missing_hashed_token",
     );
     return null;
   }
@@ -232,8 +231,8 @@ export async function restoreStaffAuthEmail(
       email: previousEmail,
       email_confirm: true,
     });
-  } catch (error) {
-    console.error("staff e-mail rollback failed", error);
+  } catch {
+    console.error("staff e-mail rollback failed");
   }
 }
 
@@ -254,7 +253,7 @@ export async function syncStaffAuthMetadata(
     if (error) {
       console.error("staff auth metadata sync failed", error.code ?? "");
     }
-  } catch (error) {
-    console.error("staff auth metadata sync failed", error);
+  } catch {
+    console.error("staff auth metadata sync failed");
   }
 }

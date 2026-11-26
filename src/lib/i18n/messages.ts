@@ -18,10 +18,6 @@ export const authErrorCopy: Record<AuthErrorCode, Bilingual> = {
     en: "Too many attempts. Wait a moment, then try again.",
     ar: "محاولات كثيرة جدًا. انتظر قليلًا ثم حاول مرة أخرى.",
   },
-  inactive_account: {
-    en: "This account is inactive. Please contact your teacher.",
-    ar: "هذا الحساب غير نشط. يرجى التواصل مع معلمك.",
-  },
   profile_missing: {
     en: "Your account is not fully set up yet. Please contact your teacher.",
     ar: "لم يكتمل إعداد حسابك بعد. يرجى التواصل مع معلمك.",

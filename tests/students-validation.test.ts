@@ -218,7 +218,7 @@ describe("student validation", () => {
     }
   });
 
-  it("matches both passwords and enforces eight characters", () => {
+  it("matches both passwords and enforces ten characters", () => {
     const mismatch = setPasswordSchema.safeParse({
       password: "longenough",
       confirm_password: "different",

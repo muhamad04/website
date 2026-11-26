@@ -47,6 +47,18 @@ export default async function StudentAttemptPage({
   const { payload, error } = await getStudentAttemptPayload(attemptId);
 
   if (error || !payload) {
+    // The database refuses a heartbeat-stale payload. Close it with the
+    // automatic reason so the student sees a result instead of a dead page.
+    if (error?.includes("attempt_stale")) {
+      await finalizeAttempt({
+        attemptId,
+        studentId: student.id,
+        reason: "heartbeat_expired",
+      });
+
+      redirect(`/student/assessments/${id}/attempt/${attemptId}/result`);
+    }
+
     redirect(`/student/assessments/${id}`);
   }
 

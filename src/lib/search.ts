@@ -40,6 +40,43 @@ export function sanitizeSearchTerm(
   return cleaned.length === 0 ? null : cleaned;
 }
 
+/** Maximum accepted free-text search length, before any filter grammar. */
+export const SEARCH_MAX_LENGTH = 80;
+
+/**
+ * Escapes a value for a PostgREST filter expression.
+ *
+ * PostgREST parses commas, periods and parentheses as filter grammar. Wrapping
+ * the entire value in double quotes makes those characters literal; embedded
+ * backslashes and quotes are escaped so the value cannot terminate the quoted
+ * segment and start a new filter.
+ */
+export function escapePostgrestFilterValue(value: string): string {
+  const withoutControls = value.replace(/[\u0000-\u001f\u007f]/g, "");
+  const escaped = withoutControls
+    .replace(/\\/g, "\\\\")
+    .replace(/"/g, '\\"');
+
+  return `"${escaped}"`;
+}
+
+/**
+ * Builds a fixed-column `ilike` OR filter. Only the caller's column names are
+ * interpolated; the search value is always one quoted literal, so a comma or
+ * `role.eq.admin` inside it stays search text instead of becoming a filter.
+ */
+export function buildIlikeOrFilter(
+  columns: readonly string[],
+  search: string,
+  maxLength = SEARCH_MAX_LENGTH,
+): string {
+  const quoted = escapePostgrestFilterValue(
+    `%${search.slice(0, maxLength)}%`,
+  );
+
+  return columns.map((column) => `${column}.ilike.${quoted}`).join(",");
+}
+
 export function clampPage(page: number, pageCount: number): number {
   if (pageCount <= 0) {
     return 1;

@@ -9,9 +9,38 @@ const state = vi.hoisted(() => ({
   signInEmail: null as string | null,
   signInPassword: null as string | null,
   signOutCalls: 0,
+  retryAfter: 0,
+  throttleRecords: [] as Array<{ succeeded: boolean }>,
+  throttleChecks: 0,
 }));
 
 vi.mock("server-only", () => ({}));
+
+vi.mock("@/lib/auth/throttle", () => ({
+  buildLoginThrottleKeys: ({
+    mode,
+    identifier,
+    ip,
+  }: {
+    mode: string;
+    identifier: string;
+    ip: string | null;
+  }) => ({
+    identifierKey: `${mode}:${identifier}`,
+    ipKey: ip ? `ip:${ip}` : null,
+  }),
+  checkLoginThrottle: async () => {
+    state.throttleChecks += 1;
+    return state.retryAfter;
+  },
+  getClientIp: async () => "203.0.113.10",
+  recordLoginAttempt: async (
+    _keys: unknown,
+    succeeded: boolean,
+  ) => {
+    state.throttleRecords.push({ succeeded });
+  },
+}));
 
 vi.mock("@/lib/env", () => ({
   isSupabaseConfigured: () => state.configured,
@@ -68,6 +97,9 @@ beforeEach(() => {
   state.signInEmail = null;
   state.signInPassword = null;
   state.signOutCalls = 0;
+  state.retryAfter = 0;
+  state.throttleRecords = [];
+  state.throttleChecks = 0;
 });
 
 describe("student ID sign-in", () => {
@@ -116,7 +148,7 @@ describe("student ID sign-in", () => {
     expect(JSON.stringify(result)).not.toContain("wrong-password");
   });
 
-  it("rejects a deactivated student only after the password succeeded", async () => {
+  it("rejects a deactivated student with the same generic error as a wrong password", async () => {
     state.profile = { role: "student", is_active: false };
 
     const result = await signInAction({
@@ -125,8 +157,9 @@ describe("student ID sign-in", () => {
       password: "Student123!",
     });
 
-    expect(result).toEqual({ ok: false, error: "inactive_account" });
+    expect(result).toEqual({ ok: false, error: "invalid_credentials" });
     expect(state.signOutCalls).toBe(1);
+    expect(state.throttleRecords).toEqual([{ succeeded: true }]);
   });
 
   it("does not let a student sign in through the staff tab", async () => {
@@ -180,7 +213,7 @@ describe("staff email sign-in", () => {
     expect(state.signInEmail).toBe("ma2034816@gmail.com");
   });
 
-  it("rejects an inactive staff account", async () => {
+  it("rejects an inactive staff account with the generic error", async () => {
     state.profile = { role: "teacher", is_active: false };
 
     const result = await signInAction({
@@ -189,6 +222,41 @@ describe("staff email sign-in", () => {
       password: "Teacher123!",
     });
 
-    expect(result).toEqual({ ok: false, error: "inactive_account" });
+    expect(result).toEqual({ ok: false, error: "invalid_credentials" });
+  });
+});
+
+describe("login throttling", () => {
+  it("stops before calling Supabase while a throttle is active", async () => {
+    state.retryAfter = 30;
+
+    const result = await signInAction({
+      mode: "student",
+      student_id: "G10-001",
+      password: "Student123!",
+    });
+
+    expect(result).toEqual({ ok: false, error: "rate_limited" });
+    expect(state.throttleChecks).toBe(1);
+    expect(state.signInEmail).toBeNull();
+  });
+
+  it("records a failed attempt without leaking the identifier", async () => {
+    state.signInError = {
+      code: "invalid_credentials",
+      message: "Invalid login credentials",
+      status: 400,
+    };
+    state.userId = null;
+
+    const result = await signInAction({
+      mode: "student",
+      student_id: "G10-001",
+      password: "wrong-password",
+    });
+
+    expect(result).toEqual({ ok: false, error: "invalid_credentials" });
+    expect(state.throttleRecords).toEqual([{ succeeded: false }]);
+    expect(JSON.stringify(result)).not.toContain("G10-001");
   });
 });

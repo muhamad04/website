@@ -3,6 +3,7 @@ import "server-only";
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
 import { requireSupabasePublicConfig } from "@/lib/env";
+import { hardenedAuthCookieOptions } from "@/lib/supabase/cookies";
 
 /**
  * Request-scoped Supabase client. RLS runs as the signed-in user, so student
@@ -23,7 +24,14 @@ export async function createClient() {
       setAll(cookiesToSet) {
         try {
           for (const { name, value, options } of cookiesToSet) {
-            cookieStore.set(name, value, options);
+            cookieStore.set(
+              name,
+              value,
+              hardenedAuthCookieOptions(
+                options,
+                process.env.NODE_ENV === "production",
+              ),
+            );
           }
         } catch {
           // Called from a Server Component rendering pass. The proxy handles

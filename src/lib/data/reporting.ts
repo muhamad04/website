@@ -22,6 +22,7 @@ import type {
 import {
   EXPORT_ROW_LIMIT,
   REPORTING_PAGE_SIZE,
+  buildStudentSearchFilter,
   dateRangeBounds,
   type ReportFilters,
 } from "@/lib/reporting/filters";
@@ -224,15 +225,7 @@ async function resolveStudentIds(
   }
 
   if (filters.search) {
-    const term = `%${filters.search}%`;
-    query = query.or(
-      [
-        `full_name_en.ilike.${term}`,
-        `full_name_ar.ilike.${term}`,
-        `email.ilike.${term}`,
-        `student_number.ilike.${term}`,
-      ].join(","),
-    );
+    query = query.or(buildStudentSearchFilter(filters.search));
   }
 
   const { data, error } = await query.range(0, 999);

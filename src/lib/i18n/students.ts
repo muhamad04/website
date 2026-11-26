@@ -131,8 +131,8 @@ export const studentsUi = {
     ),
     initialPassword: bi("Initial password", "كلمة المرور الأولية"),
     initialPasswordHint: bi(
-      "At least 8 characters. Never displayed after the account is created.",
-      "8 أحرف على الأقل. لا تُعرض أبدًا بعد إنشاء الحساب.",
+      "At least 10 characters. Never displayed after the account is created.",
+      "10 أحرف على الأقل. لا تُعرض أبدًا بعد إنشاء الحساب.",
     ),
     optional: bi("Optional", "اختياري"),
     required: bi("Required", "مطلوب"),
@@ -208,7 +208,7 @@ export const studentsUi = {
     ),
     newPassword: bi("New password", "كلمة المرور الجديدة"),
     confirmPassword: bi("Confirm password", "تأكيد كلمة المرور"),
-    hint: bi("At least 8 characters.", "8 أحرف على الأقل."),
+    hint: bi("At least 10 characters.", "10 أحرف على الأقل."),
     submit: bi("Save password", "حفظ كلمة المرور"),
     saving: bi("Saving password", "جارٍ حفظ كلمة المرور"),
     success: bi("Your password is saved.", "تم حفظ كلمة المرور."),
@@ -315,8 +315,16 @@ export const studentErrorCopy: Record<StudentErrorCode, Bilingual> = {
 export const passwordErrorCopy: Record<PasswordErrorCode, Bilingual> = {
   password_required: bi("Enter a password.", "أدخل كلمة المرور."),
   password_short: bi(
-    "Use at least 8 characters.",
-    "استخدم 8 أحرف على الأقل.",
+    "Use at least 10 characters.",
+    "استخدم 10 أحرف على الأقل.",
+  ),
+  password_too_long: bi(
+    "Use 200 characters or fewer.",
+    "استخدم 200 حرف أو أقل.",
+  ),
+  password_weak: bi(
+    "Choose a less predictable password.",
+    "اختر كلمة مرور أقل توقعًا.",
   ),
   password_mismatch: bi(
     "The two passwords do not match.",

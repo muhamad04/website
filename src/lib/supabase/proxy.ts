@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { getSupabasePublicConfig } from "@/lib/env";
+import { hardenedAuthCookieOptions } from "@/lib/supabase/cookies";
 
 const PROTECTED_PREFIXES = [
   "/teacher",
@@ -48,7 +49,7 @@ export async function updateSession(request: NextRequest) {
       getAll() {
         return request.cookies.getAll();
       },
-      setAll(cookiesToSet) {
+      setAll(cookiesToSet, headersToSet) {
         for (const { name, value } of cookiesToSet) {
           request.cookies.set(name, value);
         }
@@ -56,7 +57,20 @@ export async function updateSession(request: NextRequest) {
         response = NextResponse.next({ request });
 
         for (const { name, value, options } of cookiesToSet) {
-          response.cookies.set(name, value, options);
+          response.cookies.set(
+            name,
+            value,
+            hardenedAuthCookieOptions(
+              options,
+              process.env.NODE_ENV === "production",
+            ),
+          );
+        }
+
+        // The library supplies Cache-Control/Expires/Pragma when it writes auth
+        // cookies. Without them a CDN could serve one session to another user.
+        for (const [key, value] of Object.entries(headersToSet ?? {})) {
+          response.headers.set(key, value);
         }
       },
     },

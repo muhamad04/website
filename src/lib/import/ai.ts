@@ -67,6 +67,10 @@ function buildMessages(
   questions: ImportQuestionDraft[],
   settingsTitle: string,
 ): ChatMessage[] {
+  // Privacy: the provider receives question text, option text, marks and the
+  // explanation only. Correct flags, accepted answers, correct_value and any
+  // answer-key file are never sent. The teacher's local key is applied after
+  // the suggestion is accepted.
   const payload = questions.map((question) => ({
     question_number: question.sourceNumber,
     type: question.type,
@@ -74,10 +78,7 @@ function buildMessages(
     marks: question.marks,
     options: question.options.map((option) => ({
       text: option.text.slice(0, 500),
-      correct: option.correct,
     })),
-    correct_value: question.correctValue,
-    accepted: question.accepted.slice(0, 20),
     explanation: question.explanationEn.slice(0, 2000),
   }));
 
@@ -87,13 +88,13 @@ function buildMessages(
       content: [
         "You check an already-parsed school assessment for parsing mistakes.",
         "Return JSON only, matching this shape:",
-        '{"suggestions":[{"question_number":"1","type":"multiple_choice","prompt":"...","marks":1,"options":[{"text":"...","correct":true}],"correct_value":null,"accepted":[],"explanation":"...","reason":"why the parse is wrong"}],"warnings":[]}',
+        '{"suggestions":[{"question_number":"1","type":"multiple_choice","prompt":"...","marks":1,"options":[{"text":"..."}],"explanation":"...","reason":"why the parse is wrong"}],"warnings":[]}',
+        "You receive question text and option text only. The answer key is not provided and must not be guessed or returned.",
+        "Never add correct, correct_value or accepted fields. Never change the question type.",
         "Only suggest a change when the deterministic parse is clearly wrong.",
         "Never invent new questions, never translate, never add Arabic text.",
-        "For multiple_choice, include every option and exactly one correct option.",
-        "For true_false, set correct_value to \"true\" or \"false\".",
-        "For matching, leave options and correct_value empty.",
-        "For short_answer, rewrite, and find_the_mistake, put accepted answers in accepted.",
+        "For multiple_choice, include every option exactly once, in the same order as provided.",
+        "For matching, leave options empty.",
         "If a question is already correct, omit it. If nothing is wrong, return empty suggestions.",
       ].join(" "),
     },
@@ -267,23 +268,31 @@ export async function runImportAi(
       }
 
       const before = snapshot(question);
+      // The provider never sees the answer key. Preserve the local correctness
+      // by index when the AI returns the same number of options; otherwise keep
+      // the parsed options untouched. The AI can never change the type or key.
+      const aiOptions =
+        before.type === "multiple_choice" &&
+        item.options &&
+        item.options.length === before.options.length
+          ? item.options.map((option, index) => ({
+              text: option.text,
+              correct: before.options[index]?.correct ?? false,
+            }))
+          : before.options;
+
       const after: ImportAiQuestionSnapshot = {
-        type: item.type,
+        type: before.type,
         promptEn: item.prompt ?? before.promptEn,
         marks: item.marks ?? before.marks,
-        options:
-          item.type === "multiple_choice"
-            ? (item.options ?? before.options).map((option) => ({ ...option }))
-            : [],
+        options: before.type === "multiple_choice" ? aiOptions : [],
         correctValue:
-          item.type === "true_false"
-            ? (item.correct_value ?? before.correctValue)
-            : null,
+          before.type === "true_false" ? before.correctValue : null,
         accepted:
-          item.type === "short_answer" ||
-          item.type === "rewrite" ||
-          item.type === "find_the_mistake"
-            ? (item.accepted ?? before.accepted)
+          before.type === "short_answer" ||
+          before.type === "rewrite" ||
+          before.type === "find_the_mistake"
+            ? before.accepted
             : [],
         explanationEn: item.explanation ?? before.explanationEn,
       };

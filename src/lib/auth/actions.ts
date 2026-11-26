@@ -7,6 +7,12 @@ import { isSupabaseConfigured } from "@/lib/env";
 import { dashboardPathForRole, type UserRole } from "@/lib/domain/roles";
 import { studentAuthEmail } from "@/lib/auth/student-identity";
 import {
+  buildLoginThrottleKeys,
+  checkLoginThrottle,
+  getClientIp,
+  recordLoginAttempt,
+} from "@/lib/auth/throttle";
+import {
   loginSchema,
   type AuthErrorCode,
   type SignInActionResult,
@@ -30,7 +36,7 @@ function mapAuthError(error: AuthError | null): AuthErrorCode {
     case "over_request_rate_limit":
       return "rate_limited";
     default:
-      console.error("Supabase sign-in failed", error.code, error.message);
+      console.error("Supabase sign-in failed", error.code ?? "unknown");
       return "unknown";
   }
 }
@@ -63,6 +69,23 @@ export async function signInAction(
     return { ok: false, error: "validation_failed" };
   }
 
+  const throttleKeys = buildLoginThrottleKeys({
+    mode: isStudentLogin ? "student" : "staff",
+    identifier:
+      parsed.data.mode === "student"
+        ? parsed.data.student_id
+        : parsed.data.email.toLowerCase(),
+    ip: await getClientIp(),
+  });
+
+  // Back off before touching Supabase Auth. The delay is temporary and a
+  // successful password clears it; see src/lib/auth/throttle.ts.
+  const retryAfter = await checkLoginThrottle(throttleKeys);
+
+  if (retryAfter > 0) {
+    return { ok: false, error: "rate_limited" };
+  }
+
   const supabase = await createClient();
 
   let signInError: AuthError | null = null;
@@ -82,6 +105,7 @@ export async function signInAction(
   }
 
   if (signInError || !userId) {
+    await recordLoginAttempt(throttleKeys, false);
     return { ok: false, error: mapAuthError(signInError) };
   }
 
@@ -93,6 +117,7 @@ export async function signInAction(
     .maybeSingle<{ role: UserRole; is_active: boolean }>();
 
   if (profileError || !profile) {
+    await recordLoginAttempt(throttleKeys, true);
     redirect("/account-pending");
   }
 
@@ -101,14 +126,18 @@ export async function signInAction(
   // password, so it never confirms which identifier exists.
   if (isStudentLogin !== (profile.role === "student")) {
     await supabase.auth.signOut();
+    await recordLoginAttempt(throttleKeys, true);
     return { ok: false, error: "invalid_credentials" };
   }
 
   if (!profile.is_active) {
     await supabase.auth.signOut();
-    return { ok: false, error: "inactive_account" };
+    await recordLoginAttempt(throttleKeys, true);
+    // Inactive and wrong-password accounts are indistinguishable to the client.
+    return { ok: false, error: "invalid_credentials" };
   }
 
+  await recordLoginAttempt(throttleKeys, true);
   redirect(dashboardPathForRole(profile.role));
 }
 

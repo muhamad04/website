@@ -5,6 +5,12 @@ import { requireStudent } from "@/lib/auth/dal";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { finalizeAttempt, finalizeStaleAttempts } from "@/lib/assessments/finalize";
+import {
+  evaluateAttemptWriteState,
+  isAttemptWritable,
+  reasonForWriteState,
+  type AttemptWriteState,
+} from "@/lib/assessments/heartbeat";
 import { sanitizeAnswerResponse } from "@/lib/assessments/answers";
 import {
   ASSESSMENT_BUCKET,
@@ -52,6 +58,73 @@ function mapAttemptError(message: string): AssessmentErrorCode {
   if (message.includes("attempt_stale")) return "attempt_closed";
   if (message.includes("invalid_file_path")) return "file_required";
   return "unknown";
+}
+
+type AttemptGuardRow = {
+  id: string;
+  assessment_id: string;
+  student_id: string;
+  status: string;
+  expires_at: string;
+  started_at: string;
+  last_heartbeat_at: string | null;
+};
+
+/**
+ * Loads the attempt and its strict settings, then applies the same write-state
+ * policy as the database trigger. A strict attempt whose heartbeat went stale
+ * is not writable even if the browser keeps sending saves.
+ */
+async function loadAttemptWriteState(
+  admin: ReturnType<typeof createAdminClient>,
+  attemptId: string,
+  studentId: string,
+): Promise<
+  | { ok: true; attempt: AttemptGuardRow; state: AttemptWriteState }
+  | { ok: false; error: AssessmentErrorCode }
+> {
+  const { data: attempt } = await admin
+    .from("attempts")
+    .select(
+      "id, assessment_id, student_id, status, expires_at, started_at, last_heartbeat_at",
+    )
+    .eq("id", attemptId)
+    .maybeSingle<AttemptGuardRow>();
+
+  if (!attempt || attempt.student_id !== studentId) {
+    return { ok: false, error: "attempt_not_found" };
+  }
+
+  const { data: assessment } = await admin
+    .from("assessments")
+    .select(
+      "strict_exam_mode, allow_resume_after_connection_loss, heartbeat_timeout_seconds",
+    )
+    .eq("id", attempt.assessment_id)
+    .maybeSingle<{
+      strict_exam_mode: boolean;
+      allow_resume_after_connection_loss: boolean;
+      heartbeat_timeout_seconds: number;
+    }>();
+
+  if (!assessment) {
+    return { ok: false, error: "attempt_closed" };
+  }
+
+  return {
+    ok: true,
+    attempt,
+    state: evaluateAttemptWriteState({
+      status: attempt.status,
+      expiresAt: attempt.expires_at,
+      startedAt: attempt.started_at,
+      lastHeartbeatAt: attempt.last_heartbeat_at,
+      strictExamMode: assessment.strict_exam_mode,
+      allowResumeAfterConnectionLoss:
+        assessment.allow_resume_after_connection_loss,
+      heartbeatTimeoutSeconds: assessment.heartbeat_timeout_seconds,
+    }),
+  };
 }
 
 export async function startAttemptAction(
@@ -134,21 +207,25 @@ export async function saveAnswerAction(
     return fail("service_unavailable");
   }
 
-  const { data: attempt } = await admin
-    .from("attempts")
-    .select("id, assessment_id, student_id, status, expires_at")
-    .eq("id", data.attempt_id)
-    .maybeSingle();
+  const guard = await loadAttemptWriteState(admin, data.attempt_id, student.id);
 
-  if (!attempt || attempt.student_id !== student.id) {
-    return fail("attempt_not_found");
+  if (!guard.ok) {
+    return fail(guard.error);
   }
 
-  if (attempt.status !== "in_progress") {
-    return fail("attempt_closed");
-  }
+  const attempt = guard.attempt;
 
-  if (Date.parse(attempt.expires_at) <= Date.now()) {
+  if (!isAttemptWritable(guard.state)) {
+    const reason = reasonForWriteState(guard.state);
+
+    if (reason) {
+      await finalizeAttempt({
+        attemptId: attempt.id,
+        studentId: student.id,
+        reason,
+      });
+    }
+
     return fail("attempt_closed");
   }
 
@@ -276,21 +353,25 @@ export async function prepareSubmissionUploadAction(
     return fail("service_unavailable");
   }
 
-  const { data: attempt } = await admin
-    .from("attempts")
-    .select("id, assessment_id, student_id, status, expires_at")
-    .eq("id", data.attempt_id)
-    .maybeSingle();
+  const guard = await loadAttemptWriteState(admin, data.attempt_id, student.id);
 
-  if (!attempt || attempt.student_id !== student.id) {
-    return fail("attempt_not_found");
+  if (!guard.ok) {
+    return fail(guard.error);
   }
 
-  if (attempt.status !== "in_progress") {
-    return fail("attempt_closed");
-  }
+  const attempt = guard.attempt;
 
-  if (Date.parse(attempt.expires_at) <= Date.now()) {
+  if (!isAttemptWritable(guard.state)) {
+    const reason = reasonForWriteState(guard.state);
+
+    if (reason) {
+      await finalizeAttempt({
+        attemptId: attempt.id,
+        studentId: student.id,
+        reason,
+      });
+    }
+
     return fail("attempt_closed");
   }
 
@@ -356,10 +437,44 @@ export async function submitAttemptAction(
     return fail("reason_invalid");
   }
 
+  let admin: ReturnType<typeof createAdminClient>;
+
+  try {
+    admin = createAdminClient();
+  } catch {
+    return fail("service_unavailable");
+  }
+
+  const guard = await loadAttemptWriteState(
+    admin,
+    parsed.data.attempt_id,
+    student.id,
+  );
+
+  if (!guard.ok) {
+    return fail(guard.error);
+  }
+
+  // Duplicate finalisation is idempotent: an already-closed attempt is a
+  // success, not an error, so a double-click or a retry does not alarm the
+  // student. The result page shows the authoritative status.
+  if (guard.state === "closed") {
+    revalidatePath("/student/assessments");
+
+    return {
+      ok: true,
+      attemptId: parsed.data.attempt_id,
+    };
+  }
+
+  // A heartbeat-stale strict attempt must close with the automatic reason, even
+  // if the browser claims a normal submission.
+  const effectiveReason = reasonForWriteState(guard.state) ?? reason;
+
   const outcome = await finalizeAttempt({
     attemptId: parsed.data.attempt_id,
     studentId: student.id,
-    reason,
+    reason: effectiveReason,
   });
 
   if (!outcome.ok) {

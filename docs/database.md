@@ -22,6 +22,7 @@ The schema lives in `supabase/migrations/` and is applied in filename order.
 | `20261116150000_assessment_import.sql` | Private assessment-import staging table, owner/path guard trigger, private `assessment-imports` bucket and four import audit actions |
 | `20261119120000_strict_exam_mode.sql` | Strict exam settings, submission reasons, heartbeat/suspicious-event counters, stale-attempt sweep, seeded question/option randomisation and the `attempt_auto_submitted` audit action |
 | `20261123120000_assessment_import_50mb.sql` | Raises the private `assessment-imports` bucket limit to 50 MiB and pins the allowed import MIME types. No table, policy or auth changes; apply only with explicit approval |
+| `20261126120000_security_hardening.sql` | Blocks direct student attempt writes, enforces strict heartbeat staleness in triggers/RPCs, requires an open attempt for submission uploads, aligns the submission bucket to 25 MiB, and adds a service-role-only login throttle. **Not applied to the hosted project.** |
 
 ## Tables
 

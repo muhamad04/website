@@ -60,7 +60,7 @@ function mapAuthError(error: {
     return "service_unavailable";
   }
 
-  console.error("student provisioning failed", error.code ?? "", message);
+  console.error("student provisioning failed", error.code ?? "unknown");
   return "unknown";
 }
 
@@ -84,7 +84,9 @@ function mapProvisionWriteError(message: string): StudentErrorCode {
     return "grade_class_mismatch";
   }
 
-  console.error("student profile provisioning failed", message);
+  // Never log the raw constraint message: Postgres includes the offending
+  // Student ID or e-mail value in the detail line.
+  console.error("student profile provisioning failed");
   return "unknown";
 }
 
@@ -120,8 +122,7 @@ async function generateRecoveryLink(
   if (error || !token) {
     console.error(
       "recovery link generation failed",
-      error?.code ?? "",
-      error?.message ?? "missing hashed_token",
+      error?.code ?? "missing_hashed_token",
     );
     return null;
   }
@@ -275,8 +276,8 @@ export async function restoreStudentAuthIdentity(
       email: previousEmail,
       email_confirm: true,
     });
-  } catch (error) {
-    console.error("student identity rollback failed", error);
+  } catch {
+    console.error("student identity rollback failed");
   }
 }
 
