@@ -10,6 +10,8 @@ import { buttonVariants } from "@/components/ui/button";
 import { requireTeacher } from "@/lib/auth/dal";
 import { getAssessmentDetail } from "@/lib/data/assessments";
 import { assessmentsUi } from "@/lib/i18n/assessments";
+import { QUESTION_TYPES } from "@/lib/validation/assessments";
+import type { QuestionType } from "@/lib/domain/types";
 import { isUuid } from "@/lib/search";
 import { cn } from "@/lib/utils";
 
@@ -48,6 +50,12 @@ export default async function NewQuestionPage({
   const section =
     detail.sections.find((candidate) => candidate.id === rawSection) ??
     detail.sections[0];
+  const rawType = Array.isArray(query.type) ? query.type[0] : query.type;
+  const initialType = (QUESTION_TYPES as readonly string[]).includes(
+    rawType ?? "",
+  )
+    ? (rawType as QuestionType)
+    : undefined;
 
   return (
     <div className="space-y-5">
@@ -113,6 +121,7 @@ export default async function NewQuestionPage({
             assessmentId={detail.id}
             sectionId={section.id}
             gradingMode={detail.grading_mode}
+            initialType={initialType}
           />
         </div>
       )}

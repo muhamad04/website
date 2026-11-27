@@ -48,6 +48,7 @@ import type {
 import {
   isAutoGradableType,
   isManualOnlyType,
+  isWritingType,
   QUESTION_TYPES,
 } from "@/lib/validation/assessments";
 import {
@@ -77,6 +78,10 @@ type ReviewQuestion = {
   type: QuestionType;
   promptEn: string;
   helpTextEn: string;
+  topicEn: string;
+  minWords: string;
+  maxWords: string;
+  rubricEn: string;
   marks: string;
   confidence: ImportConfidence;
   confidenceScore: number;
@@ -96,6 +101,11 @@ type ReviewSection = {
   key: string;
   titleEn: string;
   instructionsEn: string;
+  kind: "standard" | "reading_passage" | "dialogue";
+  passageEn: string;
+  vocabularyEn: string;
+  sourceEn: string;
+  dialogueLines: Array<{ speaker: string; text: string }>;
   marks: number | null;
   questions: ReviewQuestion[];
 };
@@ -146,6 +156,12 @@ function questionFromDraft(question: ImportQuestionDraft): ReviewQuestion {
     type: question.type,
     promptEn: question.promptEn,
     helpTextEn: question.helpTextEn,
+    topicEn: question.topicEn ?? "",
+    minWords:
+      question.minWords != null ? String(question.minWords) : "",
+    maxWords:
+      question.maxWords != null ? String(question.maxWords) : "",
+    rubricEn: question.rubricEn ?? "",
     marks: String(question.marks),
     confidence: question.confidence,
     confidenceScore: question.confidenceScore ?? 0.5,
@@ -169,6 +185,10 @@ function newQuestion(): ReviewQuestion {
     type: "short_answer",
     promptEn: "",
     helpTextEn: "",
+    topicEn: "",
+    minWords: "",
+    maxWords: "",
+    rubricEn: "",
     marks: "1",
     confidence: "low",
     confidenceScore: 0.25,
@@ -190,6 +210,11 @@ function newSection(): ReviewSection {
     key: `section-${Math.random().toString(36).slice(2, 9)}`,
     titleEn: "Questions",
     instructionsEn: "",
+    kind: "standard",
+    passageEn: "",
+    vocabularyEn: "",
+    sourceEn: "",
+    dialogueLines: [],
     marks: null,
     questions: [],
   };
@@ -286,6 +311,13 @@ export function ImportReview({
       key: section.key,
       titleEn: section.titleEn,
       instructionsEn: section.instructionsEn,
+      kind: section.kind ?? "standard",
+      passageEn: section.passageEn ?? "",
+      vocabularyEn: section.vocabularyEn ?? "",
+      sourceEn: section.sourceEn ?? "",
+      dialogueLines: (section.dialogueLines ?? []).map((line) => ({
+        ...line,
+      })),
       marks: section.marks ?? null,
       questions: section.questions.map(questionFromDraft),
     })),
@@ -424,6 +456,13 @@ export function ImportReview({
       key: section.key,
       titleEn: section.titleEn,
       instructionsEn: section.instructionsEn,
+      kind: section.kind,
+      passageEn: section.passageEn,
+      vocabularyEn: section.vocabularyEn,
+      sourceEn: section.sourceEn,
+      dialogueLines: section.dialogueLines.filter(
+        (line) => line.speaker.trim() && line.text.trim(),
+      ),
       marks: section.marks,
       questions: section.questions.map((question) => ({
         key: question.key,
@@ -431,6 +470,10 @@ export function ImportReview({
         type: question.type,
         promptEn: question.promptEn,
         helpTextEn: question.helpTextEn,
+        topicEn: question.topicEn,
+        minWords: question.minWords,
+        maxWords: question.maxWords,
+        rubricEn: question.rubricEn,
         marks: Number(question.marks),
         confidence: question.confidence,
         confidenceScore: question.confidenceScore,
@@ -1356,6 +1399,159 @@ export function ImportReview({
                       }
                     />
                   </Field>
+
+                  <Field
+                    id={`section-${sectionIndex}-kind`}
+                    label={importsUi.review.sectionKind}
+                  >
+                    <Select
+                      id={`section-${sectionIndex}-kind`}
+                      value={section.kind}
+                      disabled={busy}
+                      onChange={(event) =>
+                        updateSection(sectionIndex, {
+                          kind: event.target.value as ReviewSection["kind"],
+                        })
+                      }
+                    >
+                      <option value="standard">
+                        {importsUi.review.sectionKindStandard.en}
+                      </option>
+                      <option value="reading_passage">
+                        {importsUi.review.sectionKindPassage.en}
+                      </option>
+                      <option value="dialogue">
+                        {importsUi.review.sectionKindDialogue.en}
+                      </option>
+                    </Select>
+                  </Field>
+
+                  {section.kind === "reading_passage" ? (
+                    <>
+                      <Field
+                        id={`section-${sectionIndex}-passage`}
+                        label={importsUi.review.passageText}
+                        className="sm:col-span-2"
+                      >
+                        <Textarea
+                          id={`section-${sectionIndex}-passage`}
+                          value={section.passageEn}
+                          maxLength={20000}
+                          className="min-h-40"
+                          disabled={busy}
+                          onChange={(event) =>
+                            updateSection(sectionIndex, {
+                              passageEn: event.target.value,
+                            })
+                          }
+                        />
+                      </Field>
+                      <Field
+                        id={`section-${sectionIndex}-vocabulary`}
+                        label={importsUi.review.vocabularyText}
+                      >
+                        <Textarea
+                          id={`section-${sectionIndex}-vocabulary`}
+                          value={section.vocabularyEn}
+                          maxLength={4000}
+                          disabled={busy}
+                          onChange={(event) =>
+                            updateSection(sectionIndex, {
+                              vocabularyEn: event.target.value,
+                            })
+                          }
+                        />
+                      </Field>
+                      <Field
+                        id={`section-${sectionIndex}-source`}
+                        label={importsUi.review.sourceText}
+                      >
+                        <Input
+                          id={`section-${sectionIndex}-source`}
+                          value={section.sourceEn}
+                          maxLength={500}
+                          disabled={busy}
+                          onChange={(event) =>
+                            updateSection(sectionIndex, {
+                              sourceEn: event.target.value,
+                            })
+                          }
+                        />
+                      </Field>
+                    </>
+                  ) : null}
+
+                  {section.kind === "dialogue" ? (
+                    <div className="space-y-2 sm:col-span-2">
+                      <p className="text-xs font-semibold text-muted-foreground">
+                        {importsUi.review.dialogueLines.en}
+                      </p>
+                      {section.dialogueLines.map((line, lineIndex) => (
+                        <div
+                          key={lineIndex}
+                          className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]"
+                        >
+                          <Input
+                            value={line.speaker}
+                            aria-label={importsUi.review.speaker.en}
+                            placeholder={importsUi.review.speaker.en}
+                            maxLength={120}
+                            disabled={busy}
+                            onChange={(event) =>
+                              updateSection(sectionIndex, {
+                                dialogueLines: section.dialogueLines.map(
+                                  (candidate, candidateIndex) =>
+                                    candidateIndex === lineIndex
+                                      ? {
+                                          ...candidate,
+                                          speaker: event.target.value,
+                                        }
+                                      : candidate,
+                                ),
+                              })
+                            }
+                          />
+                          <Input
+                            value={line.text}
+                            aria-label={importsUi.review.lineText.en}
+                            placeholder={importsUi.review.lineText.en}
+                            maxLength={4000}
+                            disabled={busy}
+                            onChange={(event) =>
+                              updateSection(sectionIndex, {
+                                dialogueLines: section.dialogueLines.map(
+                                  (candidate, candidateIndex) =>
+                                    candidateIndex === lineIndex
+                                      ? {
+                                          ...candidate,
+                                          text: event.target.value,
+                                        }
+                                      : candidate,
+                                ),
+                              })
+                            }
+                          />
+                        </div>
+                      ))}
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        disabled={busy}
+                        onClick={() =>
+                          updateSection(sectionIndex, {
+                            dialogueLines: [
+                              ...section.dialogueLines,
+                              { speaker: "", text: "" },
+                            ],
+                          })
+                        }
+                      >
+                        <Plus aria-hidden="true" className="size-3.5" />
+                        {importsUi.review.addDialogueLine.en}
+                      </Button>
+                    </div>
+                  ) : null}
                 </div>
 
                 <div className="flex flex-wrap items-center gap-1">
@@ -1597,6 +1793,93 @@ export function ImportReview({
                               }
                             />
                           </Field>
+
+                          {isWritingType(question.type) ? (
+                            <>
+                              {question.type === "paragraph" ? (
+                                <Field
+                                  id={`q-${sectionIndex}-${questionIndex}-topic`}
+                                  label={importsUi.review.topic}
+                                  className="sm:col-span-2"
+                                >
+                                  <Input
+                                    id={`q-${sectionIndex}-${questionIndex}-topic`}
+                                    value={question.topicEn}
+                                    maxLength={300}
+                                    disabled={busy}
+                                    onChange={(event) =>
+                                      updateQuestion(
+                                        sectionIndex,
+                                        questionIndex,
+                                        { topicEn: event.target.value },
+                                      )
+                                    }
+                                  />
+                                </Field>
+                              ) : null}
+                              <Field
+                                id={`q-${sectionIndex}-${questionIndex}-min-words`}
+                                label={importsUi.review.minWords}
+                              >
+                                <Input
+                                  id={`q-${sectionIndex}-${questionIndex}-min-words`}
+                                  type="number"
+                                  min={1}
+                                  max={20000}
+                                  step={1}
+                                  value={question.minWords}
+                                  disabled={busy}
+                                  onChange={(event) =>
+                                    updateQuestion(
+                                      sectionIndex,
+                                      questionIndex,
+                                      { minWords: event.target.value },
+                                    )
+                                  }
+                                />
+                              </Field>
+                              <Field
+                                id={`q-${sectionIndex}-${questionIndex}-max-words`}
+                                label={importsUi.review.maxWords}
+                              >
+                                <Input
+                                  id={`q-${sectionIndex}-${questionIndex}-max-words`}
+                                  type="number"
+                                  min={1}
+                                  max={20000}
+                                  step={1}
+                                  value={question.maxWords}
+                                  disabled={busy}
+                                  onChange={(event) =>
+                                    updateQuestion(
+                                      sectionIndex,
+                                      questionIndex,
+                                      { maxWords: event.target.value },
+                                    )
+                                  }
+                                />
+                              </Field>
+                              <Field
+                                id={`q-${sectionIndex}-${questionIndex}-rubric`}
+                                label={importsUi.review.rubric}
+                                className="sm:col-span-2"
+                              >
+                                <Textarea
+                                  id={`q-${sectionIndex}-${questionIndex}-rubric`}
+                                  value={question.rubricEn}
+                                  maxLength={4000}
+                                  disabled={busy}
+                                  onChange={(event) =>
+                                    updateQuestion(
+                                      sectionIndex,
+                                      questionIndex,
+                                      { rubricEn: event.target.value },
+                                    )
+                                  }
+                                />
+                              </Field>
+                            </>
+                          ) : null}
                           <Field
                             id={`q-${sectionIndex}-${questionIndex}-marks`}
                             label={importsUi.review.marks}

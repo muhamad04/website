@@ -217,6 +217,29 @@ export const assessmentsUi = {
     ),
     sectionTitle: bi("Section title", "عنوان القسم"),
     sectionInstructions: bi("Section instructions", "تعليمات القسم"),
+    sectionKind: bi("Section type", "نوع القسم"),
+    kindStandard: bi("Questions only", "أسئلة فقط"),
+    kindReadingPassage: bi("Reading passage", "نص قراءة"),
+    kindDialogue: bi("Dialogue", "حوار"),
+    addReadingPassage: bi("Add reading passage", "إضافة نص قراءة"),
+    addDialogue: bi("Add dialogue", "إضافة حوار"),
+    addEssay: bi("Add essay", "إضافة مقال"),
+    addParagraph: bi("Add paragraph", "إضافة فقرة"),
+    passageText: bi("Passage text", "نص القطعة"),
+    vocabulary: bi("Vocabulary / help (optional)", "المفردات / المساعدة (اختياري)"),
+    source: bi("Source / reference (optional)", "المصدر / المرجع (اختياري)"),
+    dialogueLines: bi("Dialogue lines", "أسطر الحوار"),
+    speaker: bi("Speaker", "المتحدث"),
+    dialogueText: bi("Line", "السطر"),
+    addLine: bi("Add line", "إضافة سطر"),
+    removeLine: bi("Remove line", "إزالة السطر"),
+    collapse: bi("Collapse", "طي"),
+    expand: bi("Expand", "توسيع"),
+    moveToGroup: bi("Move to group", "نقل إلى قسم"),
+    groupContentHint: bi(
+      "Students read this content once, then answer the questions attached to the group.",
+      "يقرأ الطالب هذا المحتوى مرة واحدة، ثم يجيب عن الأسئلة المرتبطة بالقسم.",
+    ),
     noQuestions: bi("No questions in this section", "لا توجد أسئلة في هذا القسم"),
     addFirstQuestion: bi(
       "Add the first question to this section.",
@@ -317,6 +340,22 @@ export const assessmentsUi = {
       "Students write a long answer. A teacher grades it manually.",
       "يكتب الطالب إجابة مطوّلة ويصححها المعلم يدويًا.",
     ),
+    paragraphHint: bi(
+      "Students write a focused paragraph. A teacher grades it manually.",
+      "يكتب الطالب فقرة مركّزة ويصححها المعلم يدويًا.",
+    ),
+    topic: bi("Topic / title (optional)", "الموضوع / العنوان (اختياري)"),
+    minWords: bi("Minimum words (optional)", "الحد الأدنى للكلمات (اختياري)"),
+    maxWords: bi("Maximum words (optional)", "الحد الأقصى للكلمات (اختياري)"),
+    wordLimitsHint: bi(
+      "Guidance shown to the student. It does not block submission.",
+      "إرشاد يظهر للطالب ولا يمنع التسليم.",
+    ),
+    rubric: bi("Marking rubric (optional)", "معايير التصحيح (اختياري)"),
+    rubricHint: bi(
+      "Shown to the student and used when a teacher grades the answer manually.",
+      "تظهر للطالب ويستخدمها المعلم عند التصحيح اليدوي.",
+    ),
     fileHint: bi(
       "Students upload a PDF or image. A teacher grades it manually.",
       "يرفع الطالب ملف PDF أو صورة ويصححها المعلم يدويًا.",
@@ -366,6 +405,16 @@ export const assessmentsUi = {
     ),
     writeAnswer: bi("Write your answer", "اكتب إجابتك"),
     essayAnswer: bi("Write your essay", "اكتب مقالتك"),
+    paragraphAnswer: bi("Write your paragraph", "اكتب فقرتك"),
+    words: bi("words", "كلمة"),
+    wordCount: bi("Word count", "عدد الكلمات"),
+    minWordsHint: bi("At least", "على الأقل"),
+    maxWordsHint: bi("Up to", "حتى"),
+    rubric: bi("Marking rubric", "معايير التصحيح"),
+    passage: bi("Reading passage", "نص القراءة"),
+    vocabulary: bi("Vocabulary", "المفردات"),
+    source: bi("Source", "المصدر"),
+    dialogue: bi("Dialogue", "حوار"),
     fileAnswer: bi("Upload your file", "ارفع ملفك"),
     fileHint: bi(
       "PDF, JPEG, PNG or WebP up to 25 MB.",
@@ -612,6 +661,7 @@ export const questionTypeCopy = mapOf<QuestionType>({
   matching: bi("Matching", "مطابقة"),
   short_answer: bi("Short answer", "إجابة قصيرة"),
   essay: bi("Essay", "مقال"),
+  paragraph: bi("Paragraph", "فقرة"),
   file_upload: bi("File upload", "رفع ملف"),
   rewrite: bi("Rewrite", "إعادة صياغة"),
   find_the_mistake: bi("Find the mistake", "اكتشف الخطأ"),
@@ -630,6 +680,7 @@ export const assessmentEventCopy = mapOf<AssessmentAdminAction>({
   question_created: bi("Question created", "أُنشئ السؤال"),
   question_updated: bi("Question updated", "حُدّث السؤال"),
   question_deleted: bi("Question deleted", "حُذف السؤال"),
+  question_moved: bi("Question moved", "نُقل السؤال"),
   questions_reordered: bi("Questions reordered", "أُعيد ترتيب الأسئلة"),
   attempt_graded: bi("Attempt graded", "صُححت المحاولة"),
   attempt_auto_submitted: bi(
@@ -698,8 +749,8 @@ export const assessmentErrorCopy: Record<AssessmentErrorCode, Bilingual> = {
     "اختر تصحيحًا آليًا أو يدويًا.",
   ),
   grading_method_requires_manual: bi(
-    "Essays and file uploads must be graded manually.",
-    "يجب تصحيح المقالات والملفات يدويًا.",
+    "Essays, paragraphs and file uploads must be graded manually.",
+    "يجب تصحيح المقالات والفقرات والملفات يدويًا.",
   ),
   automatic_grading_not_supported: bi(
     "This question type cannot be graded automatically.",
@@ -737,6 +788,18 @@ export const assessmentErrorCopy: Record<AssessmentErrorCode, Bilingual> = {
     "Students have answered questions in this section, so it cannot be deleted.",
     "أجاب الطلاب على أسئلة في هذا القسم، لذا لا يمكن حذفه.",
   ),
+  section_kind_invalid: bi(
+    "Choose a valid section type.",
+    "اختر نوع قسم صالحًا.",
+  ),
+  section_content_required: bi(
+    "Add the passage or at least one dialogue line before saving.",
+    "أضف النص أو سطر حوار واحدًا على الأقل قبل الحفظ.",
+  ),
+  section_has_questions: bi(
+    "Move the questions to another group before deleting this one.",
+    "انقل الأسئلة إلى قسم آخر قبل حذف هذا القسم.",
+  ),
   question_not_found: bi(
     "That question no longer exists.",
     "لم يعد هذا السؤال موجودًا.",
@@ -752,6 +815,10 @@ export const assessmentErrorCopy: Record<AssessmentErrorCode, Bilingual> = {
   question_marks_invalid: bi(
     "Marks must be between 0.01 and 100, with at most two decimals.",
     "يجب أن تكون الدرجة بين 0.01 و100 بحد أقصى منزلتين عشريتين.",
+  ),
+  question_word_limits_invalid: bi(
+    "Word limits must be whole numbers, and the maximum cannot be below the minimum.",
+    "يجب أن تكون حدود الكلمات أعدادًا صحيحة، ولا يمكن أن يكون الحد الأقصى أقل من الحد الأدنى.",
   ),
   question_options_invalid: bi(
     "Add between 2 and 10 options.",

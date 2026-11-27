@@ -90,6 +90,82 @@ function formatRemaining(ms: number): string {
     : `${pad(minutes)}:${pad(seconds)}`;
 }
 
+function countWords(value: string): number {
+  const trimmed = value.trim();
+
+  if (!trimmed) {
+    return 0;
+  }
+
+  return trimmed.split(/\s+/).length;
+}
+
+function SectionContent({ section }: { section: StudentAssessmentSection }) {
+  if (section.kind === "reading_passage" && section.passage_en) {
+    return (
+      <div className="mt-3 space-y-2 rounded-lg border border-border bg-card p-4">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          <Bi
+            en={assessmentsUi.student.passage.en}
+            ar={assessmentsUi.student.passage.ar}
+          />
+        </p>
+        <div className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+          {section.passage_en}
+        </div>
+        {section.vocabulary_en ? (
+          <div className="rounded-md bg-secondary/40 p-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              <Bi
+                en={assessmentsUi.student.vocabulary.en}
+                ar={assessmentsUi.student.vocabulary.ar}
+              />
+            </p>
+            <p className="mt-1 whitespace-pre-wrap text-sm text-foreground">
+              {section.vocabulary_en}
+            </p>
+          </div>
+        ) : null}
+        {section.source_en ? (
+          <p className="text-xs italic text-muted-foreground">
+            {assessmentsUi.student.source.en}: {section.source_en}
+          </p>
+        ) : null}
+      </div>
+    );
+  }
+
+  if (section.kind === "dialogue" && section.dialogue_lines.length > 0) {
+    return (
+      <div className="mt-3 space-y-2 rounded-lg border border-border bg-card p-4">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          <Bi
+            en={assessmentsUi.student.dialogue.en}
+            ar={assessmentsUi.student.dialogue.ar}
+          />
+        </p>
+        <ol className="space-y-2">
+          {section.dialogue_lines.map((line, index) => (
+            <li key={index} className="text-sm">
+              <span className="font-semibold text-foreground">
+                {line.speaker}:
+              </span>{" "}
+              <span className="text-foreground">{line.text}</span>
+            </li>
+          ))}
+        </ol>
+        {section.source_en ? (
+          <p className="text-xs italic text-muted-foreground">
+            {assessmentsUi.student.source.en}: {section.source_en}
+          </p>
+        ) : null}
+      </div>
+    );
+  }
+
+  return null;
+}
+
 export function AttemptRunner({
   attemptId,
   assessmentId,
@@ -775,17 +851,75 @@ export function AttemptRunner({
       );
     }
 
+    const text = typeof response.text === "string" ? response.text : "";
+    const writing = question.type === "essay" || question.type === "paragraph";
+
+    if (writing) {
+      const wordCount = countWords(text);
+
+      return (
+        <div className="space-y-2">
+          {question.topic_en ? (
+            <p className="text-sm font-semibold text-foreground">
+              {question.topic_en}
+            </p>
+          ) : null}
+          <Textarea
+            value={text}
+            onChange={(event) =>
+              updateAnswer(question.id, {
+                response: { text: event.target.value },
+              })
+            }
+            placeholder={
+              question.type === "paragraph"
+                ? `${assessmentsUi.student.paragraphAnswer.en} · ${assessmentsUi.student.paragraphAnswer.ar}`
+                : `${assessmentsUi.student.essayAnswer.en} · ${assessmentsUi.student.essayAnswer.ar}`
+            }
+            className="min-h-48"
+            maxLength={20000}
+            aria-label={`${assessmentsUi.student.question.en} ${index + 1}`}
+          />
+          <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
+            <span aria-live="polite">
+              {assessmentsUi.student.wordCount.en}: {wordCount}
+            </span>
+            {question.min_words || question.max_words ? (
+              <span>
+                {question.min_words
+                  ? `${assessmentsUi.student.minWordsHint.en} ${question.min_words}`
+                  : null}
+                {question.min_words && question.max_words ? " · " : null}
+                {question.max_words
+                  ? `${assessmentsUi.student.maxWordsHint.en} ${question.max_words}`
+                  : null}
+              </span>
+            ) : null}
+          </div>
+          {question.rubric_en ? (
+            <div className="rounded-lg border border-border bg-secondary/30 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <Bi
+                  en={assessmentsUi.student.rubric.en}
+                  ar={assessmentsUi.student.rubric.ar}
+                />
+              </p>
+              <p className="mt-1 whitespace-pre-wrap text-sm text-foreground">
+                {question.rubric_en}
+              </p>
+            </div>
+          ) : null}
+        </div>
+      );
+    }
+
     return (
       <Textarea
-        value={typeof response.text === "string" ? response.text : ""}
+        value={text}
         onChange={(event) =>
           updateAnswer(question.id, { response: { text: event.target.value } })
         }
-        placeholder={
-          question.type === "essay"
-            ? `${assessmentsUi.student.essayAnswer.en} · ${assessmentsUi.student.essayAnswer.ar}`
-            : `${assessmentsUi.student.writeAnswer.en} · ${assessmentsUi.student.writeAnswer.ar}`
-        }
+        placeholder={`${assessmentsUi.student.writeAnswer.en} · ${assessmentsUi.student.writeAnswer.ar}`}
         className="min-h-32"
         maxLength={20000}
         aria-label={`${assessmentsUi.student.question.en} ${index + 1}`}
@@ -963,6 +1097,7 @@ export function AttemptRunner({
                 />
               </p>
             ) : null}
+            <SectionContent section={section} />
           </div>
 
           <ol className="space-y-3">

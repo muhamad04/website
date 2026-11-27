@@ -264,6 +264,17 @@ const importPairSchema = z.object({
     .max(500, { error: "question_pairs_invalid" }),
 });
 
+const optionalWordCount = z.preprocess(
+  (value) =>
+    value === undefined || value === null || value === "" ? undefined : value,
+  z.coerce
+    .number({ error: "question_word_limits_invalid" })
+    .int({ error: "question_word_limits_invalid" })
+    .min(1, { error: "question_word_limits_invalid" })
+    .max(20000, { error: "question_word_limits_invalid" })
+    .optional(),
+);
+
 export const importQuestionSchema = z
   .object({
     key: z.string().trim().max(80).optional(),
@@ -271,6 +282,10 @@ export const importQuestionSchema = z
     type: z.enum(QUESTION_TYPES, { error: "question_type_invalid" }),
     promptEn: requiredText(4000, "question_prompt_required"),
     helpTextEn: optionalText(1000),
+    topicEn: optionalText(300),
+    minWords: optionalWordCount,
+    maxWords: optionalWordCount,
+    rubricEn: optionalText(4000),
     marks: z.coerce
       .number({ error: "question_marks_invalid" })
       .min(0.01, { error: "question_marks_invalid" })
@@ -294,6 +309,18 @@ export const importQuestionSchema = z
     raw: z.string().max(20_000).optional(),
   })
   .superRefine((value, ctx) => {
+    if (
+      value.minWords !== undefined &&
+      value.maxWords !== undefined &&
+      value.maxWords < value.minWords
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["maxWords"],
+        message: "question_word_limits_invalid",
+      });
+    }
+
     if (isManualOnlyType(value.type) && value.gradingMethod !== "manual") {
       ctx.addIssue({
         code: "custom",
@@ -372,13 +399,45 @@ export const importQuestionSchema = z
 
 export type ImportQuestionInput = z.infer<typeof importQuestionSchema>;
 
-export const importSectionSchema = z.object({
-  key: z.string().trim().max(80).optional(),
-  titleEn: requiredText(200, "section_title_required"),
-  instructionsEn: optionalText(2000),
-  marks: z.coerce.number().min(0).max(1000).nullable().optional(),
-  questions: z.array(importQuestionSchema).max(200).default([]),
+const importDialogueLineSchema = z.object({
+  speaker: z.string().trim().min(1).max(120),
+  text: z.string().trim().min(1).max(4000),
 });
+
+export const importSectionSchema = z
+  .object({
+    key: z.string().trim().max(80).optional(),
+    titleEn: requiredText(200, "section_title_required"),
+    instructionsEn: optionalText(2000),
+    kind: z
+      .enum(["standard", "reading_passage", "dialogue"], {
+        error: "section_kind_invalid",
+      })
+      .default("standard"),
+    passageEn: optionalText(20000, "section_content_required"),
+    vocabularyEn: optionalText(4000, "section_content_required"),
+    sourceEn: optionalText(500, "section_content_required"),
+    dialogueLines: z.array(importDialogueLineSchema).max(200).default([]),
+    marks: z.coerce.number().min(0).max(1000).nullable().optional(),
+    questions: z.array(importQuestionSchema).max(200).default([]),
+  })
+  .superRefine((value, ctx) => {
+    if (value.kind === "reading_passage" && !value.passageEn) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["passageEn"],
+        message: "section_content_required",
+      });
+    }
+
+    if (value.kind === "dialogue" && value.dialogueLines.length === 0) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["dialogueLines"],
+        message: "section_content_required",
+      });
+    }
+  });
 
 export type ImportSectionInput = z.infer<typeof importSectionSchema>;
 

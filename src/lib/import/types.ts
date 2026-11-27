@@ -30,6 +30,9 @@ export const IMPORT_WARNING_CODES = [
   "matching_incomplete",
   "marks_defaulted",
   "section_marks_distributed",
+  "group_without_questions",
+  "grouping_uncertain",
+  "passage_without_questions",
   "answer_key_in_question_file",
   "text_truncated",
   "file_empty",
@@ -66,6 +69,10 @@ export type ImportQuestionDraft = {
   type: QuestionType;
   promptEn: string;
   helpTextEn: string;
+  topicEn?: string;
+  minWords?: number | null;
+  maxWords?: number | null;
+  rubricEn?: string;
   marks: number;
   /** `false` only when the parser could not infer a type confidently. */
   confidence: ImportConfidence;
@@ -86,10 +93,20 @@ export type ImportQuestionDraft = {
   reviewed?: boolean;
 };
 
+export type ImportDialogueLine = {
+  speaker: string;
+  text: string;
+};
+
 export type ImportSectionDraft = {
   key: string;
   titleEn: string;
   instructionsEn: string;
+  kind?: "standard" | "reading_passage" | "dialogue";
+  passageEn?: string;
+  vocabularyEn?: string;
+  sourceEn?: string;
+  dialogueLines?: ImportDialogueLine[];
   /** Section-level marks printed in the heading, when clearly specified. */
   marks?: number | null;
   questions: ImportQuestionDraft[];

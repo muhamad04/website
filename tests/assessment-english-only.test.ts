@@ -53,6 +53,8 @@ const section: ImportSectionInput = {
   key: "s-1",
   titleEn: "Multiple choice",
   instructionsEn: "Choose one.",
+  kind: "standard",
+  dialogueLines: [],
   questions: [],
 };
 

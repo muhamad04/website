@@ -17,6 +17,10 @@ export type GradingRow = {
   answer_id: string;
   prompt_en: string;
   prompt_ar: string | null;
+  topic_en: string | null;
+  min_words: number | null;
+  max_words: number | null;
+  rubric_en: string | null;
   marks: number;
   marks_awarded: number | null;
   feedback_en: string | null;
@@ -144,6 +148,38 @@ export function ManualGradingForm({
                     ar={assessmentsUi.results.responseTitle.ar}
                   />
                 </p>
+
+                {row.topic_en ? (
+                  <p className="mt-1 text-sm font-semibold text-foreground">
+                    {row.topic_en}
+                  </p>
+                ) : null}
+
+                {row.min_words || row.max_words ? (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {row.min_words
+                      ? `${assessmentsUi.student.minWordsHint.en} ${row.min_words}`
+                      : null}
+                    {row.min_words && row.max_words ? " · " : null}
+                    {row.max_words
+                      ? `${assessmentsUi.student.maxWordsHint.en} ${row.max_words}`
+                      : null}
+                  </p>
+                ) : null}
+
+                {row.rubric_en ? (
+                  <div className="mt-2 rounded-md bg-secondary/40 p-2">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      <Bi
+                        en={assessmentsUi.student.rubric.en}
+                        ar={assessmentsUi.student.rubric.ar}
+                      />
+                    </p>
+                    <p className="mt-1 whitespace-pre-wrap text-foreground">
+                      {row.rubric_en}
+                    </p>
+                  </div>
+                ) : null}
 
                 {row.file_url ? (
                   <p className="mt-1">

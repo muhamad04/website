@@ -32,6 +32,7 @@ import type {
 import {
   isAutoGradableType,
   isManualOnlyType,
+  isWritingType,
 } from "@/lib/validation/assessments";
 
 type OptionDraft = { text_en: string };
@@ -44,6 +45,10 @@ type Values = {
   type: QuestionType;
   prompt_en: string;
   help_text_en: string;
+  topic_en: string;
+  min_words: string;
+  max_words: string;
+  rubric_en: string;
   marks: string;
   is_required: boolean;
   grading_method: "automatic" | "manual";
@@ -79,6 +84,7 @@ function readKey(question: QuestionRecord | undefined): {
 function initialValues(
   question: QuestionRecord | undefined,
   gradingMode: GradingMode,
+  initialType: QuestionType = "multiple_choice",
 ): Values {
   const key = readKey(question);
   const options = [...(question?.options ?? [])]
@@ -105,9 +111,13 @@ function initialValues(
     gradingMode === "manual" ? "manual" : "automatic";
 
   return {
-    type: question?.type ?? "multiple_choice",
+    type: question?.type ?? initialType,
     prompt_en: question?.prompt_en ?? "",
     help_text_en: question?.help_text_en ?? "",
+    topic_en: question?.topic_en ?? "",
+    min_words: question?.min_words != null ? String(question.min_words) : "",
+    max_words: question?.max_words != null ? String(question.max_words) : "",
+    rubric_en: question?.rubric_en ?? "",
     marks: String(question?.marks ?? 1),
     is_required: question?.is_required ?? true,
     grading_method:
@@ -138,6 +148,7 @@ export function QuestionForm({
   gradingMode,
   question,
   typeLocked = false,
+  initialType = "multiple_choice",
 }: {
   mode: "create" | "edit";
   assessmentId: string;
@@ -145,10 +156,11 @@ export function QuestionForm({
   gradingMode: GradingMode;
   question?: QuestionRecord;
   typeLocked?: boolean;
+  initialType?: QuestionType;
 }) {
   const router = useRouter();
   const [values, setValues] = useState<Values>(() =>
-    initialValues(question, gradingMode),
+    initialValues(question, gradingMode, initialType),
   );
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<AssessmentErrorCode | null>(null);
@@ -193,6 +205,8 @@ export function QuestionForm({
     values.type === "rewrite" ||
     values.type === "find_the_mistake";
 
+  const writing = isWritingType(values.type);
+
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setErrors({});
@@ -202,6 +216,10 @@ export function QuestionForm({
       type: values.type,
       prompt_en: values.prompt_en,
       help_text_en: values.help_text_en,
+      topic_en: writing ? values.topic_en : undefined,
+      min_words: writing ? values.min_words : undefined,
+      max_words: writing ? values.max_words : undefined,
+      rubric_en: writing ? values.rubric_en : undefined,
       marks: values.marks,
       is_required: values.is_required,
       grading_method: values.grading_method,
@@ -639,26 +657,110 @@ export function QuestionForm({
         </div>
       ) : null}
 
-      {values.type === "essay" || values.type === "file_upload" ? (
+      {writing ? (
+        <div className="space-y-4 rounded-xl border border-border bg-card p-5 shadow-xs">
+          <Alert variant="info">
+            <Bi
+              en={
+                values.type === "essay"
+                  ? assessmentsUi.questionForm.essayHint.en
+                  : assessmentsUi.questionForm.paragraphHint.en
+              }
+              ar={
+                values.type === "essay"
+                  ? assessmentsUi.questionForm.essayHint.ar
+                  : assessmentsUi.questionForm.paragraphHint.ar
+              }
+            />
+          </Alert>
+
+          {values.type === "paragraph" ? (
+            <Field
+              id="topic_en"
+              label={assessmentsUi.questionForm.topic}
+              error={errors.topic_en}
+              errorCopy={assessmentErrorCopy}
+            >
+              <Input
+                id="topic_en"
+                value={values.topic_en}
+                onChange={(event) => update("topic_en", event.target.value)}
+                maxLength={300}
+              />
+            </Field>
+          ) : null}
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field
+              id="min_words"
+              label={assessmentsUi.questionForm.minWords}
+              error={errors.min_words}
+              errorCopy={assessmentErrorCopy}
+            >
+              <Input
+                id="min_words"
+                type="number"
+                min={1}
+                max={20000}
+                step={1}
+                value={values.min_words}
+                aria-invalid={Boolean(errors.min_words)}
+                onChange={(event) => update("min_words", event.target.value)}
+              />
+            </Field>
+            <Field
+              id="max_words"
+              label={assessmentsUi.questionForm.maxWords}
+              error={errors.max_words}
+              errorCopy={assessmentErrorCopy}
+            >
+              <Input
+                id="max_words"
+                type="number"
+                min={1}
+                max={20000}
+                step={1}
+                value={values.max_words}
+                aria-invalid={Boolean(errors.max_words)}
+                onChange={(event) => update("max_words", event.target.value)}
+              />
+            </Field>
+          </div>
+
+          <p className="text-xs text-muted-foreground">
+            <Bi
+              en={assessmentsUi.questionForm.wordLimitsHint.en}
+              ar={assessmentsUi.questionForm.wordLimitsHint.ar}
+            />
+          </p>
+
+          <Field
+            id="rubric_en"
+            label={assessmentsUi.questionForm.rubric}
+            hint={assessmentsUi.questionForm.rubricHint}
+            error={errors.rubric_en}
+            errorCopy={assessmentErrorCopy}
+          >
+            <Textarea
+              id="rubric_en"
+              value={values.rubric_en}
+              onChange={(event) => update("rubric_en", event.target.value)}
+              maxLength={4000}
+            />
+          </Field>
+        </div>
+      ) : null}
+
+      {values.type === "file_upload" ? (
         <Alert variant="info">
           <Bi
-            en={
-              values.type === "essay"
-                ? assessmentsUi.questionForm.essayHint.en
-                : assessmentsUi.questionForm.fileHint.en
-            }
-            ar={
-              values.type === "essay"
-                ? assessmentsUi.questionForm.essayHint.ar
-                : assessmentsUi.questionForm.fileHint.ar
-            }
+            en={assessmentsUi.questionForm.fileHint.en}
+            ar={assessmentsUi.questionForm.fileHint.ar}
           />
         </Alert>
       ) : null}
 
-      {(values.type === "essay" ||
-        values.type === "file_upload" ||
-        textBased) && (
+      {(writing || values.type === "file_upload" || textBased) && (
         <div className="rounded-xl border border-border bg-card p-5 shadow-xs">
           <Field
             id="explanation_en"

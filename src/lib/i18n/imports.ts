@@ -143,6 +143,21 @@ export const importsUi = {
     addSection: bi("Add section", "إضافة قسم"),
     sectionTitle: bi("Section title (English)", "عنوان القسم (بالإنجليزية)"),
     sectionInstructions: bi("Section instructions", "تعليمات القسم"),
+    sectionKind: bi("Group type", "نوع القسم"),
+    sectionKindStandard: bi("Questions only", "أسئلة فقط"),
+    sectionKindPassage: bi("Reading passage", "نص قراءة"),
+    sectionKindDialogue: bi("Dialogue", "حوار"),
+    passageText: bi("Passage text", "نص القطعة"),
+    vocabularyText: bi("Vocabulary / help", "المفردات / المساعدة"),
+    sourceText: bi("Source / reference", "المصدر / المرجع"),
+    dialogueLines: bi("Dialogue lines", "أسطر الحوار"),
+    speaker: bi("Speaker", "المتحدث"),
+    lineText: bi("Line", "السطر"),
+    addDialogueLine: bi("Add line", "إضافة سطر"),
+    minWords: bi("Minimum words", "الحد الأدنى للكلمات"),
+    maxWords: bi("Maximum words", "الحد الأقصى للكلمات"),
+    rubric: bi("Marking rubric", "معايير التصحيح"),
+    topic: bi("Topic / title", "الموضوع / العنوان"),
     noSections: bi(
       "No sections were detected. Add one before saving.",
       "لم يُكتشف أي قسم. أضف قسمًا قبل الحفظ.",
@@ -336,6 +351,18 @@ export const importWarningCopy: Record<ImportWarningCode, Bilingual> = {
   section_marks_distributed: bi(
     "The section total does not divide evenly across its questions. Check the marks.",
     "لا تتوزع درجات القسم بالتساوي على أسئلته. تحقق من الدرجات.",
+  ),
+  group_without_questions: bi(
+    "This reading or dialogue group has no questions attached. Add questions or remove the group.",
+    "لا توجد أسئلة مرتبطة بقسم القراءة أو الحوار هذا. أضف أسئلة أو احذف القسم.",
+  ),
+  grouping_uncertain: bi(
+    "The importer was unsure which questions belong to this group. Review the grouping before saving.",
+    "لم يتأكد المستورد من الأسئلة التي تنتمي إلى هذا القسم. راجع التجميع قبل الحفظ.",
+  ),
+  passage_without_questions: bi(
+    "Passage text was detected but no questions followed it. Confirm that nothing is missing.",
+    "تم اكتشاف نص قطعة دون أسئلة تليه. تأكد من عدم فقدان أي جزء.",
   ),
   ai_partial: bi(
     "AI suggestions covered only part of the paper. Deterministic results remain for the rest.",

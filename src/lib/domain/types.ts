@@ -215,9 +215,18 @@ export type QuestionType =
   | "matching"
   | "short_answer"
   | "essay"
+  | "paragraph"
   | "file_upload"
   | "rewrite"
   | "find_the_mistake";
+
+/** A section can be an ordinary group or shared reading/dialogue content. */
+export type SectionKind = "standard" | "reading_passage" | "dialogue";
+
+export type DialogueLine = {
+  speaker: string;
+  text: string;
+};
 export type ManualReviewStatus = "not_required" | "pending" | "completed";
 export type SubmissionReason =
   | "student_submitted"
@@ -281,6 +290,12 @@ export type QuestionRecord = {
   grading_method: GradingMethod;
   explanation_en: string | null;
   explanation_ar: string | null;
+  /** Optional topic/title for a paragraph question. */
+  topic_en: string | null;
+  /** Optional writing guidance. Enforced by the teacher, not the database. */
+  min_words: number | null;
+  max_words: number | null;
+  rubric_en: string | null;
   created_at: string;
   updated_at: string;
   options: QuestionOptionRecord[];
@@ -290,10 +305,15 @@ export type QuestionRecord = {
 export type AssessmentSectionRecord = {
   id: string;
   assessment_id: string;
+  kind: SectionKind;
   title_en: string;
   title_ar: string;
   instructions_en: string | null;
   instructions_ar: string | null;
+  passage_en: string | null;
+  vocabulary_en: string | null;
+  source_en: string | null;
+  dialogue_lines: DialogueLine[];
   position: number;
   questions: QuestionRecord[];
 };
@@ -339,6 +359,7 @@ export type AssessmentAdminAction =
   | "question_created"
   | "question_updated"
   | "question_deleted"
+  | "question_moved"
   | "questions_reordered"
   | "attempt_graded"
   | "attempt_auto_submitted"
@@ -400,6 +421,10 @@ export type StudentQuestion = {
   marks: number;
   is_required: boolean;
   position: number;
+  topic_en: string | null;
+  min_words: number | null;
+  max_words: number | null;
+  rubric_en: string | null;
   options: Array<{
     id: string;
     label: string;
@@ -420,10 +445,15 @@ export type StudentQuestion = {
 
 export type StudentAssessmentSection = {
   id: string;
+  kind: SectionKind;
   title_en: string;
   title_ar: string;
   instructions_en: string | null;
   instructions_ar: string | null;
+  passage_en: string | null;
+  vocabulary_en: string | null;
+  source_en: string | null;
+  dialogue_lines: DialogueLine[];
   position: number;
   questions: StudentQuestion[];
 };
@@ -476,14 +506,23 @@ export type StudentAttemptResult = {
   graded_at?: string | null;
   sections?: Array<{
     id: string;
+    kind: SectionKind;
     title_en: string;
     title_ar: string;
+    passage_en: string | null;
+    vocabulary_en: string | null;
+    source_en: string | null;
+    dialogue_lines: DialogueLine[];
     position: number;
     questions: Array<{
       id: string;
       type: QuestionType;
       prompt_en: string;
       prompt_ar: string | null;
+      topic_en: string | null;
+      min_words: number | null;
+      max_words: number | null;
+      rubric_en: string | null;
       marks: number;
       position: number;
       grading_method: GradingMethod;

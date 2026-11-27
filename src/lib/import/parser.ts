@@ -43,6 +43,10 @@ type RawSection = {
   instructions: string[];
   explicit: boolean;
   marks: number | null;
+  kind: "standard" | "reading_passage" | "dialogue";
+  passage: string[];
+  dialogueLines: Array<{ speaker: string; text: string }>;
+  writingType: "essay" | "paragraph" | null;
   questions: ImportQuestionDraft[];
 };
 
@@ -88,7 +92,17 @@ const TRUE_FALSE_CUE =
 const FILE_UPLOAD_CUE =
   /(?:upload|attach(?:ment)?|submit (?:a|your) file|ارفع ملف|ملف مرفق|أرفق)/i;
 const ESSAY_CUE =
-  /(?:write an essay|write a paragraph|in your own words|discuss|composition|essay|article of|مقال|اكتب فقرة|اكتب مقال|عبّر)/i;
+  /(?:write an essay|in your own words|discuss|composition|essay|article of|مقال|اكتب مقال|عبّر)/i;
+const PARAGRAPH_CUE =
+  /(?:write a paragraph|paragraph writing|short paragraph|اكتب فقرة|فقرة قصيرة)/i;
+const READING_GROUP_HEADING =
+  /^(?:reading\s+(?:passage|comprehension)|passage)\s*(?:[:：\-–—]\s*(.*))?$/i;
+const DIALOGUE_GROUP_HEADING =
+  /^(?:dialogue|conversation)\s*(?:[:：\-–—]\s*(.*))?$/i;
+const PARAGRAPH_GROUP_HEADING =
+  /^(?:write\s+a\s+paragraph|paragraph\s+writing)\s*(?:[:：\-–—]\s*(.*))?$/i;
+const ESSAY_GROUP_HEADING =
+  /^(?:essay|writing\s+task)\s*(?:[:：\-–—]\s*(.*))?$/i;
 const REWRITE_CUE = /(?:rewrite|re-write|أعد كتابة|أعد صياغة|إعادة صياغة)/i;
 const FIND_MISTAKE_CUE =
   /(?:find (?:the|and correct the) mistake|correct the mistake|اكتشف الخطأ|صحح الخطأ|حدد الخطأ)/i;
@@ -206,6 +220,153 @@ function sectionTitleFromLine(line: string): string {
 
 function sectionMarksFromLine(line: string): number | null {
   return extractMarks(line).marks;
+}
+
+function contentGroupHeading(
+  line: string,
+): {
+  kind: "reading_passage" | "dialogue";
+  title: string;
+  remainder: string;
+} | null {
+  if (line.length > 120 || isQuestionStart(line, true)) {
+    return null;
+  }
+
+  const reading = line.match(READING_GROUP_HEADING);
+
+  if (reading) {
+    const remainder = reading[1]?.trim() ?? "";
+    return {
+      kind: "reading_passage",
+      title: remainder || "Reading passage",
+      remainder,
+    };
+  }
+
+  const dialogue = line.match(DIALOGUE_GROUP_HEADING);
+
+  if (dialogue) {
+    const remainder = dialogue[1]?.trim() ?? "";
+    return {
+      kind: "dialogue",
+      title: remainder || "Dialogue",
+      remainder,
+    };
+  }
+
+  return null;
+}
+
+function writingGroupHeading(
+  line: string,
+): { type: "essay" | "paragraph"; title: string; remainder: string } | null {
+  if (line.length > 200 || isQuestionStart(line, true)) {
+    return null;
+  }
+
+  const paragraph = line.match(PARAGRAPH_GROUP_HEADING);
+
+  if (paragraph) {
+    return {
+      type: "paragraph",
+      title: "Paragraph writing",
+      remainder: paragraph[1]?.trim() ?? "",
+    };
+  }
+
+  const essay = line.match(ESSAY_GROUP_HEADING);
+
+  if (essay) {
+    return {
+      type: "essay",
+      title: "Essay",
+      remainder: essay[1]?.trim() ?? "",
+    };
+  }
+
+  return null;
+}
+
+function writingPromptLine(line: string): "essay" | "paragraph" | null {
+  if (line.length > 300 || isQuestionStart(line, true)) {
+    return null;
+  }
+
+  if (/^write\s+a\s+paragraph\b/i.test(line)) {
+    return "paragraph";
+  }
+
+  if (/^write\s+an\s+essay\b/i.test(line)) {
+    return "essay";
+  }
+
+  return null;
+}
+
+function parseDialogueLine(
+  line: string,
+): { speaker: string; text: string } | null {  const match = line.match(/^([A-Za-z][A-Za-z .'-]{0,60}?)\s*[:：]\s*(.+)$/);
+
+  if (!match) {
+    return null;
+  }
+
+  const speaker = match[1].trim();
+  const text = match[2].trim();
+
+  return speaker && text ? { speaker, text } : null;
+}
+
+function extractWordLimits(text: string): {
+  text: string;
+  minWords: number | null;
+  maxWords: number | null;
+} {
+  let result = asciiDigits(text);
+  let minWords: number | null = null;
+  let maxWords: number | null = null;
+
+  const range = result.match(
+    /\b(?:between\s+)?(\d{1,5})\s*(?:-|–|—|to|and)\s*(\d{1,5})\s*words?\b/i,
+  );
+
+  if (range) {
+    minWords = Number(range[1]);
+    maxWords = Number(range[2]);
+    result = result.replace(range[0], " ");
+  }
+
+  if (minWords === null) {
+    const min = result.match(
+      /\b(?:at\s+least|minimum(?:\s+of)?|no\s+fewer\s+than)\s+(\d{1,5})\s*words?\b/i,
+    ) ?? result.match(/\b(\d{1,5})\s*words?\s*(?:minimum|min)\b/i);
+
+    if (min) {
+      minWords = Number(min[1]);
+      result = result.replace(min[0], " ");
+    }
+  }
+
+  if (maxWords === null) {
+    const max = result.match(
+      /\b(?:at\s+most|maximum(?:\s+of)?|no\s+more\s+than|up\s+to)\s+(\d{1,5})\s*words?\b/i,
+    ) ?? result.match(/\b(\d{1,5})\s*words?\s*(?:maximum|max)\b/i);
+
+    if (max) {
+      maxWords = Number(max[1]);
+      result = result.replace(max[0], " ");
+    }
+  }
+
+  return {
+    text: result
+      .replace(/\(\s*\)/g, " ")
+      .replace(/\s{2,}/g, " ")
+      .trim(),
+    minWords,
+    maxWords,
+  };
 }
 
 function isQuestionStart(
@@ -510,6 +671,17 @@ function inferType(question: RawQuestion, prompt: string): {
     };
   }
 
+  if (PARAGRAPH_CUE.test(prompt)) {
+    evidence.push("cue:paragraph");
+    return {
+      type: "paragraph",
+      confidence: "medium",
+      confidenceScore: 0.72,
+      evidence,
+      warnings,
+    };
+  }
+
   if (ESSAY_CUE.test(prompt)) {
     evidence.push("cue:essay");
     return {
@@ -611,11 +783,17 @@ function applyInlineAnswer(
   return warnings;
 }
 
-function buildQuestion(raw: RawQuestion, index: number): ImportQuestionDraft {
+function buildQuestion(
+  raw: RawQuestion,
+  index: number,
+  writingType: "essay" | "paragraph" | null = null,
+): ImportQuestionDraft {
   const key = `q-${index + 1}-${shortHash(`${raw.sourceNumber}:${raw.lines.join("|")}`)}`;
   let prompt = raw.lines.join("\n").replace(/\n{3,}/g, "\n\n").trim();
   const marks = extractMarks(prompt);
   prompt = marks.text;
+  const wordLimits = extractWordLimits(prompt);
+  prompt = wordLimits.text;
 
   const warnings = [...raw.warnings];
   if (marks.marks === null) {
@@ -624,6 +802,19 @@ function buildQuestion(raw: RawQuestion, index: number): ImportQuestionDraft {
 
   const inferred = inferType(raw, prompt);
   warnings.push(...inferred.warnings);
+  const type =
+    writingType === "essay" && PARAGRAPH_CUE.test(prompt)
+      ? "paragraph"
+      : (writingType ?? inferred.type);
+
+  if (
+    writingType &&
+    (inferred.type === "multiple_choice" ||
+      inferred.type === "matching" ||
+      inferred.type === "true_false")
+  ) {
+    warnings.push("grouping_uncertain");
+  }
 
   const options = raw.options.map((option) => ({ ...option }));
   const correctCount = options.filter((option) => option.correct).length;
@@ -632,33 +823,35 @@ function buildQuestion(raw: RawQuestion, index: number): ImportQuestionDraft {
     warnings.push("ambiguous_answer");
   }
 
-  if (
-    inferred.type === "multiple_choice" &&
-    options.length < 2
-  ) {
+  if (type === "multiple_choice" && options.length < 2) {
     warnings.push("multiple_choice_missing_options");
   }
 
-  if (inferred.type === "matching" && raw.pairs.length < 2) {
+  if (type === "matching" && raw.pairs.length < 2) {
     warnings.push("matching_incomplete");
   }
 
   const draft: ImportQuestionDraft = {
     key,
     sourceNumber: raw.sourceNumber,
-    type: inferred.type,
+    type,
     promptEn: prompt,
     helpTextEn: "",
+    topicEn: type === "paragraph" ? "" : undefined,
+    minWords: type === "essay" || type === "paragraph" ? wordLimits.minWords : null,
+    maxWords: type === "essay" || type === "paragraph" ? wordLimits.maxWords : null,
+    rubricEn: "",
     marks: marks.marks ?? 1,
     confidence: inferred.confidence,
     confidenceScore: inferred.confidenceScore,
     evidence: inferred.evidence,
     gradingMethod:
-      inferred.type === "essay" ||
-      inferred.type === "file_upload" ||
-      inferred.type === "matching"
+      type === "essay" ||
+      type === "paragraph" ||
+      type === "file_upload" ||
+      type === "matching"
         ? "manual"
-        : inferred.type === "multiple_choice" && correctCount === 1
+        : type === "multiple_choice" && correctCount === 1
           ? "automatic"
           : "manual",
     options,
@@ -688,6 +881,7 @@ function answerLinePresent(raw: RawQuestion): boolean {
 function finaliseRawQuestion(
   raw: RawQuestion,
   questions: ImportQuestionDraft[],
+  writingType: "essay" | "paragraph" | null = null,
 ): void {
   // A block with no prompt text is only kept when it contains options or
   // pairs; otherwise it is noise from a page header.
@@ -695,7 +889,7 @@ function finaliseRawQuestion(
     return;
   }
 
-  questions.push(buildQuestion(raw, questions.length));
+  questions.push(buildQuestion(raw, questions.length, writingType));
 }
 
 function isAnswerKeyHeading(line: string): boolean {
@@ -738,6 +932,10 @@ export function parseQuestionDocument(
         instructions: [],
         explicit: false,
         marks: null,
+        kind: "standard",
+        passage: [],
+        dialogueLines: [],
+        writingType: null,
         questions: [],
       };
       rawSections.push(currentSection);
@@ -752,7 +950,11 @@ export function parseQuestionDocument(
     }
 
     const section = ensureSection();
-    finaliseRawQuestion(currentQuestion, section.questions);
+    finaliseRawQuestion(
+      currentQuestion,
+      section.questions,
+      section.writingType,
+    );
     currentQuestion = null;
   };
 
@@ -763,9 +965,110 @@ export function parseQuestionDocument(
       instructions: [],
       explicit: true,
       marks,
+      kind: "standard",
+      passage: [],
+      dialogueLines: [],
+      writingType: null,
       questions: [],
     };
     rawSections.push(currentSection);
+  };
+
+  const startContentSection = (
+    heading: NonNullable<ReturnType<typeof contentGroupHeading>>,
+  ) => {
+    finishQuestion();
+    currentSection = {
+      titleEn: heading.title,
+      instructions: [],
+      explicit: true,
+      marks: null,
+      kind: heading.kind,
+      passage: [],
+      dialogueLines: [],
+      writingType: null,
+      questions: [],
+    };
+    rawSections.push(currentSection);
+  };
+
+  const startWritingSection = (
+    heading: NonNullable<ReturnType<typeof writingGroupHeading>>,
+  ) => {
+    finishQuestion();
+
+    // A bare "Writing task" heading may be followed by "Write a paragraph…",
+    // which is itself a writing heading. Replace the empty placeholder instead
+    // of keeping an empty group in the draft.
+    const previous = currentSection as RawSection | null;
+
+    if (
+      previous !== null &&
+      previous.writingType !== null &&
+      previous.questions.length === 0 &&
+      previous.instructions.length === 0
+    ) {
+      rawSections.pop();
+    }
+
+    currentSection = {
+      titleEn: heading.title,
+      instructions: [],
+      explicit: true,
+      marks: null,
+      kind: "standard",
+      passage: [],
+      dialogueLines: [],
+      writingType: heading.type,
+      questions: [],
+    };
+    rawSections.push(currentSection);
+
+    if (heading.remainder) {
+      currentQuestion = {
+        sourceNumber: "1",
+        lines: [heading.remainder],
+        options: [],
+        pairs: [],
+        warnings: [],
+        inlineAnswer: "",
+        explanation: "",
+        pendingOption: false,
+      };
+    }
+  };
+
+  const startWritingPrompt = (
+    type: "essay" | "paragraph",
+    line: string,
+  ) => {
+    finishQuestion();
+
+    let section = currentSection as RawSection | null;
+
+    if (section === null || section.writingType === null) {
+      startSection(type === "paragraph" ? "Paragraph writing" : "Essay");
+      section = currentSection as RawSection;
+      section.writingType = type;
+    } else if (
+      section.questions.length === 0 &&
+      section.instructions.length === 0
+    ) {
+      section.writingType = type;
+      section.titleEn =
+        type === "paragraph" ? "Paragraph writing" : "Essay";
+    }
+
+    currentQuestion = {
+      sourceNumber: "1",
+      lines: [line],
+      options: [],
+      pairs: [],
+      warnings: [],
+      inlineAnswer: "",
+      explanation: "",
+      pendingOption: false,
+    };
   };
 
   const nextNonEmpty = (from: number): string => {
@@ -795,7 +1098,40 @@ export function parseQuestionDocument(
       continue;
     }
 
-    if (isSectionHeading(line, nextNonEmpty(lineIndex))) {
+    const contentHeading = contentGroupHeading(line);
+
+    if (contentHeading) {
+      startContentSection(contentHeading);
+      continue;
+    }
+
+    const writingHeading = writingGroupHeading(line);
+
+    if (writingHeading) {
+      startWritingSection(writingHeading);
+      continue;
+    }
+
+    const writingPrompt = writingPromptLine(line);
+
+    if (writingPrompt) {
+      startWritingPrompt(writingPrompt, line);
+      continue;
+    }
+
+    const activeSection = currentSection as RawSection | null;
+    const inContentGroup =
+      activeSection !== null && activeSection.kind !== "standard";
+    const explicitHeading =
+      SECTION_MARKER.test(line) ||
+      SECTION_MARKER_AR.test(line) ||
+      (SECTION_INSTRUCTION.test(line) &&
+        isQuestionStart(nextNonEmpty(lineIndex), true) !== null);
+
+    if (
+      isSectionHeading(line, nextNonEmpty(lineIndex)) &&
+      (!inContentGroup || explicitHeading)
+    ) {
       startSection(sectionTitleFromLine(line), sectionMarksFromLine(line));
       continue;
     }
@@ -922,7 +1258,43 @@ export function parseQuestionDocument(
     }
 
     if (rawSections.length > 0) {
-      ensureSection().instructions.push(line);
+      const section = ensureSection();
+
+      if (section.kind === "reading_passage") {
+        section.passage.push(line);
+        continue;
+      }
+
+      if (section.kind === "dialogue") {
+        const dialogueLine = parseDialogueLine(line);
+
+        if (dialogueLine) {
+          section.dialogueLines.push(dialogueLine);
+        } else {
+          section.instructions.push(line);
+        }
+
+        continue;
+      }
+
+      if (section.writingType) {
+        // A bare "Writing task" / "Essay" heading is often followed by the
+        // prompt on the next line. Start the writing question here so the
+        // prompt is not mistaken for section instructions.
+        currentQuestion = {
+          sourceNumber: "1",
+          lines: [line],
+          options: [],
+          pairs: [],
+          warnings: [],
+          inlineAnswer: "",
+          explanation: "",
+          pendingOption: false,
+        };
+        continue;
+      }
+
+      section.instructions.push(line);
       continue;
     }
 
@@ -937,6 +1309,15 @@ export function parseQuestionDocument(
       key: `s-${sectionIndex + 1}`,
       titleEn: section.titleEn,
       instructionsEn: section.instructions.join("\n").trim(),
+      kind: section.kind,
+      passageEn:
+        section.kind === "reading_passage"
+          ? section.passage.join("\n").trim()
+          : "",
+      vocabularyEn: "",
+      sourceEn: "",
+      dialogueLines:
+        section.kind === "dialogue" ? section.dialogueLines : [],
       marks: section.marks,
       questions: section.questions,
     }));
@@ -982,6 +1363,21 @@ export function parseQuestionDocument(
   for (const section of sections) {
     if (section.questions.length === 0) {
       warnings.push("empty_section");
+    }
+
+    if (section.kind && section.kind !== "standard") {
+      if (section.questions.length === 0) {
+        warnings.push("group_without_questions");
+        warnings.push("passage_without_questions");
+      }
+
+      if (
+        (section.kind === "reading_passage" && !section.passageEn) ||
+        (section.kind === "dialogue" &&
+          (section.dialogueLines ?? []).length === 0)
+      ) {
+        warnings.push("grouping_uncertain");
+      }
     }
 
     const numbers = section.questions.map((question) => question.sourceNumber);
@@ -1327,7 +1723,11 @@ function applyEntry(
 ): { status: ImportAnswerStatus; warnings: ImportWarningCode[] } {
   const warnings: ImportWarningCode[] = [];
 
-  if (question.type === "essay" || question.type === "file_upload") {
+  if (
+    question.type === "essay" ||
+    question.type === "paragraph" ||
+    question.type === "file_upload"
+  ) {
     return {
       status: "unmatched",
       warnings: ["manual_type_answer_ignored"],

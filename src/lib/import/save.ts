@@ -20,6 +20,10 @@ export type ImportQuestionWrite = {
   prompt_ar: null;
   help_text_en: string | null;
   help_text_ar: null;
+  topic_en: string | null;
+  min_words: number | null;
+  max_words: number | null;
+  rubric_en: string | null;
   marks: number;
   is_required: boolean;
   position: number;
@@ -114,6 +118,24 @@ export function buildSectionWrite(options: {
     title_en: options.section.titleEn,
     title_ar: options.section.titleEn,
     instructions_en: options.section.instructionsEn ?? null,
+    kind: options.section.kind ?? "standard",
+    passage_en:
+      options.section.kind === "reading_passage"
+        ? blankToNull(options.section.passageEn)
+        : null,
+    vocabulary_en:
+      options.section.kind === "reading_passage"
+        ? blankToNull(options.section.vocabularyEn)
+        : null,
+    source_en:
+      options.section.kind === "reading_passage" ||
+      options.section.kind === "dialogue"
+        ? blankToNull(options.section.sourceEn)
+        : null,
+    dialogue_lines:
+      options.section.kind === "dialogue"
+        ? (options.section.dialogueLines ?? [])
+        : [],
     position: options.position,
   };
 }
@@ -158,6 +180,20 @@ export function buildQuestionWrite(options: {
     prompt_ar: null,
     help_text_en: blankToNull(question.helpTextEn),
     help_text_ar: null,
+    topic_en:
+      question.type === "paragraph" ? blankToNull(question.topicEn) : null,
+    min_words:
+      question.type === "essay" || question.type === "paragraph"
+        ? (question.minWords ?? null)
+        : null,
+    max_words:
+      question.type === "essay" || question.type === "paragraph"
+        ? (question.maxWords ?? null)
+        : null,
+    rubric_en:
+      question.type === "essay" || question.type === "paragraph"
+        ? blankToNull(question.rubricEn)
+        : null,
     marks: question.marks,
     is_required: true,
     position: options.position,
