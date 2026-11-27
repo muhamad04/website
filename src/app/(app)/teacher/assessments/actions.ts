@@ -16,12 +16,14 @@ import {
   createAssessmentSchema,
   createQuestionSchema,
   createSectionSchema,
+  deleteSectionSchema,
   fieldErrorsFrom,
   gradeAttemptSchema,
+  isWritingType,
+  moveQuestionSchema,
   questionIdSchema,
   reorderQuestionsSchema,
   reorderSectionsSchema,
-  sectionIdSchema,
   setAssessmentPublishedSchema,
   updateAssessmentSchema,
   updateQuestionSchema,
@@ -98,6 +100,91 @@ function mapWriteError(message: string): AssessmentErrorCode {
 
 function optionLabel(index: number): string {
   return String.fromCharCode(65 + index);
+}
+
+/**
+ * Word-count guidance and rubrics only apply to essay/paragraph questions.
+ * Other types clear them so a type change cannot leave stale guidance.
+ */
+function writingFieldsForQuestion(data: {
+  type: string;
+  topic_en?: string;
+  min_words?: number;
+  max_words?: number;
+  rubric_en?: string;
+}): {
+  topic_en: string | null;
+  min_words: number | null;
+  max_words: number | null;
+  rubric_en: string | null;
+} {
+  if (!isWritingType(data.type)) {
+    return {
+      topic_en: null,
+      min_words: null,
+      max_words: null,
+      rubric_en: null,
+    };
+  }
+
+  return {
+    topic_en: data.topic_en ?? null,
+    min_words: data.min_words ?? null,
+    max_words: data.max_words ?? null,
+    rubric_en: data.rubric_en ?? null,
+  };
+}
+
+type SectionContentInput = {
+  kind: "standard" | "reading_passage" | "dialogue";
+  passage_en?: string;
+  vocabulary_en?: string;
+  source_en?: string;
+  dialogue_lines: Array<{ speaker: string; text: string }>;
+};
+
+/**
+ * Content columns are written only for the matching group kind. A standard
+ * section clears them, so switching a group back cannot leave stale passage
+ * text attached to unrelated questions. Arabic columns are never touched.
+ */
+function sectionContentWrite(data: SectionContentInput): {
+  kind: SectionContentInput["kind"];
+  passage_en: string | null;
+  vocabulary_en: string | null;
+  source_en: string | null;
+  dialogue_lines: Array<{ speaker: string; text: string }>;
+} {
+  if (data.kind === "reading_passage") {
+    return {
+      kind: data.kind,
+      passage_en: data.passage_en ?? null,
+      vocabulary_en: data.vocabulary_en ?? null,
+      source_en: data.source_en ?? null,
+      dialogue_lines: [],
+    };
+  }
+
+  if (data.kind === "dialogue") {
+    return {
+      kind: data.kind,
+      passage_en: null,
+      vocabulary_en: null,
+      source_en: data.source_en ?? null,
+      dialogue_lines: data.dialogue_lines.map((line) => ({
+        speaker: line.speaker,
+        text: line.text,
+      })),
+    };
+  }
+
+  return {
+    kind: "standard",
+    passage_en: null,
+    vocabulary_en: null,
+    source_en: null,
+    dialogue_lines: [],
+  };
 }
 
 /* -------------------------------------------------------------------------- */
@@ -391,6 +478,7 @@ export async function createSectionAction(
       // Section updates omit it, preserving any Arabic already stored.
       title_ar: parsed.data.title_en,
       instructions_en: parsed.data.instructions_en ?? null,
+      ...sectionContentWrite(parsed.data),
       position,
     })
     .select("id")
@@ -404,6 +492,7 @@ export async function createSectionAction(
   await logAssessmentEvent(staff.id, assessment.id, "section_created", {
     section_id: created.id,
     title_en: parsed.data.title_en,
+    kind: parsed.data.kind,
   });
   revalidateAssessmentSurfaces(assessment.id);
 
@@ -438,6 +527,7 @@ export async function updateSectionAction(
     .update({
       title_en: parsed.data.title_en,
       instructions_en: parsed.data.instructions_en ?? null,
+      ...sectionContentWrite(parsed.data),
     })
     .eq("id", section.id);
 
@@ -449,6 +539,7 @@ export async function updateSectionAction(
   await logAssessmentEvent(staff.id, section.assessment_id, "section_updated", {
     section_id: section.id,
     title_en: parsed.data.title_en,
+    kind: parsed.data.kind,
   });
   revalidateAssessmentSurfaces(section.assessment_id);
 
@@ -459,7 +550,7 @@ export async function deleteSectionAction(
   input: unknown,
 ): Promise<AssessmentActionResult> {
   const staff = await requireTeacher();
-  const parsed = sectionIdSchema.safeParse(input);
+  const parsed = deleteSectionSchema.safeParse(input);
 
   if (!parsed.success) {
     return fail("validation_failed");
@@ -468,7 +559,7 @@ export async function deleteSectionAction(
   const supabase = await createClient();
   const { data: section } = await supabase
     .from("assessment_sections")
-    .select("id, assessment_id, title_en")
+    .select("id, assessment_id, title_en, kind")
     .eq("id", parsed.data.section_id)
     .maybeSingle();
 
@@ -479,12 +570,55 @@ export async function deleteSectionAction(
   const { data: questionRows } = await supabase
     .from("questions")
     .select("id")
-    .eq("section_id", section.id);
+    .eq("section_id", section.id)
+    .order("position", { ascending: true });
   const questionIds = ((questionRows ?? []) as Array<{ id: string }>).map(
     (row) => row.id,
   );
 
-  if (questionIds.length > 0) {
+  const moveTo = parsed.data.move_questions_to_section_id ?? null;
+  let movedCount = 0;
+
+  if (moveTo) {
+    if (moveTo === section.id) {
+      return fail("section_has_questions");
+    }
+
+    const { data: target } = await supabase
+      .from("assessment_sections")
+      .select("id, assessment_id")
+      .eq("id", moveTo)
+      .maybeSingle();
+
+    if (!target || target.assessment_id !== section.assessment_id) {
+      return fail("section_not_found");
+    }
+
+    const { data: last } = await supabase
+      .from("questions")
+      .select("position")
+      .eq("section_id", target.id)
+      .order("position", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    let nextPosition = last ? Number(last.position) + 1 : 0;
+
+    for (const questionId of questionIds) {
+      const { error: moveError } = await supabase
+        .from("questions")
+        .update({ section_id: target.id, position: nextPosition })
+        .eq("id", questionId);
+
+      if (moveError) {
+        console.error("section question move failed", moveError.message);
+        return fail(mapWriteError(moveError.message));
+      }
+
+      nextPosition += 1;
+      movedCount += 1;
+    }
+  } else if (questionIds.length > 0) {
     const { count } = await supabase
       .from("answers")
       .select("id", { count: "exact", head: true })
@@ -510,6 +644,9 @@ export async function deleteSectionAction(
   await logAssessmentEvent(staff.id, section.assessment_id, "section_deleted", {
     section_id: section.id,
     title_en: section.title_en,
+    kind: section.kind,
+    moved_questions: movedCount,
+    move_to_section_id: moveTo,
   });
   revalidateAssessmentSurfaces(section.assessment_id);
 
@@ -675,6 +812,7 @@ export async function createQuestionAction(
       correct_answer: answerKeyForQuestion(data),
       grading_method: data.grading_method,
       explanation_en: data.explanation_en ?? null,
+      ...writingFieldsForQuestion(data),
     })
     .select("id")
     .single();
@@ -772,6 +910,7 @@ export async function updateQuestionAction(
       correct_answer: answerKeyForQuestion(data),
       grading_method: data.grading_method,
       explanation_en: data.explanation_en ?? null,
+      ...writingFieldsForQuestion(data),
     })
     .eq("id", question.id);
 
@@ -916,6 +1055,91 @@ export async function reorderQuestionsAction(
   revalidateAssessmentSurfaces(section.assessment_id);
 
   return { ok: true, assessmentId: section.assessment_id, sectionId: section.id };
+}
+
+export async function moveQuestionAction(
+  input: unknown,
+): Promise<AssessmentActionResult> {
+  const staff = await requireTeacher();
+  const parsed = moveQuestionSchema.safeParse(input);
+
+  if (!parsed.success) {
+    return fail("validation_failed");
+  }
+
+  const supabase = await createClient();
+  const { data: question } = await supabase
+    .from("questions")
+    .select(
+      "id, section_id, section:assessment_sections!inner ( id, assessment_id )",
+    )
+    .eq("id", parsed.data.question_id)
+    .maybeSingle();
+
+  if (!question) {
+    return fail("question_not_found");
+  }
+
+  const source = question.section as unknown as {
+    id: string;
+    assessment_id: string;
+  } | null;
+
+  if (!source) {
+    return fail("section_not_found");
+  }
+
+  if (source.id === parsed.data.section_id) {
+    return {
+      ok: true,
+      assessmentId: source.assessment_id,
+      sectionId: source.id,
+      questionId: question.id,
+    };
+  }
+
+  const { data: target } = await supabase
+    .from("assessment_sections")
+    .select("id, assessment_id")
+    .eq("id", parsed.data.section_id)
+    .maybeSingle();
+
+  if (!target || target.assessment_id !== source.assessment_id) {
+    return fail("section_not_found");
+  }
+
+  const { data: last } = await supabase
+    .from("questions")
+    .select("position")
+    .eq("section_id", target.id)
+    .order("position", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const position = last ? Number(last.position) + 1 : 0;
+  const { error } = await supabase
+    .from("questions")
+    .update({ section_id: target.id, position })
+    .eq("id", question.id);
+
+  if (error) {
+    console.error("question move failed", error.message);
+    return fail(mapWriteError(error.message));
+  }
+
+  await logAssessmentEvent(staff.id, source.assessment_id, "question_moved", {
+    question_id: question.id,
+    from_section_id: source.id,
+    to_section_id: target.id,
+  });
+  revalidateAssessmentSurfaces(source.assessment_id);
+
+  return {
+    ok: true,
+    assessmentId: source.assessment_id,
+    sectionId: target.id,
+    questionId: question.id,
+  };
 }
 
 /* -------------------------------------------------------------------------- */

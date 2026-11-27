@@ -89,10 +89,15 @@ function expectProtectedShell(markup: string, fragments: string[]) {
 const sections: StudentAssessmentSection[] = [
   {
     id: "section-1",
+    kind: "standard",
     title_en: "Section SENTINEL title",
     title_ar: "عنوان القسم",
     instructions_en: "Section instructions SENTINEL",
     instructions_ar: "تعليمات القسم",
+    passage_en: null,
+    vocabulary_en: null,
+    source_en: null,
+    dialogue_lines: [],
     position: 1,
     questions: [
       {
@@ -102,6 +107,10 @@ const sections: StudentAssessmentSection[] = [
         prompt_ar: "نص السؤال",
         help_text_en: "Help text SENTINEL",
         help_text_ar: "نص المساعدة",
+        topic_en: null,
+        min_words: null,
+        max_words: null,
+        rubric_en: null,
         marks: 2,
         is_required: true,
         position: 1,
@@ -129,6 +138,10 @@ const sections: StudentAssessmentSection[] = [
         prompt_ar: "سؤال رفع ملف",
         help_text_en: null,
         help_text_ar: null,
+        topic_en: null,
+        min_words: null,
+        max_words: null,
+        rubric_en: null,
         marks: 5,
         is_required: false,
         position: 2,

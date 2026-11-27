@@ -295,6 +295,60 @@ export default async function StudentResultPage({
                   />
                 </h2>
 
+                {section.kind === "reading_passage" && section.passage_en ? (
+                  <div className="space-y-2 rounded-xl border border-border bg-card p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      <Bi
+                        en={assessmentsUi.student.passage.en}
+                        ar={assessmentsUi.student.passage.ar}
+                      />
+                    </p>
+                    <div className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+                      {section.passage_en}
+                    </div>
+                    {section.vocabulary_en ? (
+                      <div className="rounded-md bg-secondary/40 p-3">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                          <Bi
+                            en={assessmentsUi.student.vocabulary.en}
+                            ar={assessmentsUi.student.vocabulary.ar}
+                          />
+                        </p>
+                        <p className="mt-1 whitespace-pre-wrap text-sm text-foreground">
+                          {section.vocabulary_en}
+                        </p>
+                      </div>
+                    ) : null}
+                    {section.source_en ? (
+                      <p className="text-xs italic text-muted-foreground">
+                        {assessmentsUi.student.source.en}: {section.source_en}
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
+
+                {section.kind === "dialogue" &&
+                section.dialogue_lines.length > 0 ? (
+                  <div className="space-y-2 rounded-xl border border-border bg-card p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      <Bi
+                        en={assessmentsUi.student.dialogue.en}
+                        ar={assessmentsUi.student.dialogue.ar}
+                      />
+                    </p>
+                    <ol className="space-y-2">
+                      {section.dialogue_lines.map((line, lineIndex) => (
+                        <li key={lineIndex} className="text-sm">
+                          <span className="font-semibold text-foreground">
+                            {line.speaker}:
+                          </span>{" "}
+                          <span className="text-foreground">{line.text}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                ) : null}
+
                 <ol className="space-y-3">
                   {section.questions.map((question, index) => {
                     const answer = question.answer;

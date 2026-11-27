@@ -347,8 +347,13 @@ export default async function AssessmentBuilderPage({
           assessmentId={detail.id}
           sections={detail.sections.map((section) => ({
             id: section.id,
+            kind: section.kind,
             title_en: section.title_en,
             instructions_en: section.instructions_en,
+            passage_en: section.passage_en,
+            vocabulary_en: section.vocabulary_en,
+            source_en: section.source_en,
+            dialogue_lines: section.dialogue_lines,
             position: section.position,
             questions: section.questions.map((question) => ({
               id: question.id,

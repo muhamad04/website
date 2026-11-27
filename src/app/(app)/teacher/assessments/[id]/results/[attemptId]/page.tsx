@@ -86,6 +86,10 @@ export default async function GradeAttemptPage({
         answer_id: answer?.id ?? `unanswered-${question.id}`,
         prompt_en: question.prompt_en,
         prompt_ar: question.prompt_ar,
+        topic_en: question.topic_en,
+        min_words: question.min_words,
+        max_words: question.max_words,
+        rubric_en: question.rubric_en,
         marks: question.marks,
         marks_awarded:
           answer?.marks_awarded === null || answer?.marks_awarded === undefined

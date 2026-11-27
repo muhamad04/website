@@ -169,7 +169,7 @@ export async function getAssessmentDetail(
   const { data: sectionRows, error: sectionError } = await supabase
     .from("assessment_sections")
     .select(
-      "id, assessment_id, title_en, title_ar, instructions_en, instructions_ar, position",
+      "id, assessment_id, kind, title_en, title_ar, instructions_en, instructions_ar, passage_en, vocabulary_en, source_en, dialogue_lines, position",
     )
     .eq("assessment_id", id)
     .order("position", { ascending: true });
@@ -179,9 +179,23 @@ export async function getAssessmentDetail(
     return null;
   }
 
-  const sections = (sectionRows ?? []) as unknown as Array<
-    Omit<AssessmentSectionRecord, "questions">
-  >;
+  const sections = (
+    (sectionRows ?? []) as unknown as Array<
+      Omit<AssessmentSectionRecord, "questions">
+    >
+  ).map((section) => ({
+    ...section,
+    kind: section.kind ?? "standard",
+    dialogue_lines: Array.isArray(section.dialogue_lines)
+      ? section.dialogue_lines.filter(
+          (line) =>
+            line &&
+            typeof line === "object" &&
+            typeof (line as { speaker?: unknown }).speaker === "string" &&
+            typeof (line as { text?: unknown }).text === "string",
+        )
+      : [],
+  }));
   const sectionIds = sections.map((section) => section.id);
 
   let questions: QuestionRecord[] = [];
@@ -190,7 +204,7 @@ export async function getAssessmentDetail(
     const { data: questionRows, error: questionError } = await supabase
       .from("questions")
       .select(
-        "id, section_id, type, prompt_en, prompt_ar, help_text_en, help_text_ar, marks, is_required, position, correct_answer, grading_method, explanation_en, explanation_ar, created_at, updated_at",
+        "id, section_id, type, prompt_en, prompt_ar, help_text_en, help_text_ar, topic_en, min_words, max_words, rubric_en, marks, is_required, position, correct_answer, grading_method, explanation_en, explanation_ar, created_at, updated_at",
       )
       .in("section_id", sectionIds)
       .order("position", { ascending: true });

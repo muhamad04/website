@@ -37,10 +37,14 @@ export const ASSESSMENT_ERROR_CODES = [
   "section_not_found",
   "section_title_required",
   "section_has_answers",
+  "section_kind_invalid",
+  "section_content_required",
+  "section_has_questions",
   "question_not_found",
   "question_type_invalid",
   "question_prompt_required",
   "question_marks_invalid",
+  "question_word_limits_invalid",
   "question_options_invalid",
   "question_option_required",
   "question_pairs_invalid",
@@ -244,22 +248,85 @@ export const setAssessmentPublishedSchema = z.object({
 /* Sections                                                                   */
 /* -------------------------------------------------------------------------- */
 
+const SECTION_KINDS = ["standard", "reading_passage", "dialogue"] as const;
+
+const optionalSectionText = (max: number, error: string) =>
+  z.preprocess(
+    (value) =>
+      typeof value === "string" && value.trim() === "" ? undefined : value,
+    z.string().trim().max(max, { error }).optional(),
+  );
+
+const dialogueLineSchema = z.object({
+  speaker: z
+    .string()
+    .trim()
+    .min(1, { error: "section_content_required" })
+    .max(120, { error: "section_content_required" }),
+  text: z
+    .string()
+    .trim()
+    .min(1, { error: "section_content_required" })
+    .max(4000, { error: "section_content_required" }),
+});
+
 const sectionBaseSchema = z.object({
   title_en: requiredText(200, "section_title_required"),
   instructions_en: trimmed(2000),
+  kind: z.enum(SECTION_KINDS, { error: "section_kind_invalid" }).default("standard"),
+  passage_en: optionalSectionText(20000, "section_content_required"),
+  vocabulary_en: optionalSectionText(4000, "section_content_required"),
+  source_en: optionalSectionText(500, "section_content_required"),
+  dialogue_lines: z.array(dialogueLineSchema).max(200).default([]),
 });
 
-export const createSectionSchema = sectionBaseSchema.extend({
-  assessment_id: z.uuid({ error: "validation_failed" }),
-});
+function refineSection(
+  value: z.infer<typeof sectionBaseSchema>,
+  ctx: z.RefinementCtx,
+): void {
+  if (value.kind === "reading_passage" && !value.passage_en) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["passage_en"],
+      message: "section_content_required",
+    });
+  }
+
+  if (value.kind === "dialogue" && value.dialogue_lines.length === 0) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["dialogue_lines"],
+      message: "section_content_required",
+    });
+  }
+}
+
+export const createSectionSchema = sectionBaseSchema
+  .extend({
+    assessment_id: z.uuid({ error: "validation_failed" }),
+  })
+  .superRefine(refineSection);
 export type CreateSectionInput = z.infer<typeof createSectionSchema>;
 
-export const updateSectionSchema = sectionBaseSchema.extend({
-  section_id: z.uuid({ error: "validation_failed" }),
-});
+export const updateSectionSchema = sectionBaseSchema
+  .extend({
+    section_id: z.uuid({ error: "validation_failed" }),
+  })
+  .superRefine(refineSection);
 export type UpdateSectionInput = z.infer<typeof updateSectionSchema>;
 
 export const sectionIdSchema = z.object({
+  section_id: z.uuid({ error: "validation_failed" }),
+});
+
+export const deleteSectionSchema = z.object({
+  section_id: z.uuid({ error: "validation_failed" }),
+  /** Optional destination for questions when the group itself is deleted. */
+  move_questions_to_section_id: z.uuid({ error: "validation_failed" }).optional(),
+});
+
+export const moveQuestionSchema = z.object({
+  question_id: z.uuid({ error: "validation_failed" }),
   section_id: z.uuid({ error: "validation_failed" }),
 });
 
@@ -289,10 +356,18 @@ export const QUESTION_TYPES = [
   "matching",
   "short_answer",
   "essay",
+  "paragraph",
   "file_upload",
   "rewrite",
   "find_the_mistake",
 ] as const;
+
+/** Types that share the long-form writing UI and word-count guidance. */
+export const WRITING_TYPES = ["essay", "paragraph"] as const;
+
+export function isWritingType(type: string): boolean {
+  return (WRITING_TYPES as readonly string[]).includes(type);
+}
 
 /** Types the automatic grader understands. */
 export const AUTO_GRADABLE_TYPES = [
@@ -309,7 +384,7 @@ export function isAutoGradableType(type: string): boolean {
 }
 
 export function isManualOnlyType(type: string): boolean {
-  return type === "essay" || type === "file_upload";
+  return type === "essay" || type === "paragraph" || type === "file_upload";
 }
 
 const optionInputSchema = z.object({
@@ -333,10 +408,25 @@ const pairInputSchema = z.object({
     .max(500, { error: "question_pairs_invalid" }),
 });
 
+const optionalWordCount = z.preprocess(
+  (value) =>
+    value === undefined || value === null || value === "" ? undefined : value,
+  z.coerce
+    .number({ error: "question_word_limits_invalid" })
+    .int({ error: "question_word_limits_invalid" })
+    .min(1, { error: "question_word_limits_invalid" })
+    .max(20000, { error: "question_word_limits_invalid" })
+    .optional(),
+);
+
 const questionBaseSchema = z.object({
   type: z.enum(QUESTION_TYPES, { error: "question_type_invalid" }),
   prompt_en: requiredText(4000, "question_prompt_required"),
   help_text_en: trimmed(1000),
+  topic_en: trimmed(300),
+  min_words: optionalWordCount,
+  max_words: optionalWordCount,
+  rubric_en: trimmed(4000),
   marks: z.coerce
     .number({ error: "question_marks_invalid" })
     .min(0.01, { error: "question_marks_invalid" })
@@ -416,6 +506,18 @@ function refineQuestion(
         message: "question_answer_required",
       });
     }
+  }
+
+  if (
+    value.min_words !== undefined &&
+    value.max_words !== undefined &&
+    value.max_words < value.min_words
+  ) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["max_words"],
+      message: "question_word_limits_invalid",
+    });
   }
 
   if (isManualOnlyType(value.type) && value.grading_method !== "manual") {

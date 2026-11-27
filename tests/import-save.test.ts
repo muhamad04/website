@@ -104,6 +104,8 @@ describe("imported assessment mapping", () => {
       key: "s-1",
       titleEn: "Multiple choice",
       instructionsEn: "Choose one.",
+      kind: "standard",
+      dialogueLines: [],
       questions: [],
     };
 
@@ -114,6 +116,11 @@ describe("imported assessment mapping", () => {
       title_en: "Multiple choice",
       title_ar: "Multiple choice",
       instructions_en: "Choose one.",
+      kind: "standard",
+      passage_en: null,
+      vocabulary_en: null,
+      source_en: null,
+      dialogue_lines: [],
       position: 2,
     });
   });
