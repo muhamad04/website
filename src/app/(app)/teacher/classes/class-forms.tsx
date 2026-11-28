@@ -39,7 +39,10 @@ export function GradeForm() {
     setDone(false);
 
     startTransition(async () => {
-      const outcome = await createGradeAction(values);
+      const outcome = await createGradeAction({
+        ...values,
+        name_ar: values.name_en,
+      });
 
       if (!outcome.ok) {
         setErrors(outcome.fieldErrors ?? {});
@@ -57,12 +60,12 @@ export function GradeForm() {
     <form onSubmit={submit} className="space-y-4" noValidate>
       {error ? (
         <Alert variant="error">
-          <Bi en={studentErrorCopy[error].en} ar={studentErrorCopy[error].ar} />
+          <Bi en={studentErrorCopy[error].en} ar={studentErrorCopy[error].en} />
         </Alert>
       ) : null}
       {done ? (
         <Alert variant="success">
-          <Bi en="Grade added." ar="تمت إضافة الصف." />
+          <Bi en="Grade added." ar="Grade added." />
         </Alert>
       ) : null}
 
@@ -83,28 +86,6 @@ export function GradeForm() {
             }
             dir="ltr"
             aria-invalid={Boolean(errors.name_en)}
-            required
-          />
-        </FormField>
-
-        <FormField
-          id="grade-name-ar"
-          label={studentsUi.classes.gradeNameAr}
-          error={errors.name_ar}
-        >
-          <Input
-            id="grade-name-ar"
-            value={values.name_ar}
-            onChange={(event) =>
-              setValues((previous) => ({
-                ...previous,
-                name_ar: event.target.value,
-              }))
-            }
-            dir="rtl"
-            lang="ar"
-            className="font-arabic"
-            aria-invalid={Boolean(errors.name_ar)}
             required
           />
         </FormField>
@@ -155,7 +136,7 @@ export function GradeForm() {
         <Plus aria-hidden="true" className="size-3.5" />
         <Bi
           en={pending ? studentsUi.actions.saving.en : studentsUi.classes.addGrade.en}
-          ar={pending ? studentsUi.actions.saving.ar : studentsUi.classes.addGrade.ar}
+          ar={pending ? studentsUi.actions.saving.en : studentsUi.classes.addGrade.en}
         />
       </Button>
     </form>
@@ -188,7 +169,10 @@ export function ClassForm({
     setDone(false);
 
     startTransition(async () => {
-      const outcome = await createClassAction(values);
+      const outcome = await createClassAction({
+        ...values,
+        name_ar: values.name_en,
+      });
 
       if (!outcome.ok) {
         setErrors(outcome.fieldErrors ?? {});
@@ -212,7 +196,7 @@ export function ClassForm({
       <p className="text-sm text-muted-foreground">
         <Bi
           en={studentsUi.classes.noGradesHint.en}
-          ar={studentsUi.classes.noGradesHint.ar}
+          ar={studentsUi.classes.noGradesHint.en}
         />
       </p>
     );
@@ -222,12 +206,12 @@ export function ClassForm({
     <form onSubmit={submit} className="space-y-4" noValidate>
       {error ? (
         <Alert variant="error">
-          <Bi en={studentErrorCopy[error].en} ar={studentErrorCopy[error].ar} />
+          <Bi en={studentErrorCopy[error].en} ar={studentErrorCopy[error].en} />
         </Alert>
       ) : null}
       {done ? (
         <Alert variant="success">
-          <Bi en="Class added." ar="تمت إضافة الفصل." />
+          <Bi en="Class added." ar="Class added." />
         </Alert>
       ) : null}
 
@@ -250,7 +234,7 @@ export function ClassForm({
         >
           {grades.map((grade) => (
             <option key={grade.id} value={grade.id}>
-              {grade.name_en} · {grade.name_ar}
+              {grade.name_en}
             </option>
           ))}
         </Select>
@@ -277,27 +261,6 @@ export function ClassForm({
           />
         </FormField>
 
-        <FormField
-          id="class-name-ar"
-          label={studentsUi.classes.classNameAr}
-          error={errors.name_ar}
-        >
-          <Input
-            id="class-name-ar"
-            value={values.name_ar}
-            onChange={(event) =>
-              setValues((previous) => ({
-                ...previous,
-                name_ar: event.target.value,
-              }))
-            }
-            dir="rtl"
-            lang="ar"
-            className="font-arabic"
-            aria-invalid={Boolean(errors.name_ar)}
-            required
-          />
-        </FormField>
       </div>
 
       <FormField
@@ -323,7 +286,7 @@ export function ClassForm({
         <Plus aria-hidden="true" className="size-3.5" />
         <Bi
           en={pending ? studentsUi.actions.saving.en : studentsUi.classes.addClass.en}
-          ar={pending ? studentsUi.actions.saving.ar : studentsUi.classes.addClass.ar}
+          ar={pending ? studentsUi.actions.saving.en : studentsUi.classes.addClass.en}
         />
       </Button>
     </form>

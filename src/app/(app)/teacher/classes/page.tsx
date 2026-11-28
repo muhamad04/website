@@ -24,7 +24,7 @@ import {
 } from "@/app/(app)/teacher/classes/class-forms";
 
 export const metadata: Metadata = {
-  title: "Grades & classes · الصفوف والفصول",
+  title: "Grades & classes",
 };
 
 export const dynamic = "force-dynamic";
@@ -42,12 +42,12 @@ export default async function ClassesPage() {
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow={<Bi en={studentsUi.classes.eyebrow.en} ar={studentsUi.classes.eyebrow.ar} />}
-        title={<Bi en={studentsUi.classes.title.en} ar={studentsUi.classes.title.ar} />}
+        eyebrow={<Bi en={studentsUi.classes.eyebrow.en} ar={studentsUi.classes.eyebrow.en} />}
+        title={<Bi en={studentsUi.classes.title.en} ar={studentsUi.classes.title.en} />}
         description={
           <Bi
             en={studentsUi.classes.subtitle.en}
-            ar={studentsUi.classes.subtitle.ar}
+            ar={studentsUi.classes.subtitle.en}
           />
         }
         actions={
@@ -58,7 +58,7 @@ export default async function ClassesPage() {
             <ArrowLeft aria-hidden="true" className="size-4" />
             <Bi
               en={studentsUi.actions.backToList.en}
-              ar={studentsUi.actions.backToList.ar}
+              ar={studentsUi.actions.backToList.en}
             />
           </Link>
         }
@@ -80,7 +80,7 @@ export default async function ClassesPage() {
               <GraduationCap aria-hidden="true" className="size-4 text-primary" />
               <Bi
                 en={studentsUi.classes.addGrade.en}
-                ar={studentsUi.classes.addGrade.ar}
+                ar={studentsUi.classes.addGrade.en}
               />
             </CardTitle>
             <CardDescription>
@@ -101,7 +101,7 @@ export default async function ClassesPage() {
               <School aria-hidden="true" className="size-4 text-primary" />
               <Bi
                 en={studentsUi.classes.addClass.en}
-                ar={studentsUi.classes.addClass.ar}
+                ar={studentsUi.classes.addClass.en}
               />
             </CardTitle>
             <CardDescription>
@@ -136,13 +136,13 @@ export default async function ClassesPage() {
               title={
                 <Bi
                   en={studentsUi.classes.noGrades.en}
-                  ar={studentsUi.classes.noGrades.ar}
+                  ar={studentsUi.classes.noGrades.en}
                 />
               }
               description={
                 <Bi
                   en={studentsUi.classes.noGradesHint.en}
-                  ar={studentsUi.classes.noGradesHint.ar}
+                  ar={studentsUi.classes.noGradesHint.en}
                 />
               }
             />
@@ -158,13 +158,6 @@ export default async function ClassesPage() {
                       <p className="text-sm font-semibold text-foreground">
                         {grade.name_en}
                       </p>
-                      <p
-                        lang="ar"
-                        dir="rtl"
-                        className="font-arabic text-xs text-muted-foreground"
-                      >
-                        {grade.name_ar}
-                      </p>
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge variant="outline">{grade.slug}</Badge>
@@ -177,8 +170,8 @@ export default async function ClassesPage() {
                           }
                           ar={
                             grade.is_active
-                              ? studentsUi.filters.activeOnly.ar
-                              : studentsUi.classes.inactive.ar
+                              ? studentsUi.filters.activeOnly.en
+                              : studentsUi.classes.inactive.en
                           }
                           hideSeparator
                         />
@@ -190,12 +183,12 @@ export default async function ClassesPage() {
                     <p className="mt-3 text-xs text-muted-foreground">
                       <Bi
                         en={studentsUi.classes.noClasses.en}
-                        ar={studentsUi.classes.noClasses.ar}
+                        ar={studentsUi.classes.noClasses.en}
                       />
                       {" — "}
                       <Bi
                         en={studentsUi.classes.noClassesHint.en}
-                        ar={studentsUi.classes.noClassesHint.ar}
+                        ar={studentsUi.classes.noClassesHint.en}
                       />
                     </p>
                   ) : (
@@ -208,13 +201,6 @@ export default async function ClassesPage() {
                           <div className="min-w-0">
                             <p className="truncate font-medium text-foreground">
                               {classRow.name_en}
-                            </p>
-                            <p
-                              lang="ar"
-                              dir="rtl"
-                              className="font-arabic truncate text-muted-foreground"
-                            >
-                              {classRow.name_ar}
                             </p>
                           </div>
                           <div className="flex shrink-0 items-center gap-1.5">
@@ -229,13 +215,13 @@ export default async function ClassesPage() {
                               {classRow.is_active ? (
                                 <Bi
                                   en={studentsUi.filters.activeOnly.en}
-                                  ar={studentsUi.filters.activeOnly.ar}
+                                  ar={studentsUi.filters.activeOnly.en}
                                   hideSeparator
                                 />
                               ) : (
                                 <Bi
                                   en={studentsUi.classes.inactive.en}
-                                  ar={studentsUi.classes.inactive.ar}
+                                  ar={studentsUi.classes.inactive.en}
                                   hideSeparator
                                 />
                               )}

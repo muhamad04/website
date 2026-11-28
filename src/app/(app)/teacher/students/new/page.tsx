@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 import { StudentForm } from "@/app/(app)/teacher/students/student-form";
 
 export const metadata: Metadata = {
-  title: "New student · طالب جديد",
+  title: "New student",
 };
 
 export const dynamic = "force-dynamic";
@@ -46,14 +46,14 @@ export default async function NewStudentPage({
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow={<Bi en={studentsUi.eyebrow.en} ar={studentsUi.eyebrow.ar} />}
+        eyebrow={<Bi en={studentsUi.eyebrow.en} ar={studentsUi.eyebrow.en} />}
         title={
-          <Bi en={studentsUi.form.createTitle.en} ar={studentsUi.form.createTitle.ar} />
+          <Bi en={studentsUi.form.createTitle.en} ar={studentsUi.form.createTitle.en} />
         }
         description={
           <Bi
             en={studentsUi.form.createSubtitle.en}
-            ar={studentsUi.form.createSubtitle.ar}
+            ar={studentsUi.form.createSubtitle.en}
           />
         }
         actions={
@@ -64,7 +64,7 @@ export default async function NewStudentPage({
             <GraduationCap aria-hidden="true" className="size-4" />
             <Bi
               en={studentsUi.actions.manageClasses.en}
-              ar={studentsUi.actions.manageClasses.ar}
+              ar={studentsUi.actions.manageClasses.en}
             />
           </Link>
         }
@@ -83,7 +83,7 @@ export default async function NewStudentPage({
             >
               <Bi
                 en={studentsUi.actions.manageClasses.en}
-                ar={studentsUi.actions.manageClasses.ar}
+                ar={studentsUi.actions.manageClasses.en}
               />
             </Link>
           </div>

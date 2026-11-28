@@ -71,7 +71,7 @@ export default async function LoginPage({
         id="main-content"
         className="flex flex-1 items-center justify-center px-4 py-12"
       >
-        <SupabaseSetupNotice />
+        <SupabaseSetupNotice bilingual />
       </main>
     );
   }
@@ -105,7 +105,7 @@ export default async function LoginPage({
         <div className="space-y-8">
           <div className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/5 px-3 py-1 text-xs font-semibold text-primary">
             <GraduationCap aria-hidden="true" className="size-4" />
-            <Bi
+            <Bi bilingual
               en="Bilingual teaching platform"
               ar="منصة تعليمية ثنائية اللغة"
             />
@@ -113,14 +113,14 @@ export default async function LoginPage({
 
           <div className="space-y-4">
             <h1 className="max-w-xl text-4xl font-bold leading-tight tracking-tight text-foreground">
-              <Bi
+              <Bi bilingual
                 en="A calm home for English teaching and learning."
                 ar="مساحة هادئة لتعليم وتعلّم اللغة الإنجليزية."
                 layout="stacked"
               />
             </h1>
             <p className="max-w-lg text-sm leading-relaxed text-muted-foreground">
-              <Bi
+              <Bi bilingual
                 en="Resources, timed assessments and results stay organised by grade, in English and Arabic together."
                 ar="تبقى المصادر والاختبارات المحددة بوقت والنتائج منظمة حسب الصف، باللغتين الإنجليزية والعربية معًا."
               />
@@ -136,7 +136,7 @@ export default async function LoginPage({
                 <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-secondary text-primary">
                   <feature.icon aria-hidden="true" className="size-4" />
                 </span>
-                <Bi
+                <Bi bilingual
                   en={feature.en}
                   ar={feature.ar}
                   layout="stacked"
@@ -149,7 +149,7 @@ export default async function LoginPage({
 
           <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
             <ShieldCheck aria-hidden="true" className="size-4 text-primary" />
-            <Bi
+            <Bi bilingual
               en="Role-based access · Private grade content"
               ar="صلاحيات حسب الدور · محتوى خاص بكل صف"
             />
@@ -160,14 +160,14 @@ export default async function LoginPage({
       <Card className="shadow-lg shadow-primary/5">
         <CardHeader>
           <CardTitle className="text-2xl">
-            <Bi
+            <Bi bilingual
               en={ui.login.title.en}
               ar={ui.login.title.ar}
               layout="stacked"
             />
           </CardTitle>
           <CardDescription>
-            <Bi
+            <Bi bilingual
               en={ui.login.subtitle.en}
               ar={ui.login.subtitle.ar}
               layout="stacked"
@@ -178,7 +178,7 @@ export default async function LoginPage({
         <CardContent className="space-y-5">
           {rawError === "auth_callback_failed" ? (
             <Alert variant="error">
-              <Bi
+              <Bi bilingual
                 en={callbackNotice.en}
                 ar={callbackNotice.ar}
                 layout="stacked"
@@ -189,12 +189,12 @@ export default async function LoginPage({
           <LoginForm initialError={initialError} />
 
           <div className="space-y-2 border-t border-border/70 pt-4 text-xs leading-relaxed text-muted-foreground">
-            <Bi
+            <Bi bilingual
               en={ui.login.noRegistration.en}
               ar={ui.login.noRegistration.ar}
               layout="stacked"
             />
-            <Bi
+            <Bi bilingual
               en={ui.login.needHelp.en}
               ar={ui.login.needHelp.ar}
               layout="stacked"

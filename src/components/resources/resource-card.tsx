@@ -52,7 +52,7 @@ export function ResourceCard({
       <Link
         href={href}
         className="group relative block aspect-video overflow-hidden bg-secondary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
-        aria-label={`${resourcesUi.actions.open.en} / ${resourcesUi.actions.open.ar}: ${resource.title_en}`}
+        aria-label={`${resourcesUi.actions.open.en}: ${resource.title_en}`}
       >
         {resource.type === "youtube" && resource.thumbnail_url ? (
           <Image
@@ -73,18 +73,18 @@ export function ResourceCard({
         <div className="flex flex-wrap gap-1.5">
           <Badge variant="outline">
             <Icon aria-hidden="true" className="size-3" />
-            <Bi en={type.en} ar={type.ar} hideSeparator />
+            <Bi en={type.en} ar={type.en} hideSeparator />
           </Badge>
           {showStatus ? (
             <Badge variant={resource.is_published ? "success" : "muted"}>
-              <Bi en={status.en} ar={status.ar} hideSeparator />
+              <Bi en={status.en} ar={status.en} hideSeparator />
             </Badge>
           ) : null}
           {resource.category ? (
             <Badge variant="default">
               <Bi
                 en={resource.category.name_en}
-                ar={resource.category.name_ar}
+                ar={resource.category.name_en}
                 hideSeparator
               />
             </Badge>
@@ -98,29 +98,11 @@ export function ResourceCard({
           >
             {resource.title_en}
           </Link>
-          <p
-            lang="ar"
-            dir="rtl"
-            className="font-arabic mt-0.5 text-sm leading-relaxed text-muted-foreground"
-          >
-            {resource.title_ar}
-          </p>
         </div>
 
-        {resource.description_en || resource.description_ar ? (
+        {resource.description_en ? (
           <div className="space-y-1 text-sm text-muted-foreground">
-            {resource.description_en ? (
-              <p className="line-clamp-2">{resource.description_en}</p>
-            ) : null}
-            {resource.description_ar ? (
-              <p
-                lang="ar"
-                dir="rtl"
-                className="font-arabic line-clamp-2 text-xs"
-              >
-                {resource.description_ar}
-              </p>
-            ) : null}
+            <p className="line-clamp-2">{resource.description_en}</p>
           </div>
         ) : null}
 
@@ -131,7 +113,7 @@ export function ResourceCard({
                 <GraduationCap aria-hidden="true" className="size-3.5" />
                 <Bi
                   en={resource.grade.name_en}
-                  ar={resource.grade.name_ar}
+                  ar={resource.grade.name_en}
                   hideSeparator
                 />
               </span>
@@ -145,7 +127,7 @@ export function ResourceCard({
                 <FolderOpen aria-hidden="true" className="size-3.5" />
                 <Bi
                   en={resourcesUi.detail.fileResource.en}
-                  ar={resourcesUi.detail.fileResource.ar}
+                  ar={resourcesUi.detail.fileResource.en}
                   hideSeparator
                 />
               </span>

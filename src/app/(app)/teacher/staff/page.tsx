@@ -35,7 +35,7 @@ import type { StaffRecord } from "@/lib/domain/types";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Staff · الموظفون",
+  title: "Staff",
 };
 
 export const dynamic = "force-dynamic";
@@ -45,7 +45,7 @@ function roleBadge(role: StaffRecord["role"]) {
     <Badge variant="default">
       <Bi
         en={staffUi.roles.admin.en}
-        ar={staffUi.roles.admin.ar}
+        ar={staffUi.roles.admin.en}
         hideSeparator
       />
     </Badge>
@@ -53,7 +53,7 @@ function roleBadge(role: StaffRecord["role"]) {
     <Badge variant="outline">
       <Bi
         en={staffUi.roles.teacher.en}
-        ar={staffUi.roles.teacher.ar}
+        ar={staffUi.roles.teacher.en}
         hideSeparator
       />
     </Badge>
@@ -81,24 +81,24 @@ export default async function StaffPage({
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow={<Bi en={staffUi.eyebrow.en} ar={staffUi.eyebrow.ar} />}
-        title={<Bi en={staffUi.title.en} ar={staffUi.title.ar} />}
+        eyebrow={<Bi en={staffUi.eyebrow.en} ar={staffUi.eyebrow.en} />}
+        title={<Bi en={staffUi.title.en} ar={staffUi.title.en} />}
         description={
-          <Bi en={staffUi.subtitle.en} ar={staffUi.subtitle.ar} />
+          <Bi en={staffUi.subtitle.en} ar={staffUi.subtitle.en} />
         }
         actions={
           <Link href="/teacher/staff/new" className={cn(buttonVariants())}>
             <UserPlus aria-hidden="true" className="size-4" />
             <Bi
               en={staffUi.actions.addStaff.en}
-              ar={staffUi.actions.addStaff.ar}
+              ar={staffUi.actions.addStaff.en}
             />
           </Link>
         }
       />
 
       <Alert variant="info">
-        <Bi en={staffUi.publicNote.en} ar={staffUi.publicNote.ar} />
+        <Bi en={staffUi.publicNote.en} ar={staffUi.publicNote.en} />
       </Alert>
 
       {list.hasError ? (
@@ -142,12 +142,12 @@ export default async function StaffPage({
                 hasFilters ? (
                   <Bi
                     en={staffUi.list.emptyFiltered.en}
-                    ar={staffUi.list.emptyFiltered.ar}
+                    ar={staffUi.list.emptyFiltered.en}
                   />
                 ) : (
                   <Bi
                     en={staffUi.list.empty.en}
-                    ar={staffUi.list.empty.ar}
+                    ar={staffUi.list.empty.en}
                   />
                 )
               }
@@ -155,12 +155,12 @@ export default async function StaffPage({
                 hasFilters ? (
                   <Bi
                     en={staffUi.list.emptyFilteredHint.en}
-                    ar={staffUi.list.emptyFilteredHint.ar}
+                    ar={staffUi.list.emptyFilteredHint.en}
                   />
                 ) : (
                   <Bi
                     en={staffUi.list.emptyHint.en}
-                    ar={staffUi.list.emptyHint.ar}
+                    ar={staffUi.list.emptyHint.en}
                   />
                 )
               }
@@ -174,7 +174,7 @@ export default async function StaffPage({
                   >
                     <Bi
                       en={staffUi.filters.clear.en}
-                      ar={staffUi.filters.clear.ar}
+                      ar={staffUi.filters.clear.en}
                     />
                   </Link>
                 ) : (
@@ -185,7 +185,7 @@ export default async function StaffPage({
                     <UserPlus aria-hidden="true" className="size-4" />
                     <Bi
                       en={staffUi.actions.addStaff.en}
-                      ar={staffUi.actions.addStaff.ar}
+                      ar={staffUi.actions.addStaff.en}
                     />
                   </Link>
                 )
@@ -201,31 +201,31 @@ export default async function StaffPage({
                     <th scope="col" className="px-4 py-2.5">
                       <Bi
                         en={staffUi.list.staff.en}
-                        ar={staffUi.list.staff.ar}
+                        ar={staffUi.list.staff.en}
                       />
                     </th>
                     <th scope="col" className="px-4 py-2.5">
                       <Bi
                         en={staffUi.list.contact.en}
-                        ar={staffUi.list.contact.ar}
+                        ar={staffUi.list.contact.en}
                       />
                     </th>
                     <th scope="col" className="px-4 py-2.5">
                       <Bi
                         en={staffUi.list.role.en}
-                        ar={staffUi.list.role.ar}
+                        ar={staffUi.list.role.en}
                       />
                     </th>
                     <th scope="col" className="px-4 py-2.5">
                       <Bi
                         en={staffUi.list.status.en}
-                        ar={staffUi.list.status.ar}
+                        ar={staffUi.list.status.en}
                       />
                     </th>
                     <th scope="col" className="px-4 py-2.5">
                       <Bi
                         en={staffUi.list.lastReset.en}
-                        ar={staffUi.list.lastReset.ar}
+                        ar={staffUi.list.lastReset.en}
                       />
                     </th>
                     <th scope="col" className="px-4 py-2.5">
@@ -243,15 +243,6 @@ export default async function StaffPage({
                         >
                           {member.full_name_en}
                         </Link>
-                        {member.full_name_ar ? (
-                          <p
-                            lang="ar"
-                            dir="rtl"
-                            className="font-arabic text-xs text-muted-foreground"
-                          >
-                            {member.full_name_ar}
-                          </p>
-                        ) : null}
                       </td>
                       <td className="px-4 py-3">
                         <p dir="ltr" className="break-all text-xs text-foreground">
@@ -271,8 +262,8 @@ export default async function StaffPage({
                             }
                             ar={
                               member.is_active
-                                ? staffUi.filters.activeOnly.ar
-                                : staffUi.filters.inactiveOnly.ar
+                                ? staffUi.filters.activeOnly.en
+                                : staffUi.filters.inactiveOnly.en
                             }
                             hideSeparator
                           />
@@ -284,7 +275,7 @@ export default async function StaffPage({
                         ) : (
                           <Bi
                             en={staffUi.list.neverReset.en}
-                            ar={staffUi.list.neverReset.ar}
+                            ar={staffUi.list.neverReset.en}
                           />
                         )}
                       </td>
@@ -300,7 +291,7 @@ export default async function StaffPage({
                         >
                           <Bi
                             en={staffUi.actions.openProfile.en}
-                            ar={staffUi.actions.openProfile.ar}
+                            ar={staffUi.actions.openProfile.en}
                           />
                         </Link>
                       </td>
@@ -321,15 +312,6 @@ export default async function StaffPage({
                       >
                         {member.full_name_en}
                       </Link>
-                      {member.full_name_ar ? (
-                        <p
-                          lang="ar"
-                          dir="rtl"
-                          className="font-arabic text-xs text-muted-foreground"
-                        >
-                          {member.full_name_ar}
-                        </p>
-                      ) : null}
                     </div>
                     <Badge variant={member.is_active ? "success" : "muted"}>
                       <Bi
@@ -340,8 +322,8 @@ export default async function StaffPage({
                         }
                         ar={
                           member.is_active
-                            ? staffUi.filters.activeOnly.ar
-                            : staffUi.filters.inactiveOnly.ar
+                            ? staffUi.filters.activeOnly.en
+                            : staffUi.filters.inactiveOnly.en
                         }
                         hideSeparator
                       />
@@ -363,7 +345,7 @@ export default async function StaffPage({
                   >
                     <Bi
                       en={staffUi.actions.openProfile.en}
-                      ar={staffUi.actions.openProfile.ar}
+                      ar={staffUi.actions.openProfile.en}
                     />
                   </Link>
                 </li>
@@ -375,7 +357,7 @@ export default async function StaffPage({
 
       {list.pageCount > 1 ? (
         <nav
-          aria-label="Pagination / التنقل بين الصفحات"
+          aria-label="Pagination"
           className="flex items-center justify-between gap-3"
         >
           {list.page > 1 ? (
@@ -387,7 +369,7 @@ export default async function StaffPage({
             >
               <Bi
                 en={staffUi.list.previous.en}
-                ar={staffUi.list.previous.ar}
+                ar={staffUi.list.previous.en}
               />
             </Link>
           ) : (
@@ -409,7 +391,7 @@ export default async function StaffPage({
               })}`}
               className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
             >
-              <Bi en={staffUi.list.next.en} ar={staffUi.list.next.ar} />
+              <Bi en={staffUi.list.next.en} ar={staffUi.list.next.en} />
             </Link>
           ) : (
             <span />
@@ -423,13 +405,13 @@ export default async function StaffPage({
             <History aria-hidden="true" className="size-4 text-primary" />
             <Bi
               en={staffUi.detail.recentTitle.en}
-              ar={staffUi.detail.recentTitle.ar}
+              ar={staffUi.detail.recentTitle.en}
             />
           </CardTitle>
           <CardDescription>
             <Bi
               en={staffUi.detail.recentHint.en}
-              ar={staffUi.detail.recentHint.ar}
+              ar={staffUi.detail.recentHint.en}
             />
           </CardDescription>
         </CardHeader>
@@ -438,7 +420,7 @@ export default async function StaffPage({
             <p className="text-sm text-muted-foreground">
               <Bi
                 en={staffUi.detail.noActivity.en}
-                ar={staffUi.detail.noActivity.ar}
+                ar={staffUi.detail.noActivity.en}
               />
             </p>
           ) : (
@@ -450,7 +432,7 @@ export default async function StaffPage({
                     <p className="text-sm font-medium text-foreground">
                       <Bi
                         en={staffEventCopy[event.action].en}
-                        ar={staffEventCopy[event.action].ar}
+                        ar={staffEventCopy[event.action].en}
                       />
                       {event.staff ? (
                         <>
@@ -469,13 +451,13 @@ export default async function StaffPage({
                       {" · "}
                       <Bi
                         en={staffUi.detail.by.en}
-                        ar={staffUi.detail.by.ar}
+                        ar={staffUi.detail.by.en}
                         hideSeparator
                       />{" "}
                       {event.actor?.full_name_en ?? (
                         <Bi
                           en={staffUi.detail.systemActor.en}
-                          ar={staffUi.detail.systemActor.ar}
+                          ar={staffUi.detail.systemActor.en}
                           hideSeparator
                         />
                       )}
@@ -490,7 +472,7 @@ export default async function StaffPage({
 
       <p className="flex items-center gap-2 text-xs text-muted-foreground">
         <ShieldCheck aria-hidden="true" className="size-3.5" />
-        <Bi en={staffUi.detail.activityHint.en} ar={staffUi.detail.activityHint.ar} />
+        <Bi en={staffUi.detail.activityHint.en} ar={staffUi.detail.activityHint.en} />
       </p>
     </div>
   );

@@ -13,7 +13,7 @@ export default async function HomePage() {
         id="main-content"
         className="flex flex-1 items-center justify-center px-4 py-12"
       >
-        <SupabaseSetupNotice />
+        <SupabaseSetupNotice bilingual />
       </main>
     );
   }

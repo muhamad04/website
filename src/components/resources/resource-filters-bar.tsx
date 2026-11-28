@@ -51,21 +51,21 @@ export function ResourceFiltersBar({
     >
       <div className="space-y-1.5 sm:col-span-2 lg:col-span-1">
         <Label htmlFor={`${idPrefix}-search`}>
-          <Bi en={resourcesUi.filters.search.en} ar={resourcesUi.filters.search.ar} />
+          <Bi en={resourcesUi.filters.search.en} ar={resourcesUi.filters.search.en} />
         </Label>
         <Input
           id={`${idPrefix}-search`}
           name="q"
           type="search"
           defaultValue={filters.search ?? ""}
-          placeholder={`${resourcesUi.filters.searchPlaceholder.en} / ${resourcesUi.filters.searchPlaceholder.ar}`}
+          placeholder={resourcesUi.filters.searchPlaceholder.en}
         />
       </div>
 
       {showGrade && grades ? (
         <div className="space-y-1.5">
           <Label htmlFor={`${idPrefix}-grade`}>
-            <Bi en={resourcesUi.filters.grade.en} ar={resourcesUi.filters.grade.ar} />
+            <Bi en={resourcesUi.filters.grade.en} ar={resourcesUi.filters.grade.en} />
           </Label>
           <Select
             id={`${idPrefix}-grade`}
@@ -75,7 +75,7 @@ export function ResourceFiltersBar({
             <option value="">{resourcesUi.filters.allGrades.en}</option>
             {grades.map((grade) => (
               <option key={grade.id} value={grade.id}>
-                {grade.name_en} · {grade.name_ar}
+                {grade.name_en}
               </option>
             ))}
           </Select>
@@ -86,7 +86,7 @@ export function ResourceFiltersBar({
         <Label htmlFor={`${idPrefix}-category`}>
           <Bi
             en={resourcesUi.filters.category.en}
-            ar={resourcesUi.filters.category.ar}
+            ar={resourcesUi.filters.category.en}
           />
         </Label>
         <Select
@@ -97,7 +97,7 @@ export function ResourceFiltersBar({
           <option value="">{resourcesUi.filters.allCategories.en}</option>
           {categories.map((category) => (
             <option key={category.id} value={category.id}>
-              {category.name_en} · {category.name_ar}
+              {category.name_en}
             </option>
           ))}
         </Select>
@@ -105,14 +105,14 @@ export function ResourceFiltersBar({
 
       <div className="space-y-1.5">
         <Label htmlFor={`${idPrefix}-type`}>
-          <Bi en={resourcesUi.filters.type.en} ar={resourcesUi.filters.type.ar} />
+          <Bi en={resourcesUi.filters.type.en} ar={resourcesUi.filters.type.en} />
         </Label>
         <Select id={`${idPrefix}-type`} name="type" defaultValue={filters.type}>
           <option value="all">{resourcesUi.filters.allTypes.en}</option>
           {RESOURCE_TYPE_FILTERS.filter((type) => type !== "all").map(
             (type) => (
               <option key={type} value={type}>
-                {resourceTypeCopy[type].en} · {resourceTypeCopy[type].ar}
+                {resourceTypeCopy[type].en} · {resourceTypeCopy[type].en}
               </option>
             ),
           )}
@@ -124,7 +124,7 @@ export function ResourceFiltersBar({
           <Label htmlFor={`${idPrefix}-status`}>
             <Bi
               en={resourcesUi.filters.status.en}
-              ar={resourcesUi.filters.status.ar}
+              ar={resourcesUi.filters.status.en}
             />
           </Label>
           <Select
@@ -144,13 +144,13 @@ export function ResourceFiltersBar({
       <div className="flex flex-wrap items-center gap-2 sm:col-span-2 lg:col-span-full">
         <Button type="submit" size="sm">
           <Search aria-hidden="true" className="size-3.5" />
-          <Bi en={resourcesUi.filters.apply.en} ar={resourcesUi.filters.apply.ar} />
+          <Bi en={resourcesUi.filters.apply.en} ar={resourcesUi.filters.apply.en} />
         </Button>
         <Link
           href={basePath}
           className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
         >
-          <Bi en={resourcesUi.filters.clear.en} ar={resourcesUi.filters.clear.ar} />
+          <Bi en={resourcesUi.filters.clear.en} ar={resourcesUi.filters.clear.en} />
         </Link>
       </div>
     </form>

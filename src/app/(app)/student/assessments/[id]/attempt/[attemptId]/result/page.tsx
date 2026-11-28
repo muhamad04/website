@@ -29,7 +29,7 @@ import { isUuid } from "@/lib/search";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Attempt result · نتيجة المحاولة",
+  title: "Attempt result",
 };
 
 export const dynamic = "force-dynamic";
@@ -163,14 +163,14 @@ export default async function StudentResultPage({
         eyebrow={
           <Bi
             en={assessmentTypeCopy[result.type].en}
-            ar={assessmentTypeCopy[result.type].ar}
+            ar={assessmentTypeCopy[result.type].en}
           />
         }
         title={<Bi en={result.title_en} ar="" hideSeparator />}
         description={
           <Bi
             en={`${assessmentsUi.student.attemptNumber.en} #${result.attempt_number} · ${assessmentsUi.student.submittedAt.en} ${formatAdminDateTime(result.submitted_at)}`}
-            ar={`${assessmentsUi.student.attemptNumber.ar} #${result.attempt_number} · ${assessmentsUi.student.submittedAt.ar} ${formatAdminDateTime(result.submitted_at)}`}
+            ar={`${assessmentsUi.student.attemptNumber.en} #${result.attempt_number} · ${assessmentsUi.student.submittedAt.en} ${formatAdminDateTime(result.submitted_at)}`}
           />
         }
         actions={
@@ -181,7 +181,7 @@ export default async function StudentResultPage({
             <ArrowLeft aria-hidden="true" className="size-4" />
             <Bi
               en={assessmentsUi.student.backToAssessments.en}
-              ar={assessmentsUi.student.backToAssessments.ar}
+              ar={assessmentsUi.student.backToAssessments.en}
             />
           </Link>
         }
@@ -195,19 +195,19 @@ export default async function StudentResultPage({
           <h2 className="mt-3 text-base font-bold text-foreground">
             <Bi
               en={assessmentsUi.student.hiddenResult.en}
-              ar={assessmentsUi.student.hiddenResult.ar}
+              ar={assessmentsUi.student.hiddenResult.en}
             />
           </h2>
           <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
             <Bi
               en={assessmentsUi.student.hiddenResultHint.en}
-              ar={assessmentsUi.student.hiddenResultHint.ar}
+              ar={assessmentsUi.student.hiddenResultHint.en}
             />
           </p>
           <Badge variant="muted" className="mt-3">
             <Bi
               en={attemptStatusCopy[result.status].en}
-              ar={attemptStatusCopy[result.status].ar}
+              ar={attemptStatusCopy[result.status].en}
             />
           </Badge>
         </section>
@@ -218,7 +218,7 @@ export default async function StudentResultPage({
               <Badge variant="muted">
                 <Bi
                   en={attemptStatusCopy[result.status].en}
-                  ar={attemptStatusCopy[result.status].ar}
+                  ar={attemptStatusCopy[result.status].en}
                 />
               </Badge>
               {reviewerPending ? (
@@ -226,7 +226,7 @@ export default async function StudentResultPage({
                   <Hourglass aria-hidden="true" className="size-3.5" />
                   <Bi
                     en={assessmentsUi.list.awaitingReview.en}
-                    ar={assessmentsUi.list.awaitingReview.ar}
+                    ar={assessmentsUi.list.awaitingReview.en}
                   />
                 </Badge>
               ) : null}
@@ -237,7 +237,7 @@ export default async function StudentResultPage({
                 <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   <Bi
                     en={assessmentsUi.student.score.en}
-                    ar={assessmentsUi.student.score.ar}
+                    ar={assessmentsUi.student.score.en}
                   />
                 </div>
                 <div className="mt-0.5 text-2xl font-bold tabular-nums text-foreground">
@@ -253,7 +253,7 @@ export default async function StudentResultPage({
                 <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   <Bi
                     en={assessmentsUi.student.percentage.en}
-                    ar={assessmentsUi.student.percentage.ar}
+                    ar={assessmentsUi.student.percentage.en}
                   />
                 </div>
                 <div className="mt-0.5 text-2xl font-bold tabular-nums text-foreground">
@@ -265,7 +265,7 @@ export default async function StudentResultPage({
                 <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   <Bi
                     en={assessmentsUi.student.submittedAt.en}
-                    ar={assessmentsUi.student.submittedAt.ar}
+                    ar={assessmentsUi.student.submittedAt.en}
                   />
                 </div>
                 <div className="mt-0.5 text-sm font-medium text-foreground">
@@ -279,7 +279,7 @@ export default async function StudentResultPage({
             <Alert variant="info">
               <Bi
                 en={assessmentsUi.student.pendingReview.en}
-                ar={assessmentsUi.student.pendingReview.ar}
+                ar={assessmentsUi.student.pendingReview.en}
               />
             </Alert>
           ) : null}
@@ -300,7 +300,7 @@ export default async function StudentResultPage({
                     <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                       <Bi
                         en={assessmentsUi.student.passage.en}
-                        ar={assessmentsUi.student.passage.ar}
+                        ar={assessmentsUi.student.passage.en}
                       />
                     </p>
                     <div className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
@@ -311,7 +311,7 @@ export default async function StudentResultPage({
                         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                           <Bi
                             en={assessmentsUi.student.vocabulary.en}
-                            ar={assessmentsUi.student.vocabulary.ar}
+                            ar={assessmentsUi.student.vocabulary.en}
                           />
                         </p>
                         <p className="mt-1 whitespace-pre-wrap text-sm text-foreground">
@@ -333,7 +333,7 @@ export default async function StudentResultPage({
                     <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                       <Bi
                         en={assessmentsUi.student.dialogue.en}
-                        ar={assessmentsUi.student.dialogue.ar}
+                        ar={assessmentsUi.student.dialogue.en}
                       />
                     </p>
                     <ol className="space-y-2">
@@ -400,14 +400,14 @@ export default async function StudentResultPage({
                             <Badge variant="outline">
                               <Bi
                                 en={questionTypeCopy[question.type].en}
-                                ar={questionTypeCopy[question.type].ar}
+                                ar={questionTypeCopy[question.type].en}
                               />
                             </Badge>
                             {awarded === null ? (
                               <Badge variant="muted">
                                 <Bi
                                   en={assessmentsUi.list.awaitingReview.en}
-                                  ar={assessmentsUi.list.awaitingReview.ar}
+                                  ar={assessmentsUi.list.awaitingReview.en}
                                 />
                               </Badge>
                             ) : (
@@ -439,7 +439,7 @@ export default async function StudentResultPage({
                           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                             <Bi
                               en={assessmentsUi.student.yourAnswer.en}
-                              ar={assessmentsUi.student.yourAnswer.ar}
+                              ar={assessmentsUi.student.yourAnswer.en}
                             />
                           </p>
 
@@ -515,24 +515,24 @@ export default async function StudentResultPage({
                             <p className="mt-1 text-muted-foreground">
                               <Bi
                                 en={assessmentsUi.student.noAnswer.en}
-                                ar={assessmentsUi.student.noAnswer.ar}
+                                ar={assessmentsUi.student.noAnswer.en}
                               />
                             </p>
                           ) : null}
                         </div>
 
-                        {answer?.feedback_en || answer?.feedback_ar ? (
+                        {answer?.feedback_en ? (
                           <div className="mt-2 rounded-lg border border-primary/20 bg-primary/5 p-3 text-sm">
                             <p className="text-xs font-semibold uppercase tracking-wide text-primary">
                               <Bi
                                 en={assessmentsUi.student.feedback.en}
-                                ar={assessmentsUi.student.feedback.ar}
+                                ar={assessmentsUi.student.feedback.en}
                               />
                             </p>
                             <p className="mt-1 text-foreground">
                               <Bi
                                 en={answer.feedback_en ?? ""}
-                                ar={answer.feedback_ar ?? ""}
+                                ar={answer.feedback_en ?? ""}
                               />
                             </p>
                           </div>
@@ -555,7 +555,7 @@ export default async function StudentResultPage({
           <ArrowLeft aria-hidden="true" className="size-3.5" />
           <Bi
             en={assessmentsUi.student.backToAssessments.en}
-            ar={assessmentsUi.student.backToAssessments.ar}
+            ar={assessmentsUi.student.backToAssessments.en}
           />
         </Link>
       </div>

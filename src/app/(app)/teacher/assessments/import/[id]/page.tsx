@@ -19,7 +19,7 @@ import { importErrorCopy, importsUi } from "@/lib/i18n/imports";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Review imported assessment · مراجعة اختبار مستورد",
+  title: "Review imported assessment",
 };
 
 export const dynamic = "force-dynamic";
@@ -66,8 +66,8 @@ export default async function ImportReviewPage({
     return (
       <div className="space-y-5">
         <PageHeader
-          eyebrow={<Bi en={importsUi.eyebrow.en} ar={importsUi.eyebrow.ar} />}
-          title={<Bi en={importsUi.title.en} ar={importsUi.title.ar} />}
+          eyebrow={<Bi en={importsUi.eyebrow.en} ar={importsUi.eyebrow.en} />}
+          title={<Bi en={importsUi.title.en} ar={importsUi.title.en} />}
         />
         <Alert variant="error">
           <div className="space-y-1">
@@ -75,7 +75,7 @@ export default async function ImportReviewPage({
               <AlertCircle aria-hidden="true" className="size-4" />
               <Bi
                 en={importErrorCopy.expired.en}
-                ar={importErrorCopy.expired.ar}
+                ar={importErrorCopy.expired.en}
               />
             </p>
           </div>
@@ -86,7 +86,7 @@ export default async function ImportReviewPage({
         >
           <Bi
             en={importsUi.common.backToAssessments.en}
-            ar={importsUi.common.backToAssessments.ar}
+            ar={importsUi.common.backToAssessments.en}
           />
         </Link>
       </div>
@@ -97,13 +97,13 @@ export default async function ImportReviewPage({
     return (
       <div className="space-y-5">
         <PageHeader
-          eyebrow={<Bi en={importsUi.eyebrow.en} ar={importsUi.eyebrow.ar} />}
-          title={<Bi en={importsUi.title.en} ar={importsUi.title.ar} />}
+          eyebrow={<Bi en={importsUi.eyebrow.en} ar={importsUi.eyebrow.en} />}
+          title={<Bi en={importsUi.title.en} ar={importsUi.title.en} />}
         />
         <Alert variant="success">
           <Bi
             en={importErrorCopy.already_saved.en}
-            ar={importErrorCopy.already_saved.ar}
+            ar={importErrorCopy.already_saved.en}
           />
         </Alert>
         {row.assessment_id ? (
@@ -123,7 +123,7 @@ export default async function ImportReviewPage({
           >
             <Bi
               en={importsUi.common.backToAssessments.en}
-              ar={importsUi.common.backToAssessments.ar}
+              ar={importsUi.common.backToAssessments.en}
             />
           </Link>
         )}
@@ -135,13 +135,13 @@ export default async function ImportReviewPage({
     return (
       <div className="space-y-5">
         <PageHeader
-          eyebrow={<Bi en={importsUi.eyebrow.en} ar={importsUi.eyebrow.ar} />}
-          title={<Bi en={importsUi.title.en} ar={importsUi.title.ar} />}
+          eyebrow={<Bi en={importsUi.eyebrow.en} ar={importsUi.eyebrow.en} />}
+          title={<Bi en={importsUi.title.en} ar={importsUi.title.en} />}
         />
         <Alert variant="error">
           <Bi
             en={importErrorCopy.not_found.en}
-            ar={importErrorCopy.not_found.ar}
+            ar={importErrorCopy.not_found.en}
           />
         </Alert>
         <Link
@@ -150,7 +150,7 @@ export default async function ImportReviewPage({
         >
           <Bi
             en={importsUi.common.backToAssessments.en}
-            ar={importsUi.common.backToAssessments.ar}
+            ar={importsUi.common.backToAssessments.en}
           />
         </Link>
       </div>
@@ -162,12 +162,12 @@ export default async function ImportReviewPage({
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow={<Bi en={importsUi.eyebrow.en} ar={importsUi.eyebrow.ar} />}
-        title={<Bi en={importsUi.review.title.en} ar={importsUi.review.title.ar} />}
+        eyebrow={<Bi en={importsUi.eyebrow.en} ar={importsUi.eyebrow.en} />}
+        title={<Bi en={importsUi.review.title.en} ar={importsUi.review.title.en} />}
         description={
           <Bi
             en={importsUi.review.subtitle.en}
-            ar={importsUi.review.subtitle.ar}
+            ar={importsUi.review.subtitle.en}
           />
         }
       />

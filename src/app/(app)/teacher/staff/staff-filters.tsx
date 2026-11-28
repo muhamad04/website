@@ -21,20 +21,20 @@ export function StaffFiltersBar({ filters }: { filters: StaffFilters }) {
     >
       <div className="space-y-1.5">
         <Label htmlFor="staff-search">
-          <Bi en={staffUi.filters.search.en} ar={staffUi.filters.search.ar} />
+          <Bi en={staffUi.filters.search.en} ar={staffUi.filters.search.en} />
         </Label>
         <Input
           id="staff-search"
           name="q"
           type="search"
           defaultValue={filters.search ?? ""}
-          placeholder={`${staffUi.filters.searchPlaceholder.en} / ${staffUi.filters.searchPlaceholder.ar}`}
+          placeholder={staffUi.filters.searchPlaceholder.en}
         />
       </div>
 
       <div className="space-y-1.5">
         <Label htmlFor="staff-role-filter">
-          <Bi en={staffUi.filters.role.en} ar={staffUi.filters.role.ar} />
+          <Bi en={staffUi.filters.role.en} ar={staffUi.filters.role.en} />
         </Label>
         <Select id="staff-role-filter" name="role" defaultValue={filters.role}>
           <option value="all">{staffUi.filters.allRoles.en}</option>
@@ -45,7 +45,7 @@ export function StaffFiltersBar({ filters }: { filters: StaffFilters }) {
 
       <div className="space-y-1.5">
         <Label htmlFor="staff-status-filter">
-          <Bi en={staffUi.filters.status.en} ar={staffUi.filters.status.ar} />
+          <Bi en={staffUi.filters.status.en} ar={staffUi.filters.status.en} />
         </Label>
         <Select
           id="staff-status-filter"
@@ -61,13 +61,13 @@ export function StaffFiltersBar({ filters }: { filters: StaffFilters }) {
       <div className="flex flex-wrap items-center gap-2 sm:col-span-2 lg:col-span-3">
         <Button type="submit" size="sm">
           <Search aria-hidden="true" className="size-3.5" />
-          <Bi en={staffUi.filters.apply.en} ar={staffUi.filters.apply.ar} />
+          <Bi en={staffUi.filters.apply.en} ar={staffUi.filters.apply.en} />
         </Button>
         <Link
           href="/teacher/staff"
           className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
         >
-          <Bi en={staffUi.filters.clear.en} ar={staffUi.filters.clear.ar} />
+          <Bi en={staffUi.filters.clear.en} ar={staffUi.filters.clear.en} />
         </Link>
       </div>
     </form>

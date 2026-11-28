@@ -30,7 +30,7 @@ export default async function AccountDisabledPage() {
         id="main-content"
         className="flex flex-1 items-center justify-center px-4 py-12"
       >
-        <SupabaseSetupNotice />
+        <SupabaseSetupNotice bilingual />
       </main>
     );
   }
@@ -59,14 +59,14 @@ export default async function AccountDisabledPage() {
             <ShieldAlert aria-hidden="true" className="size-5" />
           </span>
           <CardTitle className="mt-2 text-xl">
-            <Bi
+            <Bi bilingual
               en="This account is inactive"
               ar="هذا الحساب غير نشط"
               layout="stacked"
             />
           </CardTitle>
           <CardDescription>
-            <Bi
+            <Bi bilingual
               en="Access has been paused by the teacher. If you think this is a mistake, please contact your teacher to reactivate your account."
               ar="تم إيقاف الوصول بواسطة المعلم. إذا كنت تعتقد أن هذا خطأ، يرجى التواصل مع معلمك لإعادة تنشيط حسابك."
             />
@@ -75,7 +75,7 @@ export default async function AccountDisabledPage() {
         <CardContent className="space-y-5">
           <div className="rounded-lg border border-border bg-secondary/40 p-3 text-sm">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              <Bi en="Account" ar="الحساب" />
+              <Bi bilingual en="Account" ar="الحساب" />
             </p>
             <p className="mt-1 break-all font-semibold">
               {profile.full_name_en}
@@ -90,7 +90,7 @@ export default async function AccountDisabledPage() {
           <form action={signOutAction}>
             <Button type="submit" variant="outline" className="w-full">
               <LogOut aria-hidden="true" />
-              <Bi en="Sign out" ar="تسجيل الخروج" />
+              <Bi bilingual en="Sign out" ar="تسجيل الخروج" />
             </Button>
           </form>
         </CardContent>

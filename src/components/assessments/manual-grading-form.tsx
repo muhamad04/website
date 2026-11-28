@@ -105,7 +105,7 @@ export function ManualGradingForm({
     <form onSubmit={submit} className="space-y-4" noValidate>
       {error ? (
         <Alert variant="error">
-          <Bi en={assessmentErrorCopy[error].en} ar={assessmentErrorCopy[error].ar} />
+          <Bi en={assessmentErrorCopy[error].en} ar={assessmentErrorCopy[error].en} />
         </Alert>
       ) : null}
 
@@ -113,7 +113,7 @@ export function ManualGradingForm({
         <Alert variant="success">
           <Bi
             en={assessmentsUi.results.saved.en}
-            ar={assessmentsUi.results.saved.ar}
+            ar={assessmentsUi.results.saved.en}
           />
         </Alert>
       ) : null}
@@ -145,7 +145,7 @@ export function ManualGradingForm({
                 <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   <Bi
                     en={assessmentsUi.results.responseTitle.en}
-                    ar={assessmentsUi.results.responseTitle.ar}
+                    ar={assessmentsUi.results.responseTitle.en}
                   />
                 </p>
 
@@ -172,7 +172,7 @@ export function ManualGradingForm({
                     <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                       <Bi
                         en={assessmentsUi.student.rubric.en}
-                        ar={assessmentsUi.student.rubric.ar}
+                        ar={assessmentsUi.student.rubric.en}
                       />
                     </p>
                     <p className="mt-1 whitespace-pre-wrap text-foreground">
@@ -191,7 +191,7 @@ export function ManualGradingForm({
                     >
                       {row.file_name ??
                         assessmentsUi.results.fileAnswer.en}{" "}
-                      · {assessmentsUi.results.fileAnswer.ar}
+                      · {assessmentsUi.results.fileAnswer.en}
                     </a>
                   </p>
                 ) : null}
@@ -218,7 +218,7 @@ export function ManualGradingForm({
                   <p className="mt-1 text-muted-foreground">
                     <Bi
                       en={assessmentsUi.results.noAnswer.en}
-                      ar={assessmentsUi.results.noAnswer.ar}
+                      ar={assessmentsUi.results.noAnswer.en}
                     />
                   </p>
                 ) : null}
@@ -229,7 +229,7 @@ export function ManualGradingForm({
                   <span className="text-xs font-semibold text-foreground">
                     <Bi
                       en={assessmentsUi.results.manualMarks.en}
-                      ar={assessmentsUi.results.manualMarks.ar}
+                      ar={assessmentsUi.results.manualMarks.en}
                     />
                     <span className="text-muted-foreground"> / {row.marks}</span>
                   </span>
@@ -256,16 +256,6 @@ export function ManualGradingForm({
                     className="min-h-20"
                     aria-label={assessmentsUi.results.feedbackEn.en}
                   />
-                  <Textarea
-                    dir="rtl"
-                    className="min-h-20 font-arabic"
-                    value={value.feedback_ar}
-                    placeholder={assessmentsUi.results.feedbackAr.ar}
-                    onChange={(event) =>
-                      update(index, "feedback_ar", event.target.value)
-                    }
-                    aria-label={assessmentsUi.results.feedbackAr.ar}
-                  />
                 </div>
               </div>
             </li>
@@ -282,8 +272,8 @@ export function ManualGradingForm({
           }
           ar={
             pending
-              ? assessmentsUi.actions.grading.ar
-              : assessmentsUi.actions.grade.ar
+              ? assessmentsUi.actions.grading.en
+              : assessmentsUi.actions.grade.en
           }
         />
       </Button>

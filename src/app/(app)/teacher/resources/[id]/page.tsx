@@ -46,7 +46,7 @@ import { formatAdminDateTime } from "@/lib/students/format";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Resource · المصدر",
+  title: "Resource",
 };
 
 export const dynamic = "force-dynamic";
@@ -90,24 +90,24 @@ export default async function TeacherResourceDetailPage({
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow={<Bi en={resourcesUi.eyebrow.en} ar={resourcesUi.eyebrow.ar} />}
+        eyebrow={<Bi en={resourcesUi.eyebrow.en} ar={resourcesUi.eyebrow.en} />}
         title={
           <Bi
             en={resource.title_en}
-            ar={resource.title_ar}
+            ar={resource.title_en}
             layout="stacked"
           />
         }
         description={
           <Bi
             en={resourcesUi.detail.detailsTitle.en}
-            ar={resourcesUi.detail.detailsTitle.ar}
+            ar={resourcesUi.detail.detailsTitle.en}
           />
         }
         actions={
           <>
             <Badge variant={resource.is_published ? "success" : "muted"}>
-              <Bi en={status.en} ar={status.ar} hideSeparator />
+              <Bi en={status.en} ar={status.en} hideSeparator />
             </Badge>
             <ResourcePublishToggle
               resourceId={resource.id}
@@ -120,7 +120,7 @@ export default async function TeacherResourceDetailPage({
               <Pencil aria-hidden="true" className="size-4" />
               <Bi
                 en={resourcesUi.actions.edit.en}
-                ar={resourcesUi.actions.edit.ar}
+                ar={resourcesUi.actions.edit.en}
               />
             </Link>
             <DeleteResourceButton resourceId={resource.id} redirectToList />
@@ -132,7 +132,7 @@ export default async function TeacherResourceDetailPage({
         <Alert variant="success">
           <Bi
             en={resourcesUi.detail.createdSuccess.en}
-            ar={resourcesUi.detail.createdSuccess.ar}
+            ar={resourcesUi.detail.createdSuccess.en}
           />
         </Alert>
       ) : null}
@@ -145,7 +145,7 @@ export default async function TeacherResourceDetailPage({
           <ArrowLeft aria-hidden="true" className="size-3.5" />
           <Bi
             en={resourcesUi.actions.backToList.en}
-            ar={resourcesUi.actions.backToList.ar}
+            ar={resourcesUi.actions.backToList.en}
           />
         </Link>
         {resource.type === "youtube" && resource.external_url ? (
@@ -167,13 +167,13 @@ export default async function TeacherResourceDetailPage({
             <CardTitle>
               <Bi
                 en={resourcesUi.detail.previewTitle.en}
-                ar={resourcesUi.detail.previewTitle.ar}
+                ar={resourcesUi.detail.previewTitle.en}
               />
             </CardTitle>
             <CardDescription>
               <Bi
                 en={resourcesUi.detail.noDownload.en}
-                ar={resourcesUi.detail.noDownload.ar}
+                ar={resourcesUi.detail.noDownload.en}
               />
             </CardDescription>
           </CardHeader>
@@ -183,7 +183,6 @@ export default async function TeacherResourceDetailPage({
               signedUrl={signedUrl}
               youtubeId={youtubeId}
               titleEn={resource.title_en}
-              titleAr={resource.title_ar}
             />
           </CardContent>
         </Card>
@@ -193,7 +192,7 @@ export default async function TeacherResourceDetailPage({
             <CardTitle>
               <Bi
                 en={resourcesUi.detail.detailsTitle.en}
-                ar={resourcesUi.detail.detailsTitle.ar}
+                ar={resourcesUi.detail.detailsTitle.en}
               />
             </CardTitle>
           </CardHeader>
@@ -208,14 +207,14 @@ export default async function TeacherResourceDetailPage({
                   <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                     <Bi
                       en={resourcesUi.detail.grade.en}
-                      ar={resourcesUi.detail.grade.ar}
+                      ar={resourcesUi.detail.grade.en}
                     />
                   </dt>
                   <dd className="mt-0.5">
                     {resource.grade ? (
                       <Bi
                         en={resource.grade.name_en}
-                        ar={resource.grade.name_ar}
+                        ar={resource.grade.name_en}
                         layout="stacked"
                       />
                     ) : (
@@ -234,20 +233,20 @@ export default async function TeacherResourceDetailPage({
                   <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                     <Bi
                       en={resourcesUi.detail.category.en}
-                      ar={resourcesUi.detail.category.ar}
+                      ar={resourcesUi.detail.category.en}
                     />
                   </dt>
                   <dd className="mt-0.5">
                     {resource.category ? (
                       <Bi
                         en={resource.category.name_en}
-                        ar={resource.category.name_ar}
+                        ar={resource.category.name_en}
                         layout="stacked"
                       />
                     ) : (
                       <Bi
                         en={resourcesUi.detail.noCategory.en}
-                        ar={resourcesUi.detail.noCategory.ar}
+                        ar={resourcesUi.detail.noCategory.en}
                       />
                     )}
                   </dd>
@@ -263,11 +262,11 @@ export default async function TeacherResourceDetailPage({
                   <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                     <Bi
                       en={resourcesUi.detail.type.en}
-                      ar={resourcesUi.detail.type.ar}
+                      ar={resourcesUi.detail.type.en}
                     />
                   </dt>
                   <dd className="mt-0.5">
-                    <Bi en={type.en} ar={type.ar} />
+                    <Bi en={type.en} ar={type.en} />
                   </dd>
                   {resource.storage_path ? (
                     <dd className="mt-1 break-all text-xs text-muted-foreground">
@@ -286,14 +285,14 @@ export default async function TeacherResourceDetailPage({
                   <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                     <Bi
                       en={resourcesUi.detail.createdAt.en}
-                      ar={resourcesUi.detail.createdAt.ar}
+                      ar={resourcesUi.detail.createdAt.en}
                     />
                   </dt>
                   <dd className="text-xs">{formatAdminDateTime(resource.created_at)}</dd>
                   <dt className="pt-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                     <Bi
                       en={resourcesUi.detail.updatedAt.en}
-                      ar={resourcesUi.detail.updatedAt.ar}
+                      ar={resourcesUi.detail.updatedAt.en}
                     />
                   </dt>
                   <dd className="text-xs">{formatAdminDateTime(resource.updated_at)}</dd>
@@ -310,27 +309,18 @@ export default async function TeacherResourceDetailPage({
             <CardTitle>
               <Bi
                 en={resourcesUi.detail.descriptionTitle.en}
-                ar={resourcesUi.detail.descriptionTitle.ar}
+                ar={resourcesUi.detail.descriptionTitle.en}
               />
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm leading-relaxed">
             {resource.description_en ? (
               <p>{resource.description_en}</p>
-            ) : null}
-            {resource.description_ar ? (
-              <p lang="ar" dir="rtl" className="font-arabic">
-                {resource.description_ar}
-              </p>
-            ) : null}
-            {!resource.description_en && !resource.description_ar ? (
+            ) : (
               <p className="text-muted-foreground">
-                <Bi
-                  en="No description yet."
-                  ar="لا يوجد وصف بعد."
-                />
+                <Bi en="No description yet." ar="No description yet." />
               </p>
-            ) : null}
+            )}
           </CardContent>
         </Card>
 
@@ -339,13 +329,13 @@ export default async function TeacherResourceDetailPage({
             <CardTitle>
               <Bi
                 en={resourcesUi.detail.activityTitle.en}
-                ar={resourcesUi.detail.activityTitle.ar}
+                ar={resourcesUi.detail.activityTitle.en}
               />
             </CardTitle>
             <CardDescription>
               <Bi
                 en={resourcesUi.detail.activityHint.en}
-                ar={resourcesUi.detail.activityHint.ar}
+                ar={resourcesUi.detail.activityHint.en}
               />
             </CardDescription>
           </CardHeader>
@@ -356,13 +346,13 @@ export default async function TeacherResourceDetailPage({
                 title={
                   <Bi
                     en={resourcesUi.detail.noActivity.en}
-                    ar={resourcesUi.detail.noActivity.ar}
+                    ar={resourcesUi.detail.noActivity.en}
                   />
                 }
                 description={
                   <Bi
                     en={resourcesUi.detail.activityHint.en}
-                    ar={resourcesUi.detail.activityHint.ar}
+                    ar={resourcesUi.detail.activityHint.en}
                   />
                 }
               />
@@ -378,7 +368,7 @@ export default async function TeacherResourceDetailPage({
                       <p className="font-medium text-foreground">
                         <Bi
                           en={resourceEventCopy[event.action].en}
-                          ar={resourceEventCopy[event.action].ar}
+                          ar={resourceEventCopy[event.action].en}
                         />
                       </p>
                       <p className="text-xs text-muted-foreground">

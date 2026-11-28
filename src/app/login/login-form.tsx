@@ -113,13 +113,13 @@ export function LoginForm({
             )}
             disabled={isPending}
           >
-            <Bi en={option.label.en} ar={option.label.ar} hideSeparator />
+            <Bi bilingual en={option.label.en} ar={option.label.ar} hideSeparator />
           </button>
         ))}
       </div>
 
       <p className="text-xs leading-relaxed text-muted-foreground">
-        <Bi
+        <Bi bilingual
           en={
             mode === "student"
               ? ui.login.studentSubtitle.en
@@ -135,7 +135,7 @@ export function LoginForm({
 
       {serverError ? (
         <Alert variant="error">
-          <Bi
+          <Bi bilingual
             en={authErrorCopy[serverError].en}
             ar={authErrorCopy[serverError].ar}
           />
@@ -145,7 +145,7 @@ export function LoginForm({
       {mode === "student" ? (
         <div className="space-y-2">
           <Label htmlFor="student_id">
-            <Bi en={ui.common.studentId.en} ar={ui.common.studentId.ar} />
+            <Bi bilingual en={ui.common.studentId.en} ar={ui.common.studentId.ar} />
           </Label>
           <Input
             id="student_id"
@@ -165,7 +165,7 @@ export function LoginForm({
             disabled={isPending}
             required
           />
-          <FormMessage
+          <FormMessage bilingual
             message={fieldErrors.student_id}
             className="text-xs"
           />
@@ -173,7 +173,7 @@ export function LoginForm({
       ) : (
         <div className="space-y-2">
           <Label htmlFor="email">
-            <Bi en={ui.common.email.en} ar={ui.common.email.ar} />
+            <Bi bilingual en={ui.common.email.en} ar={ui.common.email.ar} />
           </Label>
           <Input
             id="email"
@@ -189,13 +189,13 @@ export function LoginForm({
             disabled={isPending}
             required
           />
-          <FormMessage message={fieldErrors.email} className="text-xs" />
+          <FormMessage bilingual message={fieldErrors.email} className="text-xs" />
         </div>
       )}
 
       <div className="space-y-2">
         <Label htmlFor="password">
-          <Bi en={ui.common.password.en} ar={ui.common.password.ar} />
+          <Bi bilingual en={ui.common.password.en} ar={ui.common.password.ar} />
         </Label>
         <Input
           id="password"
@@ -210,19 +210,19 @@ export function LoginForm({
           disabled={isPending}
           required
         />
-        <FormMessage message={fieldErrors.password} className="text-xs" />
+        <FormMessage bilingual message={fieldErrors.password} className="text-xs" />
       </div>
 
       <Button type="submit" size="lg" className="w-full" disabled={isPending}>
         {isPending ? (
           <>
             <Loader2 aria-hidden="true" className="animate-spin" />
-            <Bi en={ui.login.signingIn.en} ar={ui.login.signingIn.ar} />
+            <Bi bilingual en={ui.login.signingIn.en} ar={ui.login.signingIn.ar} />
           </>
         ) : (
           <>
             <LogIn aria-hidden="true" />
-            <Bi en={ui.common.signIn.en} ar={ui.common.signIn.ar} />
+            <Bi bilingual en={ui.common.signIn.en} ar={ui.common.signIn.ar} />
           </>
         )}
       </Button>

@@ -30,7 +30,7 @@ export default async function AccountPendingPage() {
         id="main-content"
         className="flex flex-1 items-center justify-center px-4 py-12"
       >
-        <SupabaseSetupNotice />
+        <SupabaseSetupNotice bilingual />
       </main>
     );
   }
@@ -62,7 +62,7 @@ export default async function AccountPendingPage() {
             <Clock3 aria-hidden="true" className="size-5" />
           </span>
           <CardTitle className="mt-2 text-xl">
-            <Bi
+            <Bi bilingual
               en="Your account is almost ready"
               ar="حسابك على وشك الجاهزية"
               layout="stacked"
@@ -70,12 +70,12 @@ export default async function AccountPendingPage() {
           </CardTitle>
           <CardDescription>
             {profile ? (
-              <Bi
+              <Bi bilingual
                 en="Your sign-in worked, but your teacher still needs to assign your grade before resources and assessments can appear."
                 ar="تم تسجيل الدخول بنجاح، لكن معلمك لا يزال بحاجة إلى تحديد صفك قبل ظهور المصادر والتقييمات."
               />
             ) : (
-              <Bi
+              <Bi bilingual
                 en="Your sign-in worked, but no profile record was found yet. Ask your teacher to finish setting up your account."
                 ar="تم تسجيل الدخول بنجاح، لكن لم يُعثر على ملف تعريفي بعد. اطلب من معلمك إكمال إعداد حسابك."
               />
@@ -85,11 +85,11 @@ export default async function AccountPendingPage() {
         <CardContent className="space-y-5">
           <div className="rounded-lg border border-border bg-secondary/40 p-3 text-sm">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              <Bi en="Signed in as" ar="مسجّل الدخول باسم" />
+              <Bi bilingual en="Signed in as" ar="مسجّل الدخول باسم" />
             </p>
             <p className="mt-1 break-all font-semibold">
               {profile?.full_name_en ?? (
-                <Bi en="Your account" ar="حسابك" hideSeparator />
+                <Bi bilingual en="Your account" ar="حسابك" hideSeparator />
               )}
             </p>
             {profile?.email ? (
@@ -102,7 +102,7 @@ export default async function AccountPendingPage() {
           <form action={signOutAction}>
             <Button type="submit" variant="outline" className="w-full">
               <LogOut aria-hidden="true" />
-              <Bi en="Sign out" ar="تسجيل الخروج" />
+              <Bi bilingual en="Sign out" ar="تسجيل الخروج" />
             </Button>
           </form>
         </CardContent>

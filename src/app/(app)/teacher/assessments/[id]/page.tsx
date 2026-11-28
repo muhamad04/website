@@ -36,7 +36,7 @@ import { isUuid } from "@/lib/search";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Assessment builder · منشئ الاختبار",
+  title: "Assessment builder",
 };
 
 export const dynamic = "force-dynamic";
@@ -73,19 +73,19 @@ export default async function AssessmentBuilderPage({
     <div className="space-y-5">
       <PageHeader
         eyebrow={
-          <Bi en={assessmentsUi.eyebrow.en} ar={assessmentsUi.eyebrow.ar} />
+          <Bi en={assessmentsUi.eyebrow.en} ar={assessmentsUi.eyebrow.en} />
         }
-        title={<Bi en={detail.title_en} ar={detail.title_ar} />}
+        title={<Bi en={detail.title_en} ar={detail.title_en} />}
         description={
-          detail.instructions_en || detail.instructions_ar ? (
+          detail.instructions_en ? (
             <Bi
-              en={detail.instructions_en ?? ""}
-              ar={detail.instructions_ar ?? ""}
+              en={detail.instructions_en}
+              ar={detail.instructions_en}
             />
           ) : (
             <Bi
               en={assessmentsUi.builder.sectionsHint.en}
-              ar={assessmentsUi.builder.sectionsHint.ar}
+              ar={assessmentsUi.builder.sectionsHint.en}
             />
           )
         }
@@ -98,7 +98,7 @@ export default async function AssessmentBuilderPage({
               <Pencil aria-hidden="true" className="size-4" />
               <Bi
                 en={assessmentsUi.actions.edit.en}
-                ar={assessmentsUi.actions.edit.ar}
+                ar={assessmentsUi.actions.edit.en}
               />
             </Link>
             <Link
@@ -108,7 +108,7 @@ export default async function AssessmentBuilderPage({
               <ListChecks aria-hidden="true" className="size-4" />
               <Bi
                 en={assessmentsUi.actions.viewResults.en}
-                ar={assessmentsUi.actions.viewResults.ar}
+                ar={assessmentsUi.actions.viewResults.en}
               />
             </Link>
             <AssessmentPublishToggle
@@ -122,7 +122,7 @@ export default async function AssessmentBuilderPage({
               <ArrowLeft aria-hidden="true" className="size-4" />
               <Bi
                 en={assessmentsUi.actions.backToList.en}
-                ar={assessmentsUi.actions.backToList.ar}
+                ar={assessmentsUi.actions.backToList.en}
               />
             </Link>
           </>
@@ -133,7 +133,7 @@ export default async function AssessmentBuilderPage({
         <Alert variant="success">
           <Bi
             en={assessmentsUi.builder.createdSuccess.en}
-            ar={assessmentsUi.builder.createdSuccess.ar}
+            ar={assessmentsUi.builder.createdSuccess.en}
           />
         </Alert>
       ) : null}
@@ -142,7 +142,7 @@ export default async function AssessmentBuilderPage({
         <Alert variant="success">
           <Bi
             en={assessmentsUi.builder.updatedSuccess.en}
-            ar={assessmentsUi.builder.updatedSuccess.ar}
+            ar={assessmentsUi.builder.updatedSuccess.en}
           />
         </Alert>
       ) : null}
@@ -151,7 +151,7 @@ export default async function AssessmentBuilderPage({
         <Alert variant="success">
           <Bi
             en={assessmentsUi.builder.questionCreated.en}
-            ar={assessmentsUi.builder.questionCreated.ar}
+            ar={assessmentsUi.builder.questionCreated.en}
           />
         </Alert>
       ) : null}
@@ -161,7 +161,7 @@ export default async function AssessmentBuilderPage({
           <Badge variant={detail.type === "exam" ? "default" : "outline"}>
             <Bi
               en={assessmentTypeCopy[detail.type].en}
-              ar={assessmentTypeCopy[detail.type].ar}
+              ar={assessmentTypeCopy[detail.type].en}
             />
           </Badge>
           <Badge variant={detail.is_published ? "success" : "muted"}>
@@ -174,14 +174,14 @@ export default async function AssessmentBuilderPage({
             {detail.questionCount}{" "}
             <Bi
               en={assessmentsUi.builder.questions.en}
-              ar={assessmentsUi.builder.questions.ar}
+              ar={assessmentsUi.builder.questions.en}
             />
           </Badge>
           <Badge variant="muted">
             {detail.totalMarks}{" "}
             <Bi
               en={assessmentsUi.list.marks.en}
-              ar={assessmentsUi.list.marks.ar}
+              ar={assessmentsUi.list.marks.en}
             />
           </Badge>
         </div>
@@ -191,7 +191,7 @@ export default async function AssessmentBuilderPage({
             <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               <Bi
                 en={assessmentsUi.form.grade.en}
-                ar={assessmentsUi.form.grade.ar}
+                ar={assessmentsUi.form.grade.en}
               />
             </dt>
             <dd className="mt-0.5 font-medium">
@@ -206,14 +206,14 @@ export default async function AssessmentBuilderPage({
             <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               <Bi
                 en={assessmentsUi.form.timeLimit.en}
-                ar={assessmentsUi.form.timeLimit.ar}
+                ar={assessmentsUi.form.timeLimit.en}
               />
             </dt>
             <dd className="mt-0.5 font-medium">
               {detail.time_limit_minutes}{" "}
               <Bi
                 en={assessmentsUi.student.minutes.en}
-                ar={assessmentsUi.student.minutes.ar}
+                ar={assessmentsUi.student.minutes.en}
               />
             </dd>
           </div>
@@ -222,13 +222,13 @@ export default async function AssessmentBuilderPage({
             <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               <Bi
                 en={assessmentsUi.form.visibility.en}
-                ar={assessmentsUi.form.visibility.ar}
+                ar={assessmentsUi.form.visibility.en}
               />
             </dt>
             <dd className="mt-0.5 font-medium">
               <Bi
                 en={resultsVisibilityCopy[detail.results_visibility].en}
-                ar={resultsVisibilityCopy[detail.results_visibility].ar}
+                ar={resultsVisibilityCopy[detail.results_visibility].en}
               />
             </dd>
           </div>
@@ -237,13 +237,13 @@ export default async function AssessmentBuilderPage({
             <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               <Bi
                 en={assessmentsUi.form.gradingMode.en}
-                ar={assessmentsUi.form.gradingMode.ar}
+                ar={assessmentsUi.form.gradingMode.en}
               />
             </dt>
             <dd className="mt-0.5 font-medium">
               <Bi
                 en={gradingModeCopy[detail.grading_mode].en}
-                ar={gradingModeCopy[detail.grading_mode].ar}
+                ar={gradingModeCopy[detail.grading_mode].en}
               />
             </dd>
           </div>
@@ -252,7 +252,7 @@ export default async function AssessmentBuilderPage({
             <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               <Bi
                 en={assessmentsUi.form.maxAttempts.en}
-                ar={assessmentsUi.form.maxAttempts.ar}
+                ar={assessmentsUi.form.maxAttempts.en}
               />
             </dt>
             <dd className="mt-0.5 font-medium">
@@ -264,7 +264,7 @@ export default async function AssessmentBuilderPage({
               ) : (
                 <Bi
                   en={assessmentsUi.list.noRetakes.en}
-                  ar={assessmentsUi.list.noRetakes.ar}
+                  ar={assessmentsUi.list.noRetakes.en}
                 />
               )}
             </dd>
@@ -288,7 +288,7 @@ export default async function AssessmentBuilderPage({
               ) : (
                 <Bi
                   en={assessmentsUi.list.openNow.en}
-                  ar={assessmentsUi.list.openNow.ar}
+                  ar={assessmentsUi.list.openNow.en}
                 />
               )}
             </dd>
@@ -303,7 +303,7 @@ export default async function AssessmentBuilderPage({
             <Plus aria-hidden="true" className="size-3.5" />
             <Bi
               en={assessmentsUi.actions.addQuestion.en}
-              ar={assessmentsUi.actions.addQuestion.ar}
+              ar={assessmentsUi.actions.addQuestion.en}
             />
           </Link>
           <DeleteAssessmentButton
@@ -319,13 +319,13 @@ export default async function AssessmentBuilderPage({
             <h2 className="text-lg font-bold text-foreground">
               <Bi
                 en={assessmentsUi.builder.sections.en}
-                ar={assessmentsUi.builder.sections.ar}
+                ar={assessmentsUi.builder.sections.en}
               />
             </h2>
             <p className="text-sm text-muted-foreground">
               <Bi
                 en={assessmentsUi.builder.sectionsHint.en}
-                ar={assessmentsUi.builder.sectionsHint.ar}
+                ar={assessmentsUi.builder.sectionsHint.en}
               />
             </p>
           </div>
@@ -337,7 +337,7 @@ export default async function AssessmentBuilderPage({
               <Plus aria-hidden="true" className="size-3.5" />
               <Bi
                 en={assessmentsUi.actions.addQuestion.en}
-                ar={assessmentsUi.actions.addQuestion.ar}
+                ar={assessmentsUi.actions.addQuestion.en}
               />
             </Link>
           ) : null}
@@ -372,14 +372,14 @@ export default async function AssessmentBuilderPage({
           <h2 className="text-sm font-bold text-foreground">
             <Bi
               en={assessmentsUi.builder.activityTitle.en}
-              ar={assessmentsUi.builder.activityTitle.ar}
+              ar={assessmentsUi.builder.activityTitle.en}
             />
           </h2>
         </div>
         <p className="mt-1 text-xs text-muted-foreground">
           <Bi
             en={assessmentsUi.builder.activityHint.en}
-            ar={assessmentsUi.builder.activityHint.ar}
+            ar={assessmentsUi.builder.activityHint.en}
           />
         </p>
 
@@ -387,7 +387,7 @@ export default async function AssessmentBuilderPage({
           <p className="mt-3 text-sm text-muted-foreground">
             <Bi
               en={assessmentsUi.builder.noActivity.en}
-              ar={assessmentsUi.builder.noActivity.ar}
+              ar={assessmentsUi.builder.noActivity.en}
             />
           </p>
         ) : (
@@ -400,7 +400,7 @@ export default async function AssessmentBuilderPage({
                 <span className="font-medium text-foreground">
                   <Bi
                     en={assessmentEventCopy[event.action].en}
-                    ar={assessmentEventCopy[event.action].ar}
+                    ar={assessmentEventCopy[event.action].en}
                   />
                 </span>
                 <span className="text-xs text-muted-foreground">

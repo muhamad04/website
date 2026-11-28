@@ -105,7 +105,8 @@ export function StudentForm({
         mode === "create"
           ? {
               full_name_en: values.full_name_en,
-              full_name_ar: values.full_name_ar,
+              // English-only authoring; mirror into the legacy Arabic column.
+              full_name_ar: values.full_name_en,
               email: values.email,
               username: values.username,
               student_number: values.student_number,
@@ -120,6 +121,7 @@ export function StudentForm({
           : {
               student_id: student?.id ?? "",
               full_name_en: values.full_name_en,
+              // Keep the stored Arabic name untouched on edit.
               full_name_ar: values.full_name_ar,
               email: values.email,
               username: values.username,
@@ -157,7 +159,7 @@ export function StudentForm({
         <Alert variant="error">
           <Bi
             en={studentErrorCopy[formError].en}
-            ar={studentErrorCopy[formError].ar}
+            ar={studentErrorCopy[formError].en}
           />
         </Alert>
       ) : null}
@@ -166,7 +168,7 @@ export function StudentForm({
         <Alert variant="success">
           <Bi
             en={studentsUi.messages.updated.en}
-            ar={studentsUi.messages.updated.ar}
+            ar={studentsUi.messages.updated.en}
           />
         </Alert>
       ) : null}
@@ -176,7 +178,7 @@ export function StudentForm({
           <Alert variant="success">
             <Bi
               en={studentsUi.messages.created.en}
-              ar={studentsUi.messages.created.ar}
+              ar={studentsUi.messages.created.en}
             />
           </Alert>
 
@@ -191,7 +193,7 @@ export function StudentForm({
             >
               <Bi
                 en={studentsUi.actions.open.en}
-                ar={studentsUi.actions.open.ar}
+                ar={studentsUi.actions.open.en}
               />
             </Link>
             <Link
@@ -200,7 +202,7 @@ export function StudentForm({
             >
               <Bi
                 en={studentsUi.actions.backToList.en}
-                ar={studentsUi.actions.backToList.ar}
+                ar={studentsUi.actions.backToList.en}
               />
             </Link>
           </div>
@@ -220,24 +222,6 @@ export function StudentForm({
             autoComplete="off"
             dir="ltr"
             aria-invalid={Boolean(errors.full_name_en)}
-            required
-          />
-        </Field>
-
-        <Field
-          id="full_name_ar"
-          label={studentsUi.form.nameAr}
-          error={errors.full_name_ar}
-        >
-          <Input
-            id="full_name_ar"
-            value={values.full_name_ar}
-            onChange={(event) => update("full_name_ar", event.target.value)}
-            autoComplete="off"
-            dir="rtl"
-            lang="ar"
-            className="font-arabic"
-            aria-invalid={Boolean(errors.full_name_ar)}
             required
           />
         </Field>
@@ -293,7 +277,7 @@ export function StudentForm({
             <option value="">{studentsUi.form.noGrade.en}</option>
             {grades.map((grade) => (
               <option key={grade.id} value={grade.id}>
-                {grade.name_en} · {grade.name_ar}
+                {grade.name_en}
               </option>
             ))}
           </Select>
@@ -316,7 +300,7 @@ export function StudentForm({
             <option value="">{studentsUi.form.noClass.en}</option>
             {classOptions.map((classRow) => (
               <option key={classRow.id} value={classRow.id}>
-                {classRow.name_en} · {classRow.name_ar}
+                {classRow.name_en}
               </option>
             ))}
           </Select>
@@ -345,13 +329,13 @@ export function StudentForm({
           <legend className="px-1 text-sm font-semibold text-foreground">
             <Bi
               en={studentsUi.form.passwordTitle.en}
-              ar={studentsUi.form.passwordTitle.ar}
+              ar={studentsUi.form.passwordTitle.en}
             />
           </legend>
           <p className="text-xs leading-relaxed text-muted-foreground">
             <Bi
               en={studentsUi.form.passwordSubtitle.en}
-              ar={studentsUi.form.passwordSubtitle.ar}
+              ar={studentsUi.form.passwordSubtitle.en}
             />
           </p>
 
@@ -390,13 +374,13 @@ export function StudentForm({
                 <span className="space-y-0.5">
                   <Bi
                     en={option.label.en}
-                    ar={option.label.ar}
+                    ar={option.label.en}
                     layout="stacked"
                     className="font-medium text-foreground"
                   />
                   <Bi
                     en={option.hint.en}
-                    ar={option.hint.ar}
+                    ar={option.hint.en}
                     layout="stacked"
                     className="text-xs text-muted-foreground"
                   />
@@ -435,7 +419,7 @@ export function StudentForm({
           {pending ? (
             <Bi
               en={studentsUi.actions.saving.en}
-              ar={studentsUi.actions.saving.ar}
+              ar={studentsUi.actions.saving.en}
             />
           ) : (
             <Bi
@@ -446,8 +430,8 @@ export function StudentForm({
               }
               ar={
                 mode === "create"
-                  ? studentsUi.actions.create.ar
-                  : studentsUi.actions.save.ar
+                  ? studentsUi.actions.create.en
+                  : studentsUi.actions.save.en
               }
             />
           )}
@@ -456,7 +440,7 @@ export function StudentForm({
           href="/teacher/students"
           className={cn(buttonVariants({ variant: "outline" }))}
         >
-          <Bi en={studentsUi.actions.backToList.en} ar={studentsUi.actions.backToList.ar} />
+          <Bi en={studentsUi.actions.backToList.en} ar={studentsUi.actions.backToList.en} />
         </Link>
       </div>
     </form>

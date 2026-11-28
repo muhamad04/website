@@ -36,7 +36,7 @@ import { formatAdminDateTime } from "@/lib/students/format";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Assessments · الاختبارات",
+  title: "Assessments",
 };
 
 export const dynamic = "force-dynamic";
@@ -62,13 +62,13 @@ export default async function TeacherAssessmentsPage({
     <div className="space-y-5">
       <PageHeader
         eyebrow={
-          <Bi en={assessmentsUi.eyebrow.en} ar={assessmentsUi.eyebrow.ar} />
+          <Bi en={assessmentsUi.eyebrow.en} ar={assessmentsUi.eyebrow.en} />
         }
-        title={<Bi en={assessmentsUi.title.en} ar={assessmentsUi.title.ar} />}
+        title={<Bi en={assessmentsUi.title.en} ar={assessmentsUi.title.en} />}
         description={
           <Bi
             en={assessmentsUi.subtitle.en}
-            ar={assessmentsUi.subtitle.ar}
+            ar={assessmentsUi.subtitle.en}
           />
         }
         actions={
@@ -80,7 +80,7 @@ export default async function TeacherAssessmentsPage({
               <FileUp aria-hidden="true" className="size-4" />
               <Bi
                 en={assessmentsUi.actions.importAssessment.en}
-                ar={assessmentsUi.actions.importAssessment.ar}
+                ar={assessmentsUi.actions.importAssessment.en}
               />
             </Link>
             <Link
@@ -90,7 +90,7 @@ export default async function TeacherAssessmentsPage({
               <Plus aria-hidden="true" className="size-4" />
               <Bi
                 en={assessmentsUi.actions.addAssessment.en}
-                ar={assessmentsUi.actions.addAssessment.ar}
+                ar={assessmentsUi.actions.addAssessment.en}
               />
             </Link>
           </>
@@ -101,7 +101,7 @@ export default async function TeacherAssessmentsPage({
         <Alert variant="error">
           <Bi
             en={assessmentsUi.messages.loadFailed.en}
-            ar={assessmentsUi.messages.loadFailed.ar}
+            ar={assessmentsUi.messages.loadFailed.en}
           />
         </Alert>
       ) : null}
@@ -116,29 +116,26 @@ export default async function TeacherAssessmentsPage({
             <Search aria-hidden="true" className="size-3.5" />
             <Bi
               en={assessmentsUi.filters.search.en}
-              ar={assessmentsUi.filters.search.ar}
+              ar={assessmentsUi.filters.search.en}
             />
           </span>
           <Input
             name="q"
             defaultValue={filters.search}
-            placeholder={`${assessmentsUi.filters.searchPlaceholder.en} · ${assessmentsUi.filters.searchPlaceholder.ar}`}
+            placeholder={assessmentsUi.filters.searchPlaceholder.en}
           />
         </label>
 
         <label className="flex flex-col gap-1 text-xs font-semibold text-muted-foreground">
           <Bi
             en={assessmentsUi.filters.grade.en}
-            ar={assessmentsUi.filters.grade.ar}
+            ar={assessmentsUi.filters.grade.en}
           />
           <Select name="grade" defaultValue={filters.gradeId}>
-            <option value="">
-              {assessmentsUi.filters.allGrades.en} ·{" "}
-              {assessmentsUi.filters.allGrades.ar}
-            </option>
+            <option value="">{assessmentsUi.filters.allGrades.en}</option>
             {grades.map((grade) => (
               <option key={grade.id} value={grade.id}>
-                {grade.name_en} · {grade.name_ar}
+                {grade.name_en}
               </option>
             ))}
           </Select>
@@ -147,32 +144,26 @@ export default async function TeacherAssessmentsPage({
         <label className="flex flex-col gap-1 text-xs font-semibold text-muted-foreground">
           <Bi
             en={assessmentsUi.filters.type.en}
-            ar={assessmentsUi.filters.type.ar}
+            ar={assessmentsUi.filters.type.en}
           />
           <Select name="type" defaultValue={filters.type}>
-            <option value="all">
-              {assessmentsUi.filters.allTypes.en} ·{" "}
-              {assessmentsUi.filters.allTypes.ar}
-            </option>
-            <option value="quiz">{assessmentTypeCopy.quiz.en} · اختبار قصير</option>
-            <option value="exam">Exam · اختبار نهائي</option>
+            <option value="all">{assessmentsUi.filters.allTypes.en}</option>
+            <option value="quiz">{assessmentTypeCopy.quiz.en}</option>
+            <option value="exam">{assessmentTypeCopy.exam.en}</option>
           </Select>
         </label>
 
         <label className="flex flex-col gap-1 text-xs font-semibold text-muted-foreground">
           <Bi
             en={assessmentsUi.filters.status.en}
-            ar={assessmentsUi.filters.status.ar}
+            ar={assessmentsUi.filters.status.en}
           />
           <Select name="status" defaultValue={filters.status}>
-            <option value="all">
-              {assessmentsUi.filters.allStatuses.en} ·{" "}
-              {assessmentsUi.filters.allStatuses.ar}
-            </option>
+            <option value="all">{assessmentsUi.filters.allStatuses.en}</option>
             <option value="published">
-              {assessmentsUi.filters.publishedOnly.en} · منشور
+              {assessmentsUi.filters.publishedOnly.en}
             </option>
-            <option value="draft">Drafts · مسودات</option>
+            <option value="draft">Drafts</option>
           </Select>
         </label>
 
@@ -181,7 +172,7 @@ export default async function TeacherAssessmentsPage({
             <SlidersHorizontal aria-hidden="true" className="size-3.5" />
             <Bi
               en={assessmentsUi.filters.apply.en}
-              ar={assessmentsUi.filters.apply.ar}
+              ar={assessmentsUi.filters.apply.en}
             />
           </button>
           {filtered ? (
@@ -191,7 +182,7 @@ export default async function TeacherAssessmentsPage({
             >
               <Bi
                 en={assessmentsUi.filters.clear.en}
-                ar={assessmentsUi.filters.clear.ar}
+                ar={assessmentsUi.filters.clear.en}
               />
             </Link>
           ) : null}
@@ -199,7 +190,7 @@ export default async function TeacherAssessmentsPage({
             {result.total}{" "}
             <Bi
               en={result.total === 1 ? "assessment" : "assessments"}
-              ar="اختبار"
+              ar={result.total === 1 ? "assessment" : "assessments"}
             />
           </span>
         </div>
@@ -217,8 +208,8 @@ export default async function TeacherAssessmentsPage({
               }
               ar={
                 filtered
-                  ? assessmentsUi.list.emptyFiltered.ar
-                  : assessmentsUi.list.empty.ar
+                  ? assessmentsUi.list.emptyFiltered.en
+                  : assessmentsUi.list.empty.en
               }
             />
           }
@@ -231,8 +222,8 @@ export default async function TeacherAssessmentsPage({
               }
               ar={
                 filtered
-                  ? assessmentsUi.list.emptyFilteredHint.ar
-                  : assessmentsUi.list.emptyHint.ar
+                  ? assessmentsUi.list.emptyFilteredHint.en
+                  : assessmentsUi.list.emptyHint.en
               }
             />
           }
@@ -244,7 +235,7 @@ export default async function TeacherAssessmentsPage({
               >
                 <Bi
                   en={assessmentsUi.filters.clear.en}
-                  ar={assessmentsUi.filters.clear.ar}
+                  ar={assessmentsUi.filters.clear.en}
                 />
               </Link>
             ) : (
@@ -255,7 +246,7 @@ export default async function TeacherAssessmentsPage({
                 <Plus aria-hidden="true" className="size-3.5" />
                 <Bi
                   en={assessmentsUi.actions.addAssessment.en}
-                  ar={assessmentsUi.actions.addAssessment.ar}
+                  ar={assessmentsUi.actions.addAssessment.en}
                 />
               </Link>
             )
@@ -285,7 +276,7 @@ export default async function TeacherAssessmentsPage({
                     >
                       <Bi
                         en={assessmentTypeCopy[assessment.type].en}
-                        ar={assessmentTypeCopy[assessment.type].ar}
+                        ar={assessmentTypeCopy[assessment.type].en}
                       />
                     </Badge>
                     <Badge
@@ -310,13 +301,13 @@ export default async function TeacherAssessmentsPage({
                       {assessment.time_limit_minutes}{" "}
                       <Bi
                         en={assessmentsUi.student.minutes.en}
-                        ar={assessmentsUi.student.minutes.ar}
+                        ar={assessmentsUi.student.minutes.en}
                       />
                     </span>
                     <span>
                       <Bi
                         en={resultsVisibilityCopy[assessment.results_visibility].en}
-                        ar={resultsVisibilityCopy[assessment.results_visibility].ar}
+                        ar={resultsVisibilityCopy[assessment.results_visibility].en}
                       />
                     </span>
                     <span>
@@ -328,7 +319,7 @@ export default async function TeacherAssessmentsPage({
                       ) : (
                         <Bi
                           en={assessmentsUi.list.noRetakes.en}
-                          ar={assessmentsUi.list.noRetakes.ar}
+                          ar={assessmentsUi.list.noRetakes.en}
                         />
                       )}
                     </span>
@@ -350,7 +341,7 @@ export default async function TeacherAssessmentsPage({
                     <Pencil aria-hidden="true" className="size-3.5" />
                     <Bi
                       en={assessmentsUi.actions.open.en}
-                      ar={assessmentsUi.actions.open.ar}
+                      ar={assessmentsUi.actions.open.en}
                     />
                   </Link>
                   <Link
@@ -360,7 +351,7 @@ export default async function TeacherAssessmentsPage({
                     <ListChecks aria-hidden="true" className="size-3.5" />
                     <Bi
                       en={assessmentsUi.actions.viewResults.en}
-                      ar={assessmentsUi.actions.viewResults.ar}
+                      ar={assessmentsUi.actions.viewResults.en}
                     />
                   </Link>
                   <AssessmentPublishToggle
@@ -386,7 +377,7 @@ export default async function TeacherAssessmentsPage({
               })}`}
               className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
             >
-              <Bi en="Previous" ar="السابق" />
+              <Bi en="Previous" ar="Previous" />
             </Link>
           ) : (
             <span />
@@ -401,7 +392,7 @@ export default async function TeacherAssessmentsPage({
               })}`}
               className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
             >
-              <Bi en="Next" ar="التالي" />
+              <Bi en="Next" ar="Next" />
             </Link>
           ) : (
             <span />

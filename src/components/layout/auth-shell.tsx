@@ -36,7 +36,7 @@ export function AuthShell({
             </span>
           </Link>
           <div className="hidden text-right text-xs text-muted-foreground sm:block">
-            <Bi
+            <Bi bilingual
               en={ui.appTagline.en}
               ar={ui.appTagline.ar}
               layout="stacked"
@@ -57,7 +57,7 @@ export function AuthShell({
 
       <footer className="border-t border-border/70 bg-card/40">
         <div className="mx-auto max-w-6xl px-4 py-4 text-xs text-muted-foreground sm:px-6">
-          <Bi
+          <Bi bilingual
             en="English teaching resources & assessments · Egypt"
             ar="مصادر وتقييمات لتعليم اللغة الإنجليزية · مصر"
           />

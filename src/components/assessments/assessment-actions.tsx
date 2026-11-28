@@ -71,10 +71,10 @@ export function AssessmentPublishToggle({
           }
           ar={
             pending
-              ? assessmentsUi.actions.working.ar
+              ? assessmentsUi.actions.working.en
               : isPublished
-                ? assessmentsUi.actions.unpublish.ar
-                : assessmentsUi.actions.publish.ar
+                ? assessmentsUi.actions.unpublish.en
+                : assessmentsUi.actions.publish.en
           }
         />
       </Button>
@@ -82,7 +82,7 @@ export function AssessmentPublishToggle({
         <span role="alert" className="text-[11px] text-destructive">
           <Bi
             en={assessmentErrorCopy[error].en}
-            ar={assessmentErrorCopy[error].ar}
+            ar={assessmentErrorCopy[error].en}
           />
         </span>
       ) : null}
@@ -103,7 +103,7 @@ export function DeleteAssessmentButton({
 
   const remove = () => {
     const confirmed = window.confirm(
-      `${assessmentsUi.actions.confirmDelete.en}\n${assessmentsUi.actions.deleteWarning.en}\n\n${assessmentsUi.actions.confirmDelete.ar}\n${assessmentsUi.actions.deleteWarning.ar}`,
+      `${assessmentsUi.actions.confirmDelete.en}\n${assessmentsUi.actions.deleteWarning.en}`,
     );
 
     if (!confirmed) {
@@ -148,8 +148,8 @@ export function DeleteAssessmentButton({
           }
           ar={
             pending
-              ? assessmentsUi.actions.deleting.ar
-              : assessmentsUi.actions.delete.ar
+              ? assessmentsUi.actions.deleting.en
+              : assessmentsUi.actions.delete.en
           }
         />
       </Button>
@@ -157,7 +157,7 @@ export function DeleteAssessmentButton({
         <span role="alert" className="text-[11px] text-destructive">
           <Bi
             en={assessmentErrorCopy[error].en}
-            ar={assessmentErrorCopy[error].ar}
+            ar={assessmentErrorCopy[error].en}
           />
         </span>
       ) : null}
@@ -221,14 +221,14 @@ export function StartAttemptButton({
           <Play aria-hidden="true" className="size-3.5" />
           <Bi
             en={pending ? assessmentsUi.actions.starting.en : label.en}
-            ar={pending ? assessmentsUi.actions.starting.ar : label.ar}
+            ar={pending ? assessmentsUi.actions.starting.en : label.en}
           />
         </Button>
         {error ? (
           <span role="alert" className="text-[11px] text-destructive">
             <Bi
               en={assessmentErrorCopy[error].en}
-              ar={assessmentErrorCopy[error].ar}
+              ar={assessmentErrorCopy[error].en}
             />
           </span>
         ) : null}
@@ -248,13 +248,13 @@ export function StartAttemptButton({
             >
               <Bi
                 en={assessmentsUi.strict.confirmationTitle.en}
-                ar={assessmentsUi.strict.confirmationTitle.ar}
+                ar={assessmentsUi.strict.confirmationTitle.en}
               />
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
               <Bi
                 en={assessmentsUi.strict.confirmationIntro.en}
-                ar={assessmentsUi.strict.confirmationIntro.ar}
+                ar={assessmentsUi.strict.confirmationIntro.en}
               />
             </p>
 
@@ -262,7 +262,7 @@ export function StartAttemptButton({
               <div className="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-100">
                 <Bi
                   en={assessmentsUi.strict.warning.en}
-                  ar={assessmentsUi.strict.warning.ar}
+                  ar={assessmentsUi.strict.warning.en}
                 />
               </div>
             ) : null}
@@ -272,14 +272,14 @@ export function StartAttemptButton({
                 <dt className="text-muted-foreground">
                   <Bi
                     en={assessmentsUi.strict.timed.en}
-                    ar={assessmentsUi.strict.timed.ar}
+                    ar={assessmentsUi.strict.timed.en}
                   />
                 </dt>
                 <dd className="text-end font-medium">
                   {confirmation.timeLimitMinutes}{" "}
                   <Bi
                     en={assessmentsUi.student.minutes.en}
-                    ar={assessmentsUi.student.minutes.ar}
+                    ar={assessmentsUi.student.minutes.en}
                   />
                 </dd>
               </div>
@@ -287,7 +287,7 @@ export function StartAttemptButton({
                 <dt className="text-muted-foreground">
                   <Bi
                     en={assessmentsUi.strict.attempts.en}
-                    ar={assessmentsUi.strict.attempts.ar}
+                    ar={assessmentsUi.strict.attempts.en}
                   />
                 </dt>
                 <dd className="text-end font-medium tabular-nums">
@@ -304,8 +304,8 @@ export function StartAttemptButton({
                     }
                     ar={
                       confirmation.leavingSubmits
-                        ? assessmentsUi.strict.leaving.ar
-                        : assessmentsUi.strict.leavingNo.ar
+                        ? assessmentsUi.strict.leaving.en
+                        : assessmentsUi.strict.leavingNo.en
                     }
                   />
                 </dt>
@@ -320,13 +320,13 @@ export function StartAttemptButton({
                 <dt className="text-muted-foreground">
                   <Bi
                     en={assessmentsUi.strict.resultsRule.en}
-                    ar={assessmentsUi.strict.resultsRule.ar}
+                    ar={assessmentsUi.strict.resultsRule.en}
                   />
                 </dt>
                 <dd className="text-end font-medium">
                   <Bi
                     en={resultsVisibilityCopy[confirmation.resultsVisibility].en}
-                    ar={resultsVisibilityCopy[confirmation.resultsVisibility].ar}
+                    ar={resultsVisibilityCopy[confirmation.resultsVisibility].en}
                   />
                 </dd>
               </div>
@@ -336,7 +336,7 @@ export function StartAttemptButton({
               <p className="mt-4 text-xs text-muted-foreground">
                 <Bi
                   en={assessmentsUi.strict.notFoolproof.en}
-                  ar={assessmentsUi.strict.notFoolproof.ar}
+                  ar={assessmentsUi.strict.notFoolproof.en}
                 />
               </p>
             ) : null}
@@ -351,7 +351,7 @@ export function StartAttemptButton({
               >
                 <Bi
                   en={assessmentsUi.strict.back.en}
-                  ar={assessmentsUi.strict.back.ar}
+                  ar={assessmentsUi.strict.back.en}
                 />
               </Button>
               <Button type="button" size="sm" disabled={pending} onClick={start}>
@@ -364,8 +364,8 @@ export function StartAttemptButton({
                   }
                   ar={
                     pending
-                      ? assessmentsUi.actions.starting.ar
-                      : assessmentsUi.strict.startConfirm.ar
+                      ? assessmentsUi.actions.starting.en
+                      : assessmentsUi.strict.startConfirm.en
                   }
                 />
               </Button>

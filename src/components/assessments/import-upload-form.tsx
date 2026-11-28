@@ -288,7 +288,7 @@ export function ImportUploadForm({
     <form onSubmit={submit} className="space-y-5" noValidate>
       {error ? (
         <Alert variant="error">
-          <Bi en={errorCopy.en} ar={errorCopy.ar} />
+          <Bi en={errorCopy.en} ar={errorCopy.en} />
         </Alert>
       ) : null}
 
@@ -307,7 +307,7 @@ export function ImportUploadForm({
           >
             {grades.map((grade) => (
               <option key={grade.id} value={grade.id}>
-                {grade.name_en} · {grade.name_ar}
+                {grade.name_en}
               </option>
             ))}
           </Select>
@@ -327,7 +327,7 @@ export function ImportUploadForm({
             {(Object.keys(assessmentTypeCopy) as AssessmentType[]).map(
               (value) => (
                 <option key={value} value={value}>
-                  {assessmentTypeCopy[value].en} · {assessmentTypeCopy[value].ar}
+                  {assessmentTypeCopy[value].en} · {assessmentTypeCopy[value].en}
                 </option>
               ),
             )}
@@ -371,7 +371,7 @@ export function ImportUploadForm({
             <p className="mt-1 text-xs text-muted-foreground">
               <Bi
                 en={importsUi.upload.selectedSize.en}
-                ar={importsUi.upload.selectedSize.ar}
+                ar={importsUi.upload.selectedSize.en}
               />{" "}
               {formatImportBytes(questionFile.size)}
             </p>
@@ -395,7 +395,7 @@ export function ImportUploadForm({
             <p className="mt-1 text-xs text-muted-foreground">
               <Bi
                 en={importsUi.upload.selectedSize.en}
-                ar={importsUi.upload.selectedSize.ar}
+                ar={importsUi.upload.selectedSize.en}
               />{" "}
               {formatImportBytes(answerFile.size)}
             </p>
@@ -406,7 +406,7 @@ export function ImportUploadForm({
       {pending ? (
         <div className="space-y-3 rounded-xl border border-border bg-card p-4">
           <p className="text-sm font-semibold">
-            <Bi en={phaseCopy.en} ar={phaseCopy.ar} />
+            <Bi en={phaseCopy.en} ar={phaseCopy.en} />
           </p>
           {phase === "uploading" || phase === "processing" ? (
             <div className="space-y-2">
@@ -433,20 +433,20 @@ export function ImportUploadForm({
             <ShieldCheck aria-hidden="true" className="size-4" />
             <Bi
               en={importsUi.upload.localOnly.en}
-              ar={importsUi.upload.localOnly.ar}
+              ar={importsUi.upload.localOnly.en}
             />
           </p>
           <p>
             <Bi
               en={importsUi.upload.limits.en}
-              ar={importsUi.upload.limits.ar}
+              ar={importsUi.upload.limits.en}
             />
           </p>
           <p className="text-sm">
             <span className="font-semibold">
               <Bi
                 en={importsUi.upload.maxFile.en}
-                ar={importsUi.upload.maxFile.ar}
+                ar={importsUi.upload.maxFile.en}
               />
               :{" "}
             </span>
@@ -454,7 +454,7 @@ export function ImportUploadForm({
             <span className="font-semibold">
               <Bi
                 en={importsUi.upload.totalMax.en}
-                ar={importsUi.upload.totalMax.ar}
+                ar={importsUi.upload.totalMax.en}
               />
               :{" "}
             </span>
@@ -463,13 +463,13 @@ export function ImportUploadForm({
           <p>
             <Bi
               en={importsUi.upload.privacy.en}
-              ar={importsUi.upload.privacy.ar}
+              ar={importsUi.upload.privacy.en}
             />
           </p>
           <p>
             <Bi
               en={importsUi.upload.reviewRequired.en}
-              ar={importsUi.upload.reviewRequired.ar}
+              ar={importsUi.upload.reviewRequired.en}
             />
           </p>
         </div>
@@ -478,7 +478,7 @@ export function ImportUploadForm({
       <div className="flex flex-wrap items-center gap-3">
         <Button type="submit" disabled={pending || grades.length === 0}>
           <FileUp aria-hidden="true" />
-          <Bi en={phaseCopy.en} ar={phaseCopy.ar} />
+          <Bi en={phaseCopy.en} ar={phaseCopy.en} />
         </Button>
         <Link
           href="/teacher/assessments"
@@ -486,7 +486,7 @@ export function ImportUploadForm({
         >
           <Bi
             en={assessmentsUi.actions.backToList.en}
-            ar={assessmentsUi.actions.backToList.ar}
+            ar={assessmentsUi.actions.backToList.en}
           />
         </Link>
       </div>
@@ -495,7 +495,7 @@ export function ImportUploadForm({
         <Alert variant="error">
           <Bi
             en={assessmentsUi.messages.noGrades.en}
-            ar={assessmentsUi.messages.noGrades.ar}
+            ar={assessmentsUi.messages.noGrades.en}
           />
         </Alert>
       ) : null}
@@ -513,7 +513,7 @@ function ProgressRow({
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between text-xs text-muted-foreground">
-        <Bi en={label.en} ar={label.ar} />
+        <Bi en={label.en} ar={label.en} />
         <span>{percent}%</span>
       </div>
       <div

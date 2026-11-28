@@ -29,7 +29,7 @@ import { StudentForm } from "@/app/(app)/teacher/students/student-form";
 import { StudentAccessActions } from "@/app/(app)/teacher/students/student-access-actions";
 
 export const metadata: Metadata = {
-  title: "Student profile · ملف الطالب",
+  title: "Student profile",
 };
 
 export const dynamic = "force-dynamic";
@@ -56,7 +56,7 @@ export default async function StudentDetailPage({
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow={<Bi en={studentsUi.detail.profileTitle.en} ar={studentsUi.detail.profileTitle.ar} />}
+        eyebrow={<Bi en={studentsUi.detail.profileTitle.en} ar={studentsUi.detail.profileTitle.en} />}
         title={
           <Bi
             en={student.full_name_en}
@@ -69,7 +69,7 @@ export default async function StudentDetailPage({
             {student.student_number ? (
               <>
                 <span>
-                  <Bi en={studentsUi.form.studentNumber.en} ar={studentsUi.form.studentNumber.ar} />
+                  <Bi en={studentsUi.form.studentNumber.en} ar={studentsUi.form.studentNumber.en} />
                   {": "}
                   <span dir="ltr" className="font-semibold text-foreground">
                     {student.student_number}
@@ -106,8 +106,8 @@ export default async function StudentDetailPage({
                 }
                 ar={
                   student.is_active
-                    ? studentsUi.filters.activeOnly.ar
-                    : studentsUi.filters.inactiveOnly.ar
+                    ? studentsUi.filters.activeOnly.en
+                    : studentsUi.filters.inactiveOnly.en
                 }
                 hideSeparator
               />
@@ -119,7 +119,7 @@ export default async function StudentDetailPage({
               <ArrowLeft aria-hidden="true" className="size-4" />
               <Bi
                 en={studentsUi.actions.backToList.en}
-                ar={studentsUi.actions.backToList.ar}
+                ar={studentsUi.actions.backToList.en}
               />
             </Link>
           </>
@@ -130,12 +130,12 @@ export default async function StudentDetailPage({
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>
-              <Bi en={studentsUi.form.editTitle.en} ar={studentsUi.form.editTitle.ar} />
+              <Bi en={studentsUi.form.editTitle.en} ar={studentsUi.form.editTitle.en} />
             </CardTitle>
             <CardDescription>
               <Bi
                 en={studentsUi.form.editSubtitle.en}
-                ar={studentsUi.form.editSubtitle.ar}
+                ar={studentsUi.form.editSubtitle.en}
               />
             </CardDescription>
           </CardHeader>
@@ -154,7 +154,7 @@ export default async function StudentDetailPage({
               <CardTitle>
                 <Bi
                   en={studentsUi.detail.accessTitle.en}
-                  ar={studentsUi.detail.accessTitle.ar}
+                  ar={studentsUi.detail.accessTitle.en}
                 />
               </CardTitle>
               <CardDescription>
@@ -170,7 +170,7 @@ export default async function StudentDetailPage({
                   <dt>
                     <Bi
                       en={studentsUi.detail.lastInvite.en}
-                      ar={studentsUi.detail.lastInvite.ar}
+                      ar={studentsUi.detail.lastInvite.en}
                     />
                   </dt>
                   <dd className="font-medium text-foreground">
@@ -181,7 +181,7 @@ export default async function StudentDetailPage({
                   <dt>
                     <Bi
                       en={studentsUi.detail.lastReset.en}
-                      ar={studentsUi.detail.lastReset.ar}
+                      ar={studentsUi.detail.lastReset.en}
                     />
                   </dt>
                   <dd className="font-medium text-foreground">
@@ -192,7 +192,7 @@ export default async function StudentDetailPage({
                   <dt>
                     <Bi
                       en={studentsUi.detail.createdOn.en}
-                      ar={studentsUi.detail.createdOn.ar}
+                      ar={studentsUi.detail.createdOn.en}
                     />
                   </dt>
                   <dd className="font-medium text-foreground">
@@ -214,13 +214,13 @@ export default async function StudentDetailPage({
                 <History aria-hidden="true" className="size-4 text-primary" />
                 <Bi
                   en={studentsUi.detail.activityTitle.en}
-                  ar={studentsUi.detail.activityTitle.ar}
+                  ar={studentsUi.detail.activityTitle.en}
                 />
               </CardTitle>
               <CardDescription>
                 <Bi
                   en={studentsUi.detail.activityHint.en}
-                  ar={studentsUi.detail.activityHint.ar}
+                  ar={studentsUi.detail.activityHint.en}
                 />
               </CardDescription>
             </CardHeader>
@@ -229,7 +229,7 @@ export default async function StudentDetailPage({
                 <p className="text-sm text-muted-foreground">
                   <Bi
                     en={studentsUi.detail.noActivity.en}
-                    ar={studentsUi.detail.noActivity.ar}
+                    ar={studentsUi.detail.noActivity.en}
                   />
                 </p>
               ) : (
@@ -241,7 +241,7 @@ export default async function StudentDetailPage({
                         <p className="text-sm font-medium text-foreground">
                           <Bi
                             en={studentEventCopy[event.action].en}
-                            ar={studentEventCopy[event.action].ar}
+                            ar={studentEventCopy[event.action].en}
                           />
                         </p>
                         <p className="text-[11px] text-muted-foreground">

@@ -29,7 +29,7 @@ export function AccessLinkPanel({ url }: { url: string }) {
         <Link2 aria-hidden="true" className="size-4 text-success" />
         <Bi
           en={studentsUi.access.ready.en}
-          ar={studentsUi.access.ready.ar}
+          ar={studentsUi.access.ready.en}
           hideSeparator
         />
       </p>
@@ -38,7 +38,7 @@ export function AccessLinkPanel({ url }: { url: string }) {
         <Input
           readOnly
           value={url}
-          aria-label="Access link / رابط الوصول"
+          aria-label="Access link"
           onFocus={(event) => event.currentTarget.select()}
           className="h-9 font-mono text-xs"
         />
@@ -56,14 +56,14 @@ export function AccessLinkPanel({ url }: { url: string }) {
           )}
           <Bi
             en={copied ? studentsUi.actions.copied.en : studentsUi.actions.copy.en}
-            ar={copied ? studentsUi.actions.copied.ar : studentsUi.actions.copy.ar}
+            ar={copied ? studentsUi.actions.copied.en : studentsUi.actions.copy.en}
             hideSeparator
           />
         </Button>
       </div>
 
       <p className="text-xs leading-relaxed text-muted-foreground">
-        <Bi en={studentsUi.access.once.en} ar={studentsUi.access.once.ar} />
+        <Bi en={studentsUi.access.once.en} ar={studentsUi.access.once.en} />
       </p>
     </div>
   );

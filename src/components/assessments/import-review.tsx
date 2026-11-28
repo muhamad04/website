@@ -286,7 +286,7 @@ function ErrorAlert({ error }: { error: string }) {
 
   return (
     <Alert variant="error">
-      <Bi en={copy.en} ar={copy.ar} />
+      <Bi en={copy.en} ar={copy.en} />
     </Alert>
   );
 }
@@ -680,7 +680,7 @@ export function ImportReview({
   };
 
   const cancelImport = async () => {
-    if (!window.confirm(`${importsUi.review.confirmCancel.en}\n${importsUi.review.confirmCancel.ar}`)) {
+    if (!window.confirm(`${importsUi.review.confirmCancel.en}\n${importsUi.review.confirmCancel.en}`)) {
       return;
     }
 
@@ -712,14 +712,14 @@ export function ImportReview({
         <Alert variant="error">
           <Bi
             en={importsUi.review.fieldErrors.en}
-            ar={importsUi.review.fieldErrors.ar}
+            ar={importsUi.review.fieldErrors.en}
           />
         </Alert>
       ) : null}
 
       {notice ? (
         <Alert variant="success">
-          <Bi en={notice.en} ar={notice.ar} />
+          <Bi en={notice.en} ar={notice.en} />
         </Alert>
       ) : null}
 
@@ -728,7 +728,7 @@ export function ImportReview({
           label={
             <Bi
               en={importsUi.review.sectionsCount.en}
-              ar={importsUi.review.sectionsCount.ar}
+              ar={importsUi.review.sectionsCount.en}
             />
           }
           value={sections.length}
@@ -737,7 +737,7 @@ export function ImportReview({
           label={
             <Bi
               en={importsUi.review.questionsCount.en}
-              ar={importsUi.review.questionsCount.ar}
+              ar={importsUi.review.questionsCount.en}
             />
           }
           value={questions.length}
@@ -746,7 +746,7 @@ export function ImportReview({
           label={
             <Bi
               en={importsUi.review.marksCount.en}
-              ar={importsUi.review.marksCount.ar}
+              ar={importsUi.review.marksCount.en}
             />
           }
           value={totalMarks}
@@ -755,7 +755,7 @@ export function ImportReview({
           label={
             <Bi
               en={importsUi.review.warningsCount.en}
-              ar={importsUi.review.warningsCount.ar}
+              ar={importsUi.review.warningsCount.en}
             />
           }
           value={initialDraft.warnings.length}
@@ -764,7 +764,7 @@ export function ImportReview({
           label={
             <Bi
               en={importsUi.review.matchedAnswers.en}
-              ar={importsUi.review.matchedAnswers.ar}
+              ar={importsUi.review.matchedAnswers.en}
             />
           }
           value={initialDraft.stats.matchedAnswers}
@@ -773,7 +773,7 @@ export function ImportReview({
           label={
             <Bi
               en={importsUi.review.reviewCount.en}
-              ar={importsUi.review.reviewCount.ar}
+              ar={importsUi.review.reviewCount.en}
             />
           }
           value={reviewCount}
@@ -782,7 +782,7 @@ export function ImportReview({
           label={
             <Bi
               en={importsUi.review.parserConfidence.en}
-              ar={importsUi.review.parserConfidence.ar}
+              ar={importsUi.review.parserConfidence.en}
             />
           }
           value={parserConfidence}
@@ -795,7 +795,7 @@ export function ImportReview({
             <AlertTriangle aria-hidden="true" className="size-4 text-warning" />
             <Bi
               en={importsUi.review.warnings.en}
-              ar={importsUi.review.warnings.ar}
+              ar={importsUi.review.warnings.en}
             />
           </h2>
           <ul className="grid gap-1.5 text-sm text-muted-foreground">
@@ -805,7 +805,7 @@ export function ImportReview({
                 <span>
                   <Bi
                     en={importWarningCopy[warning.code].en}
-                    ar={importWarningCopy[warning.code].ar}
+                    ar={importWarningCopy[warning.code].en}
                   />
                   {warning.questionNumber ? (
                     <span className="ms-1 font-semibold">
@@ -821,7 +821,7 @@ export function ImportReview({
         <Alert variant="success">
           <Bi
             en={importsUi.review.noWarnings.en}
-            ar={importsUi.review.noWarnings.ar}
+            ar={importsUi.review.noWarnings.en}
           />
         </Alert>
       )}
@@ -834,13 +834,13 @@ export function ImportReview({
                 <Sparkles aria-hidden="true" className="size-4 text-primary" />
                 <Bi
                   en={importsUi.review.aiTitle.en}
-                  ar={importsUi.review.aiTitle.ar}
+                  ar={importsUi.review.aiTitle.en}
                 />
               </h2>
               <p className="max-w-2xl text-sm text-muted-foreground">
                 <Bi
                   en={importsUi.review.aiHint.en}
-                  ar={importsUi.review.aiHint.ar}
+                  ar={importsUi.review.aiHint.en}
                 />
               </p>
             </div>
@@ -859,8 +859,8 @@ export function ImportReview({
                 }
                 ar={
                   aiPending
-                    ? importsUi.review.aiRunning.ar
-                    : importsUi.review.aiRun.ar
+                    ? importsUi.review.aiRunning.en
+                    : importsUi.review.aiRun.en
                 }
               />
             </Button>
@@ -871,7 +871,7 @@ export function ImportReview({
             <p className="text-xs text-muted-foreground">
               <Bi
                 en={importsUi.review.aiModel.en}
-                ar={importsUi.review.aiModel.ar}
+                ar={importsUi.review.aiModel.en}
               />
               : {ai.model} · {ai.requestCount} requests
             </p>
@@ -882,7 +882,7 @@ export function ImportReview({
                   <li key={`${code}-${index}`}>
                     <Bi
                       en={importWarningCopy[code].en}
-                      ar={importWarningCopy[code].ar}
+                      ar={importWarningCopy[code].en}
                     />
                   </li>
                 ))}
@@ -893,7 +893,7 @@ export function ImportReview({
               <p className="text-sm text-muted-foreground">
                 <Bi
                   en={importsUi.review.aiNoSuggestions.en}
-                  ar={importsUi.review.aiNoSuggestions.ar}
+                  ar={importsUi.review.aiNoSuggestions.en}
                 />
               </p>
             ) : (
@@ -911,17 +911,17 @@ export function ImportReview({
                         {suggestion.status === "accepted" ? (
                           <Bi
                             en={importsUi.review.aiAccepted.en}
-                            ar={importsUi.review.aiAccepted.ar}
+                            ar={importsUi.review.aiAccepted.en}
                           />
                         ) : suggestion.status === "rejected" ? (
                           <Bi
                             en={importsUi.review.aiRejected.en}
-                            ar={importsUi.review.aiRejected.ar}
+                            ar={importsUi.review.aiRejected.en}
                           />
                         ) : (
                           <Bi
                             en={importsUi.review.aiAfter.en}
-                            ar={importsUi.review.aiAfter.ar}
+                            ar={importsUi.review.aiAfter.en}
                           />
                         )}
                       </Badge>
@@ -929,7 +929,7 @@ export function ImportReview({
                         <span className="text-xs text-warning">
                           <Bi
                             en={importsUi.review.aiUnsafe.en}
-                            ar={importsUi.review.aiUnsafe.ar}
+                            ar={importsUi.review.aiUnsafe.en}
                           />
                         </span>
                       ) : null}
@@ -945,7 +945,7 @@ export function ImportReview({
                         <p className="font-semibold">
                           <Bi
                             en={importsUi.review.aiBefore.en}
-                            ar={importsUi.review.aiBefore.ar}
+                            ar={importsUi.review.aiBefore.en}
                           />
                         </p>
                         {describeSnapshot(suggestion.before).map((line) => (
@@ -956,7 +956,7 @@ export function ImportReview({
                         <p className="font-semibold">
                           <Bi
                             en={importsUi.review.aiAfter.en}
-                            ar={importsUi.review.aiAfter.ar}
+                            ar={importsUi.review.aiAfter.en}
                           />
                         </p>
                         {describeSnapshot(suggestion.after).map((line) => (
@@ -979,7 +979,7 @@ export function ImportReview({
                         <Check aria-hidden="true" />
                         <Bi
                           en={importsUi.review.aiAccept.en}
-                          ar={importsUi.review.aiAccept.ar}
+                          ar={importsUi.review.aiAccept.en}
                         />
                       </Button>
                       <Button
@@ -992,7 +992,7 @@ export function ImportReview({
                         <X aria-hidden="true" />
                         <Bi
                           en={importsUi.review.aiReject.en}
-                          ar={importsUi.review.aiReject.ar}
+                          ar={importsUi.review.aiReject.en}
                         />
                       </Button>
                     </div>
@@ -1009,7 +1009,7 @@ export function ImportReview({
         <span className="text-sm font-semibold">
           <Bi
             en={importsUi.review.filters.en}
-            ar={importsUi.review.filters.ar}
+            ar={importsUi.review.filters.en}
           />
         </span>
         {(
@@ -1027,7 +1027,7 @@ export function ImportReview({
             variant={filter === value ? "default" : "outline"}
             onClick={() => setFilter(value)}
           >
-            <Bi en={copy.en} ar={copy.ar} />
+            <Bi en={copy.en} ar={copy.en} />
           </Button>
         ))}
         <span className="ms-auto text-xs text-muted-foreground">
@@ -1042,13 +1042,13 @@ export function ImportReview({
           <h2 className="text-base font-semibold">
             <Bi
               en={importsUi.review.settings.en}
-              ar={importsUi.review.settings.ar}
+              ar={importsUi.review.settings.en}
             />
           </h2>
           <p className="text-sm text-muted-foreground">
             <Bi
               en={importsUi.review.settingsHint.en}
-              ar={importsUi.review.settingsHint.ar}
+              ar={importsUi.review.settingsHint.en}
             />
           </p>
         </div>
@@ -1076,7 +1076,7 @@ export function ImportReview({
             >
               {grades.map((grade) => (
                 <option key={grade.id} value={grade.id}>
-                  {grade.name_en} · {grade.name_ar}
+                  {grade.name_en}
                 </option>
               ))}
             </Select>
@@ -1096,7 +1096,7 @@ export function ImportReview({
               {(Object.keys(assessmentTypeCopy) as AssessmentType[]).map(
                 (value) => (
                   <option key={value} value={value}>
-                    {assessmentTypeCopy[value].en} · {assessmentTypeCopy[value].ar}
+                    {assessmentTypeCopy[value].en} · {assessmentTypeCopy[value].en}
                   </option>
                 ),
               )}
@@ -1145,7 +1145,7 @@ export function ImportReview({
                 (value) => (
                   <option key={value} value={value}>
                     {resultsVisibilityCopy[value].en} ·{" "}
-                    {resultsVisibilityCopy[value].ar}
+                    {resultsVisibilityCopy[value].en}
                   </option>
                 ),
               )}
@@ -1168,10 +1168,10 @@ export function ImportReview({
               }}
             >
               <option value="false">
-                {importsUi.review.no.en} · {importsUi.review.no.ar}
+                {importsUi.review.no.en} · {importsUi.review.no.en}
               </option>
               <option value="true">
-                {importsUi.review.yes.en} · {importsUi.review.yes.ar}
+                {importsUi.review.yes.en} · {importsUi.review.yes.en}
               </option>
             </Select>
           </Field>
@@ -1215,7 +1215,7 @@ export function ImportReview({
         <p className="text-xs text-muted-foreground">
           <Bi
             en={importsUi.review.availabilityHint.en}
-            ar={importsUi.review.availabilityHint.ar}
+            ar={importsUi.review.availabilityHint.en}
           />
         </p>
 
@@ -1223,14 +1223,14 @@ export function ImportReview({
           <span className="font-semibold">
             <Bi
               en={importsUi.review.gradingPreview.en}
-              ar={importsUi.review.gradingPreview.ar}
+              ar={importsUi.review.gradingPreview.en}
             />
             {": "}
           </span>
           <Badge variant="outline">
             <Bi
               en={gradingModeCopy[gradingPreview].en}
-              ar={gradingModeCopy[gradingPreview].ar}
+              ar={gradingModeCopy[gradingPreview].en}
             />
           </Badge>
         </p>
@@ -1241,13 +1241,13 @@ export function ImportReview({
           <h2 className="text-base font-semibold">
             <Bi
               en={importsUi.review.answerKey.en}
-              ar={importsUi.review.answerKey.ar}
+              ar={importsUi.review.answerKey.en}
             />
           </h2>
           <p className="text-sm text-muted-foreground">
             <Bi
               en={importsUi.review.answerKeyHint.en}
-              ar={importsUi.review.answerKeyHint.ar}
+              ar={importsUi.review.answerKeyHint.en}
             />
           </p>
         </div>
@@ -1256,7 +1256,7 @@ export function ImportReview({
           <Alert variant="info">
             <Bi
               en={importsUi.review.noAnswerKey.en}
-              ar={importsUi.review.noAnswerKey.ar}
+              ar={importsUi.review.noAnswerKey.en}
             />
           </Alert>
         ) : (
@@ -1283,14 +1283,14 @@ export function ImportReview({
                 >
                   <Bi
                     en={importsUi.answerStatus[entry.status].en}
-                    ar={importsUi.answerStatus[entry.status].ar}
+                    ar={importsUi.answerStatus[entry.status].en}
                   />
                 </Badge>
                 {entry.questionNumber ? (
                   <span className="text-xs text-muted-foreground">
                     <Bi
                       en={`${importsUi.review.matchedTo.en} #${entry.questionNumber}`}
-                      ar={`${importsUi.review.matchedTo.ar} ${entry.questionNumber}`}
+                      ar={`${importsUi.review.matchedTo.en} ${entry.questionNumber}`}
                     />
                   </span>
                 ) : null}
@@ -1300,7 +1300,7 @@ export function ImportReview({
                       <span key={code} className="me-2">
                         <Bi
                           en={importWarningCopy[code].en}
-                          ar={importWarningCopy[code].ar}
+                          ar={importWarningCopy[code].en}
                         />
                       </span>
                     ))}
@@ -1316,7 +1316,7 @@ export function ImportReview({
             <summary className="cursor-pointer text-sm font-semibold">
               <Bi
                 en={importsUi.review.answerSource.en}
-                ar={importsUi.review.answerSource.ar}
+                ar={importsUi.review.answerSource.en}
               />
             </summary>
             <pre className="mt-2 max-h-64 overflow-auto whitespace-pre-wrap rounded bg-secondary/40 p-3 text-xs">
@@ -1331,7 +1331,7 @@ export function ImportReview({
           <h2 className="text-base font-semibold">
             <Bi
               en={importsUi.review.sections.en}
-              ar={importsUi.review.sections.ar}
+              ar={importsUi.review.sections.en}
             />
           </h2>
           <Button
@@ -1344,7 +1344,7 @@ export function ImportReview({
             <Plus aria-hidden="true" />
             <Bi
               en={importsUi.review.addSection.en}
-              ar={importsUi.review.addSection.ar}
+              ar={importsUi.review.addSection.en}
             />
           </Button>
         </div>
@@ -1353,7 +1353,7 @@ export function ImportReview({
           <Alert variant="info">
             <Bi
               en={importsUi.review.noSections.en}
-              ar={importsUi.review.noSections.ar}
+              ar={importsUi.review.noSections.en}
             />
           </Alert>
         ) : null}
@@ -1576,7 +1576,7 @@ export function ImportReview({
                     onClick={() => {
                       if (
                         window.confirm(
-                          `${importsUi.review.confirmDeleteSection.en}\n${importsUi.review.confirmDeleteSection.ar}`,
+                          `${importsUi.review.confirmDeleteSection.en}\n${importsUi.review.confirmDeleteSection.en}`,
                         )
                       ) {
                         setSections((previous) =>
@@ -1594,7 +1594,7 @@ export function ImportReview({
                 <h3 className="text-sm font-semibold">
                   <Bi
                     en={`${importsUi.review.questions.en} (${section.questions.length})`}
-                    ar={`${importsUi.review.questions.ar} (${section.questions.length})`}
+                    ar={`${importsUi.review.questions.en} (${section.questions.length})`}
                   />
                 </h3>
                 <Button
@@ -1618,7 +1618,7 @@ export function ImportReview({
                   <Plus aria-hidden="true" />
                   <Bi
                     en={importsUi.review.addQuestion.en}
-                    ar={importsUi.review.addQuestion.ar}
+                    ar={importsUi.review.addQuestion.en}
                   />
                 </Button>
               </div>
@@ -1627,7 +1627,7 @@ export function ImportReview({
                 <p className="text-sm text-muted-foreground">
                   <Bi
                     en={importsUi.review.noQuestions.en}
-                    ar={importsUi.review.noQuestions.ar}
+                    ar={importsUi.review.noQuestions.en}
                   />
                 </p>
               ) : null}
@@ -1657,14 +1657,14 @@ export function ImportReview({
                         <Badge variant="outline">
                           <Bi
                             en={questionTypeCopy[question.type].en}
-                            ar={questionTypeCopy[question.type].ar}
+                            ar={questionTypeCopy[question.type].en}
                           />
                         </Badge>
                         {question.confidence !== "high" ? (
                           <Badge variant="muted">
                             <Bi
                               en={importConfidenceCopy[question.confidence].en}
-                              ar={importConfidenceCopy[question.confidence].ar}
+                              ar={importConfidenceCopy[question.confidence].en}
                             />
                           </Badge>
                         ) : null}
@@ -1686,7 +1686,7 @@ export function ImportReview({
                               <li key={`${code}-${index}`}>
                                 <Bi
                                   en={importWarningCopy[code].en}
-                                  ar={importWarningCopy[code].ar}
+                                  ar={importWarningCopy[code].en}
                                 />
                               </li>
                             ))}
@@ -1698,7 +1698,7 @@ export function ImportReview({
                             <span className="font-semibold">
                               <Bi
                                 en={importsUi.review.evidence.en}
-                                ar={importsUi.review.evidence.ar}
+                                ar={importsUi.review.evidence.en}
                               />
                               :{" "}
                             </span>
@@ -1720,7 +1720,7 @@ export function ImportReview({
                           />
                           <Bi
                             en={importsUi.review.reviewed.en}
-                            ar={importsUi.review.reviewed.ar}
+                            ar={importsUi.review.reviewed.en}
                           />
                         </label>
 
@@ -1771,7 +1771,7 @@ export function ImportReview({
                               {QUESTION_TYPES.map((type) => (
                                 <option key={type} value={type}>
                                   {questionTypeCopy[type].en} ·{" "}
-                                  {questionTypeCopy[type].ar}
+                                  {questionTypeCopy[type].en}
                                 </option>
                               ))}
                             </Select>
@@ -1918,11 +1918,11 @@ export function ImportReview({
                             >
                               <option value="automatic">
                                 {importsUi.review.automatic.en} ·{" "}
-                                {importsUi.review.automatic.ar}
+                                {importsUi.review.automatic.en}
                               </option>
                               <option value="manual">
                                 {importsUi.review.manual.en} ·{" "}
-                                {importsUi.review.manual.ar}
+                                {importsUi.review.manual.en}
                               </option>
                             </Select>
                           </Field>
@@ -1934,7 +1934,7 @@ export function ImportReview({
                               <h4 className="text-sm font-semibold">
                                 <Bi
                                   en={importsUi.review.options.en}
-                                  ar={importsUi.review.options.ar}
+                                  ar={importsUi.review.options.en}
                                 />
                               </h4>
                               <Button
@@ -1958,7 +1958,7 @@ export function ImportReview({
                                 <Plus aria-hidden="true" />
                                 <Bi
                                   en={importsUi.review.addOption.en}
-                                  ar={importsUi.review.addOption.ar}
+                                  ar={importsUi.review.addOption.en}
                                 />
                               </Button>
                             </div>
@@ -2015,7 +2015,7 @@ export function ImportReview({
                                   />
                                   <Bi
                                     en={importsUi.review.correct.en}
-                                    ar={importsUi.review.correct.ar}
+                                    ar={importsUi.review.correct.en}
                                   />
                                 </label>
                                 <IconButton
@@ -2063,11 +2063,11 @@ export function ImportReview({
                               <option value="">—</option>
                               <option value="true">
                                 {importsUi.review.trueLabel.en} ·{" "}
-                                {importsUi.review.trueLabel.ar}
+                                {importsUi.review.trueLabel.en}
                               </option>
                               <option value="false">
                                 {importsUi.review.falseLabel.en} ·{" "}
-                                {importsUi.review.falseLabel.ar}
+                                {importsUi.review.falseLabel.en}
                               </option>
                             </Select>
                           </Field>
@@ -2079,7 +2079,7 @@ export function ImportReview({
                               <h4 className="text-sm font-semibold">
                                 <Bi
                                   en={importsUi.review.pairs.en}
-                                  ar={importsUi.review.pairs.ar}
+                                  ar={importsUi.review.pairs.en}
                                 />
                               </h4>
                               <Button
@@ -2103,7 +2103,7 @@ export function ImportReview({
                                 <Plus aria-hidden="true" />
                                 <Bi
                                   en={importsUi.review.addPair.en}
-                                  ar={importsUi.review.addPair.ar}
+                                  ar={importsUi.review.addPair.en}
                                 />
                               </Button>
                             </div>
@@ -2114,7 +2114,7 @@ export function ImportReview({
                               >
                                 <Input
                                   aria-label={importsUi.review.left.en}
-                                  placeholder={`${importsUi.review.left.en} · ${importsUi.review.left.ar}`}
+                                  placeholder={importsUi.review.left.en}
                                   value={pair.left}
                                   maxLength={500}
                                   disabled={busy}
@@ -2138,7 +2138,7 @@ export function ImportReview({
                                 />
                                 <Input
                                   aria-label={importsUi.review.right.en}
-                                  placeholder={`${importsUi.review.right.en} · ${importsUi.review.right.ar}`}
+                                  placeholder={importsUi.review.right.en}
                                   value={pair.right}
                                   maxLength={500}
                                   disabled={busy}
@@ -2227,7 +2227,7 @@ export function ImportReview({
                             <summary className="cursor-pointer text-xs font-semibold text-muted-foreground">
                               <Bi
                                 en={importsUi.review.rawBlock.en}
-                                ar={importsUi.review.rawBlock.ar}
+                                ar={importsUi.review.rawBlock.en}
                               />
                             </summary>
                             <pre className="mt-2 max-h-48 overflow-auto whitespace-pre-wrap text-xs text-muted-foreground">
@@ -2265,7 +2265,7 @@ export function ImportReview({
                             onClick={() => {
                               if (
                                 window.confirm(
-                                  `${importsUi.review.confirmDeleteQuestion.en}\n${importsUi.review.confirmDeleteQuestion.ar}`,
+                                  `${importsUi.review.confirmDeleteQuestion.en}\n${importsUi.review.confirmDeleteQuestion.en}`,
                                 )
                               ) {
                                 setSections((previous) =>
@@ -2296,7 +2296,7 @@ export function ImportReview({
                 <p className="text-sm text-muted-foreground">
                   <Bi
                     en={importsUi.review.noMatchingQuestions.en}
-                    ar={importsUi.review.noMatchingQuestions.ar}
+                    ar={importsUi.review.noMatchingQuestions.en}
                   />
                 </p>
               ) : null}
@@ -2311,13 +2311,13 @@ export function ImportReview({
             <FileText aria-hidden="true" className="size-4" />
             <Bi
               en={importsUi.review.showSource.en}
-              ar={importsUi.review.showSource.ar}
+              ar={importsUi.review.showSource.en}
             />
           </summary>
           <p className="mt-2 text-xs text-muted-foreground">
             <Bi
               en={importsUi.review.sourcePrivate.en}
-              ar={importsUi.review.sourcePrivate.ar}
+              ar={importsUi.review.sourcePrivate.en}
             />
           </p>
           <pre className="mt-2 max-h-96 overflow-auto whitespace-pre-wrap rounded bg-secondary/40 p-3 text-xs">
@@ -2332,7 +2332,7 @@ export function ImportReview({
             <CheckCircle2 aria-hidden="true" className="size-4" />
             <Bi
               en={importsUi.review.publishNote.en}
-              ar={importsUi.review.publishNote.ar}
+              ar={importsUi.review.publishNote.en}
             />
           </p>
         </div>
@@ -2349,8 +2349,8 @@ export function ImportReview({
             }
             ar={
               pending === "save"
-                ? importsUi.review.saving.ar
-                : importsUi.review.save.ar
+                ? importsUi.review.saving.en
+                : importsUi.review.save.en
             }
           />
         </Button>
@@ -2368,8 +2368,8 @@ export function ImportReview({
             }
             ar={
               pending === "progress"
-                ? importsUi.review.savingProgress.ar
-                : importsUi.review.saveProgress.ar
+                ? importsUi.review.savingProgress.en
+                : importsUi.review.saveProgress.en
             }
           />
         </Button>
@@ -2388,8 +2388,8 @@ export function ImportReview({
             }
             ar={
               pending === "cancel"
-                ? importsUi.review.cancelling.ar
-                : importsUi.review.cancel.ar
+                ? importsUi.review.cancelling.en
+                : importsUi.review.cancel.en
             }
           />
         </Button>
@@ -2399,7 +2399,7 @@ export function ImportReview({
         >
           <Bi
             en={importsUi.common.backToAssessments.en}
-            ar={importsUi.common.backToAssessments.ar}
+            ar={importsUi.common.backToAssessments.en}
           />
         </Link>
       </div>
@@ -2436,8 +2436,8 @@ function IconButton({
       size="sm"
       disabled={disabled}
       onClick={onClick}
-      aria-label={`${label.en} · ${label.ar}`}
-      title={`${label.en} · ${label.ar}`}
+      aria-label={label.en}
+      title={label.en}
     >
       {children}
     </Button>

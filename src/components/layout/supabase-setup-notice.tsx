@@ -3,7 +3,15 @@ import { Bi } from "@/components/bilingual";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert } from "@/components/ui/alert";
 
-export function SupabaseSetupNotice() {
+export function SupabaseSetupNotice({
+  bilingual = false,
+}: {
+  /**
+   * Setup pages opt in to bilingual copy. Inside the normal application shell
+   * the notice stays English-only like the rest of the site.
+   */
+  bilingual?: boolean;
+}) {
   return (
     <Card className="mx-auto max-w-2xl">
       <CardHeader>
@@ -12,6 +20,7 @@ export function SupabaseSetupNotice() {
         </span>
         <CardTitle className="mt-2 text-xl">
           <Bi
+            bilingual={bilingual}
             en="Connect Supabase to finish setup"
             ar="اربط Supabase لإكمال الإعداد"
             layout="stacked"
@@ -19,6 +28,7 @@ export function SupabaseSetupNotice() {
         </CardTitle>
         <p className="text-sm leading-relaxed text-muted-foreground">
           <Bi
+            bilingual={bilingual}
             en="The app is running, but the database credentials are missing. Everything else will work once Supabase is connected."
             ar="التطبيق يعمل، لكن بيانات الاتصال بقاعدة البيانات غير موجودة. سيعمل كل شيء بعد ربط Supabase."
           />
@@ -27,7 +37,11 @@ export function SupabaseSetupNotice() {
       <CardContent className="space-y-5">
         <Alert variant="info">
           <p className="font-semibold">
-            <Bi en="1. Copy the environment template" ar="١. انسخ قالب المتغيرات" />
+            <Bi
+              bilingual={bilingual}
+              en="1. Copy the environment template"
+              ar="١. انسخ قالب المتغيرات"
+            />
           </p>
           <pre className="mt-2 overflow-x-auto rounded-lg bg-foreground p-3 text-xs text-background">
             <code>copy .env.example .env.local</code>
@@ -36,7 +50,11 @@ export function SupabaseSetupNotice() {
 
         <div className="space-y-2 text-sm">
           <p className="font-semibold">
-            <Bi en="2. Start local Supabase" ar="٢. شغّل Supabase محليًا" />
+            <Bi
+              bilingual={bilingual}
+              en="2. Start local Supabase"
+              ar="٢. شغّل Supabase محليًا"
+            />
           </p>
           <div className="flex items-start gap-2 rounded-lg border border-border bg-secondary/40 p-3">
             <Terminal aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
@@ -47,6 +65,7 @@ export function SupabaseSetupNotice() {
           </div>
           <p className="text-xs leading-relaxed text-muted-foreground">
             <Bi
+              bilingual={bilingual}
               en="Copy the API URL and publishable (anon) key printed by the CLI into .env.local, then restart the dev server."
               ar="انسخ رابط API والمفتاح القابل للنشر (publishable/anon) من سطر الأوامر إلى ملف .env.local ثم أعد تشغيل خادم التطوير."
             />
@@ -55,7 +74,11 @@ export function SupabaseSetupNotice() {
 
         <div className="space-y-2 text-sm">
           <p className="font-semibold">
-            <Bi en="3. Required variables" ar="٣. المتغيرات المطلوبة" />
+            <Bi
+              bilingual={bilingual}
+              en="3. Required variables"
+              ar="٣. المتغيرات المطلوبة"
+            />
           </p>
           <ul className="grid gap-1 rounded-lg border border-border bg-secondary/30 p-3 font-mono text-xs">
             <li>NEXT_PUBLIC_SUPABASE_URL</li>
@@ -68,6 +91,7 @@ export function SupabaseSetupNotice() {
 
         <p className="text-xs leading-relaxed text-muted-foreground">
           <Bi
+            bilingual={bilingual}
             en="Full instructions, demo accounts and deployment notes are in README.md."
             ar="التعليمات الكاملة وحسابات التجربة وخطوات النشر موجودة في ملف README.md."
           />

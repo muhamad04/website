@@ -29,7 +29,7 @@ export function StatCard({
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            <Bi en={label.en} ar={label.ar} layout="stacked" />
+            <Bi en={label.en} ar={label.en} layout="stacked" />
           </div>
           <div className="mt-2 text-2xl font-bold tabular-nums text-foreground">
             {value}

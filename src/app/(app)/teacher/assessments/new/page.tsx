@@ -12,7 +12,7 @@ import { assessmentsUi } from "@/lib/i18n/assessments";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "New assessment · اختبار جديد",
+  title: "New assessment",
 };
 
 export const dynamic = "force-dynamic";
@@ -42,18 +42,18 @@ export default async function NewAssessmentPage({
     <div className="space-y-5">
       <PageHeader
         eyebrow={
-          <Bi en={assessmentsUi.eyebrow.en} ar={assessmentsUi.eyebrow.ar} />
+          <Bi en={assessmentsUi.eyebrow.en} ar={assessmentsUi.eyebrow.en} />
         }
         title={
           <Bi
             en={assessmentsUi.form.createTitle.en}
-            ar={assessmentsUi.form.createTitle.ar}
+            ar={assessmentsUi.form.createTitle.en}
           />
         }
         description={
           <Bi
             en={assessmentsUi.form.createSubtitle.en}
-            ar={assessmentsUi.form.createSubtitle.ar}
+            ar={assessmentsUi.form.createSubtitle.en}
           />
         }
         actions={
@@ -64,7 +64,7 @@ export default async function NewAssessmentPage({
             <ArrowLeft aria-hidden="true" className="size-4" />
             <Bi
               en={assessmentsUi.actions.backToList.en}
-              ar={assessmentsUi.actions.backToList.ar}
+              ar={assessmentsUi.actions.backToList.en}
             />
           </Link>
         }
@@ -76,13 +76,13 @@ export default async function NewAssessmentPage({
           title={
             <Bi
               en={assessmentsUi.messages.noGrades.en}
-              ar={assessmentsUi.messages.noGrades.ar}
+              ar={assessmentsUi.messages.noGrades.en}
             />
           }
           description={
             <Bi
               en={assessmentsUi.messages.noGradesHint.en}
-              ar={assessmentsUi.messages.noGradesHint.ar}
+              ar={assessmentsUi.messages.noGradesHint.en}
             />
           }
           action={

@@ -216,18 +216,18 @@ describe("student assessment translation guard", () => {
       "File upload prompt SENTINEL",
       assessmentsUi.student.fileHint.en,
       assessmentsUi.actions.upload.en,
-      // Countdown and submission messages.
+      // Countdown and submission messages. Platform chrome is English-only
+      // here; only login/authentication and the main navigation are bilingual.
       "1:00:00",
       assessmentsUi.actions.submit.en,
       assessmentsUi.student.submitHint.en,
-      // Platform chrome stays bilingual; only authored content is English-only.
-      assessmentsUi.actions.submit.ar,
     ]);
 
-    // Authored Arabic content is intentionally not rendered any more.
+    // Authored Arabic content and Arabic platform chrome are not rendered.
     expect(markup).not.toContain("نص السؤال");
     expect(markup).not.toContain("الخيار الأول");
     expect(markup).not.toContain("سؤال رفع ملف");
+    expect(markup).not.toContain(assessmentsUi.actions.submit.ar);
   });
 
   it("keeps strict-mode warnings inside the protected runner", async () => {
@@ -235,7 +235,6 @@ describe("student assessment translation guard", () => {
 
     expectProtectedShell(markup, [
       assessmentsUi.strict.runnerBanner.en,
-      assessmentsUi.strict.runnerBanner.ar,
       assessmentsUi.strict.copyBlocked.en,
     ]);
   });

@@ -164,9 +164,12 @@ export function ResourceForm({
     const metadata = {
       type: values.type,
       title_en: values.title_en,
-      title_ar: values.title_ar,
+      // English-only authoring. On create the legacy Arabic column mirrors the
+      // English title; on edit the existing Arabic value is sent back untouched.
+      title_ar: mode === "create" ? values.title_en : values.title_ar,
       description_en: values.description_en,
-      description_ar: values.description_ar,
+      description_ar:
+        mode === "create" ? values.description_en : values.description_ar,
       grade_id: values.grade_id,
       category_id: values.category_id,
       sort_order: values.sort_order,
@@ -288,7 +291,7 @@ export function ResourceForm({
     <form onSubmit={submit} className="space-y-5" noValidate>
       {formError ? (
         <Alert variant="error">
-          <Bi en={resourceErrorCopy[formError].en} ar={resourceErrorCopy[formError].ar} />
+          <Bi en={resourceErrorCopy[formError].en} ar={resourceErrorCopy[formError].en} />
         </Alert>
       ) : null}
 
@@ -296,14 +299,14 @@ export function ResourceForm({
         <Alert variant="success">
           <Bi
             en={resourcesUi.detail.updatedSuccess.en}
-            ar={resourcesUi.detail.updatedSuccess.ar}
+            ar={resourcesUi.detail.updatedSuccess.en}
           />
         </Alert>
       ) : null}
 
       <fieldset className="space-y-2">
         <legend className="text-sm font-semibold text-foreground">
-          <Bi en={resourcesUi.form.type.en} ar={resourcesUi.form.type.ar} />
+          <Bi en={resourcesUi.form.type.en} ar={resourcesUi.form.type.en} />
         </legend>
 
         {mode === "create" ? (
@@ -333,7 +336,7 @@ export function ResourceForm({
                   <span className="space-y-0.5">
                     <span className="flex items-center gap-1.5 font-medium text-foreground">
                       <Icon aria-hidden="true" className="size-4 text-primary" />
-                      <Bi en={copy.en} ar={copy.ar} hideSeparator />
+                      <Bi en={copy.en} ar={copy.en} hideSeparator />
                     </span>
                   </span>
                 </label>
@@ -344,12 +347,12 @@ export function ResourceForm({
           <p className="rounded-lg border border-border bg-secondary/40 px-3 py-2 text-sm">
             <Bi
               en={resourceTypeCopy[values.type].en}
-              ar={resourceTypeCopy[values.type].ar}
+              ar={resourceTypeCopy[values.type].en}
             />
             <span className="mt-1 block text-xs text-muted-foreground">
               <Bi
                 en={resourcesUi.form.typeHint.en}
-                ar={resourcesUi.form.typeHint.ar}
+                ar={resourcesUi.form.typeHint.en}
               />
             </span>
           </p>
@@ -374,24 +377,6 @@ export function ResourceForm({
         </Field>
 
         <Field
-          id="resource-title-ar"
-          label={resourcesUi.form.titleAr}
-          error={errors.title_ar}
-          errorCopy={resourceErrorCopy}
-        >
-          <Input
-            id="resource-title-ar"
-            value={values.title_ar}
-            onChange={(event) => update("title_ar", event.target.value)}
-            dir="rtl"
-            lang="ar"
-            className="font-arabic"
-            aria-invalid={Boolean(errors.title_ar)}
-            required
-          />
-        </Field>
-
-        <Field
           id="resource-description-en"
           label={resourcesUi.form.descriptionEn}
           error={errors.description_en}
@@ -402,23 +387,6 @@ export function ResourceForm({
             value={values.description_en}
             onChange={(event) => update("description_en", event.target.value)}
             dir="ltr"
-            rows={4}
-          />
-        </Field>
-
-        <Field
-          id="resource-description-ar"
-          label={resourcesUi.form.descriptionAr}
-          error={errors.description_ar}
-          errorCopy={resourceErrorCopy}
-        >
-          <Textarea
-            id="resource-description-ar"
-            value={values.description_ar}
-            onChange={(event) => update("description_ar", event.target.value)}
-            dir="rtl"
-            lang="ar"
-            className="font-arabic"
             rows={4}
           />
         </Field>
@@ -439,7 +407,7 @@ export function ResourceForm({
           >
             {grades.map((grade) => (
               <option key={grade.id} value={grade.id}>
-                {grade.name_en} · {grade.name_ar}
+                {grade.name_en}
               </option>
             ))}
           </Select>
@@ -461,7 +429,7 @@ export function ResourceForm({
             <option value="">{resourcesUi.form.noCategory.en}</option>
             {categories.map((category) => (
               <option key={category.id} value={category.id}>
-                {category.name_en} · {category.name_ar}
+                {category.name_en}
               </option>
             ))}
           </Select>
@@ -515,7 +483,7 @@ export function ResourceForm({
               ) : (
                 <Bi
                   en={resourcesUi.form.noFileChosen.en}
-                  ar={resourcesUi.form.noFileChosen.ar}
+                  ar={resourcesUi.form.noFileChosen.en}
                 />
               )}
             </p>
@@ -526,7 +494,7 @@ export function ResourceForm({
           <p className="font-semibold text-foreground">
             <Bi
               en={resourcesUi.form.existingFile.en}
-              ar={resourcesUi.form.existingFile.ar}
+              ar={resourcesUi.form.existingFile.en}
             />
           </p>
           <p className="mt-1 break-all text-xs text-muted-foreground">
@@ -535,7 +503,7 @@ export function ResourceForm({
           <p className="mt-1 text-xs text-muted-foreground">
             <Bi
               en={resourcesUi.form.fileReplaceHint.en}
-              ar={resourcesUi.form.fileReplaceHint.ar}
+              ar={resourcesUi.form.fileReplaceHint.en}
             />
           </p>
         </div>
@@ -573,13 +541,13 @@ export function ResourceForm({
               <span className="font-semibold text-foreground">
                 <Bi
                   en={resourcesUi.form.publish.en}
-                  ar={resourcesUi.form.publish.ar}
+                  ar={resourcesUi.form.publish.en}
                 />
               </span>
               <span className="block text-xs text-muted-foreground">
                 <Bi
                   en={resourcesUi.form.publishHint.en}
-                  ar={resourcesUi.form.publishHint.ar}
+                  ar={resourcesUi.form.publishHint.en}
                 />
               </span>
             </span>
@@ -590,7 +558,7 @@ export function ResourceForm({
       <div className="flex flex-wrap items-center gap-2">
         <Button type="submit" disabled={pending}>
           {pending ? (
-            <Bi en={pendingLabel.en} ar={pendingLabel.ar} />
+            <Bi en={pendingLabel.en} ar={pendingLabel.en} />
           ) : (
             <Bi
               en={
@@ -600,8 +568,8 @@ export function ResourceForm({
               }
               ar={
                 mode === "create"
-                  ? resourcesUi.actions.create.ar
-                  : resourcesUi.actions.save.ar
+                  ? resourcesUi.actions.create.en
+                  : resourcesUi.actions.save.en
               }
             />
           )}
@@ -612,7 +580,7 @@ export function ResourceForm({
         >
           <Bi
             en={resourcesUi.actions.backToList.en}
-            ar={resourcesUi.actions.backToList.ar}
+            ar={resourcesUi.actions.backToList.en}
           />
         </Link>
       </div>

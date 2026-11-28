@@ -39,7 +39,7 @@ import { formatAdminDateTime } from "@/lib/students/format";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Assessments · الاختبارات",
+  title: "Assessments",
 };
 
 export const dynamic = "force-dynamic";
@@ -107,18 +107,18 @@ export default async function StudentAssessmentsPage({
     <div className="space-y-5">
       <PageHeader
         eyebrow={
-          <Bi en={assessmentsUi.eyebrow.en} ar={assessmentsUi.eyebrow.ar} />
+          <Bi en={assessmentsUi.eyebrow.en} ar={assessmentsUi.eyebrow.en} />
         }
         title={
           <Bi
             en={assessmentsUi.student.title.en}
-            ar={assessmentsUi.student.title.ar}
+            ar={assessmentsUi.student.title.en}
           />
         }
         description={
           <Bi
             en={assessmentsUi.student.subtitle.en}
-            ar={assessmentsUi.student.subtitle.ar}
+            ar={assessmentsUi.student.subtitle.en}
           />
         }
         actions={
@@ -130,8 +130,8 @@ export default async function StudentAssessmentsPage({
                 assessmentsUi.student.gradeLocked.en
               }
               ar={
-                student.grade?.name_ar ??
-                assessmentsUi.student.gradeLocked.ar
+                student.grade?.name_en ??
+                assessmentsUi.student.gradeLocked.en
               }
             />
           </Badge>
@@ -142,7 +142,7 @@ export default async function StudentAssessmentsPage({
         <Alert variant="error">
           <Bi
             en={assessmentsUi.messages.loadFailed.en}
-            ar={assessmentsUi.messages.loadFailed.ar}
+            ar={assessmentsUi.messages.loadFailed.en}
           />
         </Alert>
       ) : null}
@@ -155,30 +155,27 @@ export default async function StudentAssessmentsPage({
         <label className="flex min-w-40 flex-1 flex-col gap-1 text-xs font-semibold text-muted-foreground">
           <Bi
             en={assessmentsUi.filters.type.en}
-            ar={assessmentsUi.filters.type.ar}
+            ar={assessmentsUi.filters.type.en}
           />
           <Select name="type" defaultValue={filters.type}>
-            <option value="all">
-              {assessmentsUi.filters.allTypes.en} ·{" "}
-              {assessmentsUi.filters.allTypes.ar}
-            </option>
-            <option value="quiz">Quiz · اختبار قصير</option>
-            <option value="exam">Exam · اختبار نهائي</option>
+            <option value="all">{assessmentsUi.filters.allTypes.en}</option>
+            <option value="quiz">Quiz</option>
+            <option value="exam">Exam</option>
           </Select>
         </label>
 
         <label className="flex min-w-40 flex-1 flex-col gap-1 text-xs font-semibold text-muted-foreground">
-          <Bi en="View" ar="العرض" />
+          <Bi en="View" ar="View" />
           <Select name="view" defaultValue={filters.view}>
-            <option value="all">All · الكل</option>
-            <option value="completed">Completed · المكتملة</option>
+            <option value="all">All</option>
+            <option value="completed">Completed</option>
           </Select>
         </label>
 
         <button type="submit" className={cn(buttonVariants({ size: "sm" }))}>
           <Bi
             en={assessmentsUi.filters.apply.en}
-            ar={assessmentsUi.filters.apply.ar}
+            ar={assessmentsUi.filters.apply.en}
           />
         </button>
         {filters.type !== "all" || filters.view !== "all" ? (
@@ -188,7 +185,7 @@ export default async function StudentAssessmentsPage({
           >
             <Bi
               en={assessmentsUi.filters.clear.en}
-              ar={assessmentsUi.filters.clear.ar}
+              ar={assessmentsUi.filters.clear.en}
             />
           </Link>
         ) : null}
@@ -206,8 +203,8 @@ export default async function StudentAssessmentsPage({
               }
               ar={
                 filters.view === "completed"
-                  ? assessmentsUi.list.studentEmptyCompleted.ar
-                  : assessmentsUi.list.studentEmpty.ar
+                  ? assessmentsUi.list.studentEmptyCompleted.en
+                  : assessmentsUi.list.studentEmpty.en
               }
             />
           }
@@ -220,8 +217,8 @@ export default async function StudentAssessmentsPage({
               }
               ar={
                 filters.view === "completed"
-                  ? assessmentsUi.list.studentEmptyCompletedHint.ar
-                  : assessmentsUi.list.studentEmptyHint.ar
+                  ? assessmentsUi.list.studentEmptyCompletedHint.en
+                  : assessmentsUi.list.studentEmptyHint.en
               }
             />
           }
@@ -231,7 +228,7 @@ export default async function StudentAssessmentsPage({
                 href={`/student/assessments${buildStudentAssessmentQuery(filters, { view: "all" })}`}
                 className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
               >
-                <Bi en="All assessments" ar="كل الاختبارات" />
+                <Bi en="All assessments" ar="All assessments" />
               </Link>
             ) : null
           }
@@ -286,7 +283,7 @@ export default async function StudentAssessmentsPage({
                       >
                         <Bi
                           en={assessmentTypeCopy[assessment.type].en}
-                          ar={assessmentTypeCopy[assessment.type].ar}
+                          ar={assessmentTypeCopy[assessment.type].en}
                         />
                       </Badge>
                       {inProgress ? (
@@ -294,7 +291,7 @@ export default async function StudentAssessmentsPage({
                           <AlarmClock aria-hidden="true" className="size-3.5" />
                           <Bi
                             en={assessmentsUi.list.inProgress.en}
-                            ar={assessmentsUi.list.inProgress.ar}
+                            ar={assessmentsUi.list.inProgress.en}
                           />
                         </Badge>
                       ) : assessment.result_visible ? (
@@ -305,21 +302,21 @@ export default async function StudentAssessmentsPage({
                           />
                           <Bi
                             en={assessmentsUi.list.resultReady.en}
-                            ar={assessmentsUi.list.resultReady.ar}
+                            ar={assessmentsUi.list.resultReady.en}
                           />
                         </Badge>
                       ) : assessment.last_attempt_status === "grading" ? (
                         <Badge variant="muted">
                           <Bi
                             en={assessmentsUi.list.awaitingReview.en}
-                            ar={assessmentsUi.list.awaitingReview.ar}
+                            ar={assessmentsUi.list.awaitingReview.en}
                           />
                         </Badge>
                       ) : assessment.last_attempt_id ? (
                         <Badge variant="muted">
                           <Bi
                             en={assessmentsUi.list.resultHidden.en}
-                            ar={assessmentsUi.list.resultHidden.ar}
+                            ar={assessmentsUi.list.resultHidden.en}
                           />
                         </Badge>
                       ) : null}
@@ -331,28 +328,28 @@ export default async function StudentAssessmentsPage({
                         {assessment.time_limit_minutes}{" "}
                         <Bi
                           en={assessmentsUi.student.minutes.en}
-                          ar={assessmentsUi.student.minutes.ar}
+                          ar={assessmentsUi.student.minutes.en}
                         />
                       </span>
                       <span>
                         {assessment.attempts_used}/{assessment.max_attempts}{" "}
                         <Bi
                           en={assessmentsUi.list.attemptsUsed.en}
-                          ar={assessmentsUi.list.attemptsUsed.ar}
+                          ar={assessmentsUi.list.attemptsUsed.en}
                         />
                       </span>
                       {assessment.allow_retakes ? (
                         <span>
                           <Bi
                             en={assessmentsUi.list.unlimited.en}
-                            ar={assessmentsUi.list.unlimited.ar}
+                            ar={assessmentsUi.list.unlimited.en}
                           />
                         </span>
                       ) : (
                         <span>
                           <Bi
                             en={assessmentsUi.list.noRetakes.en}
-                            ar={assessmentsUi.list.noRetakes.ar}
+                            ar={assessmentsUi.list.noRetakes.en}
                           />
                         </span>
                       )}
@@ -360,7 +357,7 @@ export default async function StudentAssessmentsPage({
                         <span>
                           <Bi
                             en={`${assessmentsUi.list.availableUntil.en} ${formatAdminDateTime(assessment.available_until)}`}
-                            ar={`${assessmentsUi.list.availableUntil.ar} ${formatAdminDateTime(assessment.available_until)}`}
+                            ar={`${assessmentsUi.list.availableUntil.en} ${formatAdminDateTime(assessment.available_until)}`}
                           />
                         </span>
                       ) : null}
@@ -389,7 +386,7 @@ export default async function StudentAssessmentsPage({
                         <Eye aria-hidden="true" className="size-3.5" />
                         <Bi
                           en={assessmentsUi.actions.openResult.en}
-                          ar={assessmentsUi.actions.openResult.ar}
+                          ar={assessmentsUi.actions.openResult.en}
                         />
                       </Link>
                     ) : canStart ? (
@@ -415,7 +412,7 @@ export default async function StudentAssessmentsPage({
                       <ClipboardList aria-hidden="true" className="size-3.5" />
                       <Bi
                         en={assessmentsUi.student.introTitle.en}
-                        ar={assessmentsUi.student.introTitle.ar}
+                        ar={assessmentsUi.student.introTitle.en}
                       />
                     </Link>
                   </div>
@@ -425,21 +422,21 @@ export default async function StudentAssessmentsPage({
                   <p className="mt-2 text-xs font-medium text-muted-foreground">
                     <Bi
                       en={assessmentsUi.student.notOpenYet.en}
-                      ar={assessmentsUi.student.notOpenYet.ar}
+                      ar={assessmentsUi.student.notOpenYet.en}
                     />
                   </p>
                 ) : closed ? (
                   <p className="mt-2 text-xs font-medium text-muted-foreground">
                     <Bi
                       en={assessmentsUi.student.closed.en}
-                      ar={assessmentsUi.student.closed.ar}
+                      ar={assessmentsUi.student.closed.en}
                     />
                   </p>
                 ) : !inProgress && attemptsLeft === 0 ? (
                   <p className="mt-2 text-xs font-medium text-muted-foreground">
                     <Bi
                       en={assessmentsUi.student.noAttemptsLeft.en}
-                      ar={assessmentsUi.student.noAttemptsLeft.ar}
+                      ar={assessmentsUi.student.noAttemptsLeft.en}
                     />
                   </p>
                 ) : null}
@@ -453,7 +450,7 @@ export default async function StudentAssessmentsPage({
         <Play aria-hidden="true" className="size-3.5" />
         <Bi
           en={assessmentsUi.student.autoSubmit.en}
-          ar={assessmentsUi.student.autoSubmit.ar}
+          ar={assessmentsUi.student.autoSubmit.en}
         />
       </div>
     </div>

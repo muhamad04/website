@@ -4,6 +4,11 @@ import { cn } from "@/lib/utils";
 type BilingualTextProps = {
   en: ReactNode;
   ar: ReactNode;
+  /**
+   * Opt in to the bilingual rendering used by the login/authentication screens
+   * and the main navigation. Everywhere else the site is English-only.
+   */
+  bilingual?: boolean;
   /** Inline keeps both languages on one line; stacked is better for headings. */
   layout?: "inline" | "stacked";
   className?: string;
@@ -13,18 +18,35 @@ type BilingualTextProps = {
 };
 
 /**
- * Renders English and Arabic together. Arabic is always marked with lang/dir
- * so screen readers and browsers shape it correctly inside an LTR page.
+ * Renders interface copy. The default is English-only; approved areas
+ * (authentication and the main navigation) pass `bilingual` to show Arabic
+ * beside the English text.
  */
 export function Bi({
   en,
   ar,
+  bilingual = false,
   layout = "inline",
   className,
   enClassName,
   arClassName,
   hideSeparator = false,
 }: BilingualTextProps) {
+  if (!bilingual) {
+    return (
+      <span
+        lang="en"
+        className={cn(
+          layout === "stacked" ? "block" : "inline",
+          className,
+          enClassName,
+        )}
+      >
+        {en}
+      </span>
+    );
+  }
+
   return (
     <span
       className={cn(

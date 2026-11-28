@@ -63,19 +63,19 @@ export function ConnectivityButton() {
         <RefreshCw aria-hidden="true" className="size-3.5" />
         <Bi
           en={pending ? reportingUi.admin.checking.en : reportingUi.admin.checkConnectivity.en}
-          ar={pending ? reportingUi.admin.checking.ar : reportingUi.admin.checkConnectivity.ar}
+          ar={pending ? reportingUi.admin.checking.en : reportingUi.admin.checkConnectivity.en}
         />
       </Button>
       {result ? (
         result.ok ? (
           <Feedback
             ok
-            message={`${reportingUi.admin.connectivityOk.en} / ${reportingUi.admin.connectivityOk.ar}`}
+            message={`${reportingUi.admin.connectivityOk.en}`}
           />
         ) : (
           <Feedback
             ok={false}
-            message={`${reportingUi.admin.connectivityFailed.en} / ${reportingUi.admin.connectivityFailed.ar}`}
+            message={`${reportingUi.admin.connectivityFailed.en}`}
           />
         )
       ) : null}
@@ -126,10 +126,10 @@ export function RetrySyncButton({
           }
           ar={
             pending
-              ? reportingUi.admin.retrying.ar
+              ? reportingUi.admin.retrying.en
               : mode === "retry"
-                ? reportingUi.admin.retry.ar
-                : reportingUi.admin.syncNow.ar
+                ? reportingUi.admin.retry.en
+                : reportingUi.admin.syncNow.en
           }
         />
       </Button>
@@ -150,8 +150,8 @@ export function RetrySyncButton({
             }
             ar={
               outcome === "ok"
-                ? reportingUi.admin.retryQueued.ar
-                : reportingUi.admin.retryFailed.ar
+                ? reportingUi.admin.retryQueued.en
+                : reportingUi.admin.retryFailed.en
             }
           />
         </span>
@@ -187,7 +187,7 @@ export function RetryAllSyncButton({ count }: { count: number }) {
         <RefreshCw aria-hidden="true" className="size-3.5" />
         <Bi
           en={pending ? reportingUi.admin.retrying.en : reportingUi.admin.retryAll.en}
-          ar={pending ? reportingUi.admin.retrying.ar : reportingUi.admin.retryAll.ar}
+          ar={pending ? reportingUi.admin.retrying.en : reportingUi.admin.retryAll.en}
         />
         {count > 0 ? (
           <span className="rounded-full bg-secondary px-1.5 text-[10px] font-bold text-secondary-foreground">
@@ -200,8 +200,8 @@ export function RetryAllSyncButton({ count }: { count: number }) {
           ok={outcome === "ok"}
           message={
             outcome === "ok"
-              ? `${reportingUi.admin.retryQueued.en} / ${reportingUi.admin.retryQueued.ar}`
-              : `${reportingUi.admin.retryFailed.en} / ${reportingUi.admin.retryFailed.ar}`
+              ? `${reportingUi.admin.retryQueued.en}`
+              : `${reportingUi.admin.retryFailed.en}`
           }
         />
       ) : null}

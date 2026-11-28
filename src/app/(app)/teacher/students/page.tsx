@@ -27,7 +27,7 @@ import { studentsUi } from "@/lib/i18n/students";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Students · الطلاب",
+  title: "Students",
 };
 
 export const dynamic = "force-dynamic";
@@ -59,10 +59,10 @@ export default async function StudentsPage({
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow={<Bi en={studentsUi.eyebrow.en} ar={studentsUi.eyebrow.ar} />}
-        title={<Bi en={studentsUi.title.en} ar={studentsUi.title.ar} />}
+        eyebrow={<Bi en={studentsUi.eyebrow.en} ar={studentsUi.eyebrow.en} />}
+        title={<Bi en={studentsUi.title.en} ar={studentsUi.title.en} />}
         description={
-          <Bi en={studentsUi.subtitle.en} ar={studentsUi.subtitle.ar} />
+          <Bi en={studentsUi.subtitle.en} ar={studentsUi.subtitle.en} />
         }
         actions={
           <>
@@ -73,7 +73,7 @@ export default async function StudentsPage({
               <GraduationCap aria-hidden="true" className="size-4" />
               <Bi
                 en={studentsUi.actions.manageClasses.en}
-                ar={studentsUi.actions.manageClasses.ar}
+                ar={studentsUi.actions.manageClasses.en}
               />
             </Link>
             <Link
@@ -83,7 +83,7 @@ export default async function StudentsPage({
               <UserPlus aria-hidden="true" className="size-4" />
               <Bi
                 en={studentsUi.actions.addStudent.en}
-                ar={studentsUi.actions.addStudent.ar}
+                ar={studentsUi.actions.addStudent.en}
               />
             </Link>
           </>
@@ -134,12 +134,12 @@ export default async function StudentsPage({
                 hasFilters ? (
                   <Bi
                     en={studentsUi.list.emptyFiltered.en}
-                    ar={studentsUi.list.emptyFiltered.ar}
+                    ar={studentsUi.list.emptyFiltered.en}
                   />
                 ) : (
                   <Bi
                     en={studentsUi.list.empty.en}
-                    ar={studentsUi.list.empty.ar}
+                    ar={studentsUi.list.empty.en}
                   />
                 )
               }
@@ -147,12 +147,12 @@ export default async function StudentsPage({
                 hasFilters ? (
                   <Bi
                     en={studentsUi.list.emptyFilteredHint.en}
-                    ar={studentsUi.list.emptyFilteredHint.ar}
+                    ar={studentsUi.list.emptyFilteredHint.en}
                   />
                 ) : (
                   <Bi
                     en={studentsUi.list.emptyHint.en}
-                    ar={studentsUi.list.emptyHint.ar}
+                    ar={studentsUi.list.emptyHint.en}
                   />
                 )
               }
@@ -166,7 +166,7 @@ export default async function StudentsPage({
                   >
                     <Bi
                       en={studentsUi.filters.clear.en}
-                      ar={studentsUi.filters.clear.ar}
+                      ar={studentsUi.filters.clear.en}
                     />
                   </Link>
                 ) : (
@@ -177,7 +177,7 @@ export default async function StudentsPage({
                     <UserPlus aria-hidden="true" className="size-4" />
                     <Bi
                       en={studentsUi.actions.addStudent.en}
-                      ar={studentsUi.actions.addStudent.ar}
+                      ar={studentsUi.actions.addStudent.en}
                     />
                   </Link>
                 )
@@ -194,25 +194,25 @@ export default async function StudentsPage({
                     <th scope="col" className="px-4 py-2.5">
                       <Bi
                         en={studentsUi.list.student.en}
-                        ar={studentsUi.list.student.ar}
+                        ar={studentsUi.list.student.en}
                       />
                     </th>
                     <th scope="col" className="px-4 py-2.5">
                       <Bi
                         en={studentsUi.list.contact.en}
-                        ar={studentsUi.list.contact.ar}
+                        ar={studentsUi.list.contact.en}
                       />
                     </th>
                     <th scope="col" className="px-4 py-2.5">
                       <Bi
                         en={studentsUi.list.placement.en}
-                        ar={studentsUi.list.placement.ar}
+                        ar={studentsUi.list.placement.en}
                       />
                     </th>
                     <th scope="col" className="px-4 py-2.5">
                       <Bi
                         en={studentsUi.list.access.en}
-                        ar={studentsUi.list.access.ar}
+                        ar={studentsUi.list.access.en}
                       />
                     </th>
                     <th scope="col" className="px-4 py-2.5">
@@ -230,20 +230,11 @@ export default async function StudentsPage({
                         >
                           {student.full_name_en}
                         </Link>
-                        {student.full_name_ar ? (
-                          <p
-                            lang="ar"
-                            dir="rtl"
-                            className="font-arabic text-xs text-muted-foreground"
-                          >
-                            {student.full_name_ar}
-                          </p>
-                        ) : null}
                         {student.student_number ? (
                           <p className="mt-1 text-xs font-medium text-muted-foreground">
                             <Bi
                               en={studentsUi.form.studentNumber.en}
-                              ar={studentsUi.form.studentNumber.ar}
+                              ar={studentsUi.form.studentNumber.en}
                               hideSeparator
                             />
                             {": "}
@@ -263,7 +254,7 @@ export default async function StudentsPage({
                           <p className="text-xs text-muted-foreground">
                             <Bi
                               en="No contact email"
-                              ar="لا يوجد بريد للتواصل"
+                              ar="No contact email"
                               hideSeparator
                             />
                           </p>
@@ -278,24 +269,16 @@ export default async function StudentsPage({
                         {student.grade ? (
                           <span className="block text-foreground">
                             {student.grade.name_en}
-                            <span lang="ar" dir="rtl" className="font-arabic">
-                              {" "}
-                              · {student.grade.name_ar}
-                            </span>
                           </span>
                         ) : (
                           <Bi
                             en={studentsUi.form.noGrade.en}
-                            ar={studentsUi.form.noGrade.ar}
+                            ar={studentsUi.form.noGrade.en}
                           />
                         )}
                         {student.class ? (
                           <span className="mt-0.5 block">
                             {student.class.name_en}
-                            <span lang="ar" dir="rtl" className="font-arabic">
-                              {" "}
-                              · {student.class.name_ar}
-                            </span>
                           </span>
                         ) : null}
                       </td>
@@ -309,8 +292,8 @@ export default async function StudentsPage({
                             }
                             ar={
                               student.is_active
-                                ? studentsUi.filters.activeOnly.ar
-                                : studentsUi.filters.inactiveOnly.ar
+                                ? studentsUi.filters.activeOnly.en
+                                : studentsUi.filters.inactiveOnly.en
                             }
                             hideSeparator
                           />
@@ -321,7 +304,7 @@ export default async function StudentsPage({
                           ) : (
                             <Bi
                               en={studentsUi.list.neverInvited.en}
-                              ar={studentsUi.list.neverInvited.ar}
+                              ar={studentsUi.list.neverInvited.en}
                             />
                           )}
                         </p>
@@ -350,15 +333,6 @@ export default async function StudentsPage({
                       >
                         {student.full_name_en}
                       </Link>
-                      {student.full_name_ar ? (
-                        <p
-                          lang="ar"
-                          dir="rtl"
-                          className="font-arabic text-xs text-muted-foreground"
-                        >
-                          {student.full_name_ar}
-                        </p>
-                      ) : null}
                     </div>
                     <Badge variant={student.is_active ? "success" : "muted"}>
                       <Bi
@@ -369,8 +343,8 @@ export default async function StudentsPage({
                         }
                         ar={
                           student.is_active
-                            ? studentsUi.filters.activeOnly.ar
-                            : studentsUi.filters.inactiveOnly.ar
+                            ? studentsUi.filters.activeOnly.en
+                            : studentsUi.filters.inactiveOnly.en
                         }
                         hideSeparator
                       />
@@ -382,7 +356,7 @@ export default async function StudentsPage({
                       <p className="font-medium text-foreground">
                         <Bi
                           en={studentsUi.form.studentNumber.en}
-                          ar={studentsUi.form.studentNumber.ar}
+                          ar={studentsUi.form.studentNumber.en}
                           hideSeparator
                         />
                         {": "}
@@ -393,7 +367,7 @@ export default async function StudentsPage({
                       {student.email ?? (
                         <Bi
                           en="No contact email"
-                          ar="لا يوجد بريد للتواصل"
+                          ar="No contact email"
                           hideSeparator
                         />
                       )}
@@ -417,7 +391,7 @@ export default async function StudentsPage({
 
       {list.pageCount > 1 ? (
         <nav
-          aria-label="Pagination / التنقل بين الصفحات"
+          aria-label="Pagination"
           className="flex items-center justify-between gap-3"
         >
           {list.page > 1 ? (
@@ -429,7 +403,7 @@ export default async function StudentsPage({
             >
               <Bi
                 en={studentsUi.list.previous.en}
-                ar={studentsUi.list.previous.ar}
+                ar={studentsUi.list.previous.en}
               />
             </Link>
           ) : (
@@ -451,7 +425,7 @@ export default async function StudentsPage({
               })}`}
               className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
             >
-              <Bi en={studentsUi.list.next.en} ar={studentsUi.list.next.ar} />
+              <Bi en={studentsUi.list.next.en} ar={studentsUi.list.next.en} />
             </Link>
           ) : (
             <span />

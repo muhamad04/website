@@ -107,7 +107,7 @@ function SectionContent({ section }: { section: StudentAssessmentSection }) {
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           <Bi
             en={assessmentsUi.student.passage.en}
-            ar={assessmentsUi.student.passage.ar}
+            ar={assessmentsUi.student.passage.en}
           />
         </p>
         <div className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
@@ -118,7 +118,7 @@ function SectionContent({ section }: { section: StudentAssessmentSection }) {
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               <Bi
                 en={assessmentsUi.student.vocabulary.en}
-                ar={assessmentsUi.student.vocabulary.ar}
+                ar={assessmentsUi.student.vocabulary.en}
               />
             </p>
             <p className="mt-1 whitespace-pre-wrap text-sm text-foreground">
@@ -141,7 +141,7 @@ function SectionContent({ section }: { section: StudentAssessmentSection }) {
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           <Bi
             en={assessmentsUi.student.dialogue.en}
-            ar={assessmentsUi.student.dialogue.ar}
+            ar={assessmentsUi.student.dialogue.en}
           />
         </p>
         <ol className="space-y-2">
@@ -738,7 +738,7 @@ export function AttemptRunner({
           <p className="text-xs text-muted-foreground">
             <Bi
               en={assessmentsUi.student.matchHint.en}
-              ar={assessmentsUi.student.matchHint.ar}
+              ar={assessmentsUi.student.matchHint.en}
             />
           </p>
           {question.left_items.map((left) => (
@@ -794,7 +794,7 @@ export function AttemptRunner({
                 <Paperclip aria-hidden="true" className="size-4" />
                 <Bi
                   en={answer.file_name ?? assessmentsUi.student.fileAttached.en}
-                  ar={assessmentsUi.student.fileAttached.ar}
+                  ar={assessmentsUi.student.fileAttached.en}
                   hideSeparator
                 />
               </span>
@@ -802,7 +802,7 @@ export function AttemptRunner({
               <span className="text-muted-foreground">
                 <Bi
                   en={assessmentsUi.student.noFile.en}
-                  ar={assessmentsUi.student.noFile.ar}
+                  ar={assessmentsUi.student.noFile.en}
                 />
               </span>
             )}
@@ -819,10 +819,10 @@ export function AttemptRunner({
               }
               ar={
                 uploadingId === question.id
-                  ? assessmentsUi.actions.uploading.ar
+                  ? assessmentsUi.actions.uploading.en
                   : answer.file_path
-                    ? assessmentsUi.actions.uploadReplace.ar
-                    : assessmentsUi.actions.upload.ar
+                    ? assessmentsUi.actions.uploadReplace.en
+                    : assessmentsUi.actions.upload.en
               }
             />
             <input
@@ -844,7 +844,7 @@ export function AttemptRunner({
           <p className="text-xs text-muted-foreground">
             <Bi
               en={assessmentsUi.student.fileHint.en}
-              ar={assessmentsUi.student.fileHint.ar}
+              ar={assessmentsUi.student.fileHint.en}
             />
           </p>
         </div>
@@ -873,8 +873,8 @@ export function AttemptRunner({
             }
             placeholder={
               question.type === "paragraph"
-                ? `${assessmentsUi.student.paragraphAnswer.en} · ${assessmentsUi.student.paragraphAnswer.ar}`
-                : `${assessmentsUi.student.essayAnswer.en} · ${assessmentsUi.student.essayAnswer.ar}`
+                ? assessmentsUi.student.paragraphAnswer.en
+                : assessmentsUi.student.essayAnswer.en
             }
             className="min-h-48"
             maxLength={20000}
@@ -901,7 +901,7 @@ export function AttemptRunner({
               <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 <Bi
                   en={assessmentsUi.student.rubric.en}
-                  ar={assessmentsUi.student.rubric.ar}
+                  ar={assessmentsUi.student.rubric.en}
                 />
               </p>
               <p className="mt-1 whitespace-pre-wrap text-sm text-foreground">
@@ -919,7 +919,7 @@ export function AttemptRunner({
         onChange={(event) =>
           updateAnswer(question.id, { response: { text: event.target.value } })
         }
-        placeholder={`${assessmentsUi.student.writeAnswer.en} · ${assessmentsUi.student.writeAnswer.ar}`}
+        placeholder={assessmentsUi.student.writeAnswer.en}
         className="min-h-32"
         maxLength={20000}
         aria-label={`${assessmentsUi.student.question.en} ${index + 1}`}
@@ -949,7 +949,7 @@ export function AttemptRunner({
           <span className="text-xs text-muted-foreground">
             <Bi
               en={`${answeredCount}/${questions.length} ${assessmentsUi.student.answered.en}`}
-              ar={`${answeredCount}/${questions.length} ${assessmentsUi.student.answered.ar}`}
+              ar={`${answeredCount}/${questions.length} ${assessmentsUi.student.answered.en}`}
             />
           </span>
         </div>
@@ -959,18 +959,18 @@ export function AttemptRunner({
             className="text-xs text-muted-foreground"
           >
             {saveState === "saving" ? (
-              <Bi en={assessmentsUi.student.saving.en} ar={assessmentsUi.student.saving.ar} />
+              <Bi en={assessmentsUi.student.saving.en} ar={assessmentsUi.student.saving.en} />
             ) : saveState === "saved" ? (
-              <Bi en={assessmentsUi.student.saved.en} ar={assessmentsUi.student.saved.ar} />
+              <Bi en={assessmentsUi.student.saved.en} ar={assessmentsUi.student.saved.en} />
             ) : saveState === "error" ? (
               <Bi
                 en={assessmentsUi.student.saveFailed.en}
-                ar={assessmentsUi.student.saveFailed.ar}
+                ar={assessmentsUi.student.saveFailed.en}
               />
             ) : (
               <Bi
                 en={assessmentsUi.student.notSaved.en}
-                ar={assessmentsUi.student.notSaved.ar}
+                ar={assessmentsUi.student.notSaved.en}
               />
             )}
           </span>
@@ -981,7 +981,7 @@ export function AttemptRunner({
             onClick={() => {
               if (
                 window.confirm(
-                  `${assessmentsUi.actions.confirmSubmit.en}\n${assessmentsUi.actions.confirmSubmit.ar}`,
+                  `${assessmentsUi.actions.confirmSubmit.en}\n${assessmentsUi.actions.confirmSubmit.en}`,
                 )
               ) {
                 void submit("student_submitted");
@@ -996,8 +996,8 @@ export function AttemptRunner({
               }
               ar={
                 submitting
-                  ? assessmentsUi.actions.submitting.ar
-                  : assessmentsUi.actions.submit.ar
+                  ? assessmentsUi.actions.submitting.en
+                  : assessmentsUi.actions.submit.en
               }
             />
           </Button>
@@ -1008,7 +1008,7 @@ export function AttemptRunner({
         <Alert variant="error">
           <Bi
             en={assessmentsUi.student.timeExpired.en}
-            ar={assessmentsUi.student.timeExpired.ar}
+            ar={assessmentsUi.student.timeExpired.en}
           />
         </Alert>
       ) : null}
@@ -1017,7 +1017,7 @@ export function AttemptRunner({
         <Alert variant="error">
           <Bi
             en={assessmentsUi.student.saveFailed.en}
-            ar={assessmentsUi.student.saveFailed.ar}
+            ar={assessmentsUi.student.saveFailed.en}
           />
         </Alert>
       ) : null}
@@ -1025,7 +1025,7 @@ export function AttemptRunner({
       <Alert variant="info">
         <Bi
           en={assessmentsUi.student.submitHint.en}
-          ar={assessmentsUi.student.submitHint.ar}
+          ar={assessmentsUi.student.submitHint.en}
         />
       </Alert>
 
@@ -1034,7 +1034,7 @@ export function AttemptRunner({
           <p className="font-semibold">
             <Bi
               en={assessmentsUi.strict.runnerBanner.en}
-              ar={assessmentsUi.strict.runnerBanner.ar}
+              ar={assessmentsUi.strict.runnerBanner.en}
             />
           </p>
           <ul className="list-disc space-y-1 ps-5 text-xs">
@@ -1042,7 +1042,7 @@ export function AttemptRunner({
               <li>
                 <Bi
                   en={assessmentsUi.strict.tabHidden.en}
-                  ar={assessmentsUi.strict.tabHidden.ar}
+                  ar={assessmentsUi.strict.tabHidden.en}
                 />
               </li>
             ) : null}
@@ -1050,7 +1050,7 @@ export function AttemptRunner({
               <li>
                 <Bi
                   en={assessmentsUi.strict.navigation.en}
-                  ar={assessmentsUi.strict.navigation.ar}
+                  ar={assessmentsUi.strict.navigation.en}
                 />
               </li>
             ) : null}
@@ -1058,21 +1058,21 @@ export function AttemptRunner({
               <li>
                 <Bi
                   en={assessmentsUi.strict.runnerConnection.en}
-                  ar={assessmentsUi.strict.runnerConnection.ar}
+                  ar={assessmentsUi.strict.runnerConnection.en}
                 />
               </li>
             ) : null}
             <li>
               <Bi
                 en={assessmentsUi.strict.copyBlocked.en}
-                ar={assessmentsUi.strict.copyBlocked.ar}
+                ar={assessmentsUi.strict.copyBlocked.en}
               />
             </li>
           </ul>
           <p className="text-xs">
             <Bi
               en={assessmentsUi.strict.notFoolproof.en}
-              ar={assessmentsUi.strict.notFoolproof.ar}
+              ar={assessmentsUi.strict.notFoolproof.en}
             />
           </p>
         </div>
@@ -1137,14 +1137,14 @@ export function AttemptRunner({
                     <span>
                       <Bi
                         en={questionTypeCopy[question.type].en}
-                        ar={questionTypeCopy[question.type].ar}
+                        ar={questionTypeCopy[question.type].en}
                       />
                     </span>
                     {question.is_required ? (
                       <Badge variant="outline" className="ms-1">
                         <Bi
                           en={assessmentsUi.form.required.en}
-                          ar={assessmentsUi.form.required.ar}
+                          ar={assessmentsUi.form.required.en}
                         />
                       </Badge>
                     ) : null}
