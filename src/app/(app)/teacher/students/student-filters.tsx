@@ -28,20 +28,20 @@ export function StudentFiltersBar({
     >
       <div className="space-y-1.5">
         <Label htmlFor="student-search">
-          <Bi en={studentsUi.filters.search.en} ar={studentsUi.filters.search.ar} />
+          <Bi en={studentsUi.filters.search.en} ar={studentsUi.filters.search.en} />
         </Label>
         <Input
           id="student-search"
           name="q"
           type="search"
           defaultValue={filters.search ?? ""}
-          placeholder={`${studentsUi.filters.searchPlaceholder.en} / ${studentsUi.filters.searchPlaceholder.ar}`}
+          placeholder={studentsUi.filters.searchPlaceholder.en}
         />
       </div>
 
       <div className="space-y-1.5">
         <Label htmlFor="student-grade">
-          <Bi en={studentsUi.filters.grade.en} ar={studentsUi.filters.grade.ar} />
+          <Bi en={studentsUi.filters.grade.en} ar={studentsUi.filters.grade.en} />
         </Label>
         <Select
           id="student-grade"
@@ -51,7 +51,7 @@ export function StudentFiltersBar({
           <option value="">{studentsUi.filters.allGrades.en}</option>
           {grades.map((grade) => (
             <option key={grade.id} value={grade.id}>
-              {grade.name_en} · {grade.name_ar}
+              {grade.name_en}
             </option>
           ))}
         </Select>
@@ -59,7 +59,7 @@ export function StudentFiltersBar({
 
       <div className="space-y-1.5">
         <Label htmlFor="student-class">
-          <Bi en={studentsUi.filters.class.en} ar={studentsUi.filters.class.ar} />
+          <Bi en={studentsUi.filters.class.en} ar={studentsUi.filters.class.en} />
         </Label>
         <Select
           id="student-class"
@@ -69,13 +69,10 @@ export function StudentFiltersBar({
           <option value="">{studentsUi.filters.allClasses.en}</option>
           {grades.map((grade) =>
             grade.classes.length > 0 ? (
-              <optgroup
-                key={grade.id}
-                label={`${grade.name_en} · ${grade.name_ar}`}
-              >
+              <optgroup key={grade.id} label={grade.name_en}>
                 {grade.classes.map((classRow) => (
                   <option key={classRow.id} value={classRow.id}>
-                    {classRow.name_en} · {classRow.name_ar}
+                    {classRow.name_en}
                   </option>
                 ))}
               </optgroup>
@@ -86,7 +83,7 @@ export function StudentFiltersBar({
 
       <div className="space-y-1.5">
         <Label htmlFor="student-status">
-          <Bi en={studentsUi.filters.status.en} ar={studentsUi.filters.status.ar} />
+          <Bi en={studentsUi.filters.status.en} ar={studentsUi.filters.status.en} />
         </Label>
         <Select id="student-status" name="status" defaultValue={filters.status}>
           <option value="all">{studentsUi.filters.allStatuses.en}</option>
@@ -98,13 +95,13 @@ export function StudentFiltersBar({
       <div className="flex flex-wrap items-center gap-2 sm:col-span-2 lg:col-span-4">
         <Button type="submit" size="sm">
           <Search aria-hidden="true" className="size-3.5" />
-          <Bi en={studentsUi.filters.apply.en} ar={studentsUi.filters.apply.ar} />
+          <Bi en={studentsUi.filters.apply.en} ar={studentsUi.filters.apply.en} />
         </Button>
         <Link
           href="/teacher/students"
           className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
         >
-          <Bi en={studentsUi.filters.clear.en} ar={studentsUi.filters.clear.ar} />
+          <Bi en={studentsUi.filters.clear.en} ar={studentsUi.filters.clear.en} />
         </Link>
       </div>
     </form>

@@ -117,7 +117,7 @@ function SectionKindBadge({ kind }: { kind: SectionKind }) {
         <BookOpen aria-hidden="true" className="size-3" />
         <Bi
           en={assessmentsUi.builder.kindReadingPassage.en}
-          ar={assessmentsUi.builder.kindReadingPassage.ar}
+          ar={assessmentsUi.builder.kindReadingPassage.en}
         />
       </Badge>
     );
@@ -129,7 +129,7 @@ function SectionKindBadge({ kind }: { kind: SectionKind }) {
         <MessagesSquare aria-hidden="true" className="size-3" />
         <Bi
           en={assessmentsUi.builder.kindDialogue.en}
-          ar={assessmentsUi.builder.kindDialogue.ar}
+          ar={assessmentsUi.builder.kindDialogue.en}
         />
       </Badge>
     );
@@ -200,7 +200,7 @@ function DialogueEditor({
         <Plus aria-hidden="true" className="size-3.5" />
         <Bi
           en={assessmentsUi.builder.addLine.en}
-          ar={assessmentsUi.builder.addLine.ar}
+          ar={assessmentsUi.builder.addLine.en}
         />
       </Button>
     </div>
@@ -226,7 +226,7 @@ function SectionFields({
           <label className="text-xs font-semibold text-muted-foreground">
             <Bi
               en={assessmentsUi.builder.sectionKind.en}
-              ar={assessmentsUi.builder.sectionKind.ar}
+              ar={assessmentsUi.builder.sectionKind.en}
             />
           </label>
           <Select
@@ -516,7 +516,7 @@ export function SectionManager({
         <Alert variant="error">
           <Bi
             en={assessmentErrorCopy[error].en}
-            ar={assessmentErrorCopy[error].ar}
+            ar={assessmentErrorCopy[error].en}
           />
         </Alert>
       ) : null}
@@ -526,13 +526,13 @@ export function SectionManager({
           <p className="text-sm font-semibold text-foreground">
             <Bi
               en={assessmentsUi.builder.emptySections.en}
-              ar={assessmentsUi.builder.emptySections.ar}
+              ar={assessmentsUi.builder.emptySections.en}
             />
           </p>
           <p className="mt-1 text-sm text-muted-foreground">
             <Bi
               en={assessmentsUi.builder.emptySectionsHint.en}
-              ar={assessmentsUi.builder.emptySectionsHint.ar}
+              ar={assessmentsUi.builder.emptySectionsHint.en}
             />
           </p>
         </div>
@@ -569,7 +569,7 @@ export function SectionManager({
                           <Check aria-hidden="true" className="size-3.5" />
                           <Bi
                             en={assessmentsUi.actions.saveSection.en}
-                            ar={assessmentsUi.actions.saveSection.ar}
+                            ar={assessmentsUi.actions.saveSection.en}
                           />
                         </Button>
                         <Button
@@ -581,7 +581,7 @@ export function SectionManager({
                           <X aria-hidden="true" className="size-3.5" />
                           <Bi
                             en={assessmentsUi.actions.cancel.en}
-                            ar={assessmentsUi.actions.cancel.ar}
+                            ar={assessmentsUi.actions.cancel.en}
                           />
                         </Button>
                       </div>
@@ -592,7 +592,7 @@ export function SectionManager({
                         <Badge variant="muted">
                           <Bi
                             en={`${assessmentsUi.builder.sections.en} ${sectionIndex + 1}`}
-                            ar={`${assessmentsUi.builder.sections.ar} ${sectionIndex + 1}`}
+                            ar={`${assessmentsUi.builder.sections.en} ${sectionIndex + 1}`}
                           />
                         </Badge>
                         <h3 className="text-base font-bold text-foreground">
@@ -602,7 +602,7 @@ export function SectionManager({
                         <Badge variant="muted">
                           <Bi
                             en={`${section.questions.length} ${assessmentsUi.builder.questions.en}`}
-                            ar={`${section.questions.length} ${assessmentsUi.builder.questions.ar}`}
+                            ar={`${section.questions.length} ${assessmentsUi.builder.questions.en}`}
                           />
                         </Badge>
                       </div>
@@ -668,7 +668,7 @@ export function SectionManager({
                       <Pencil aria-hidden="true" className="size-3.5" />
                       <Bi
                         en={assessmentsUi.actions.edit.en}
-                        ar={assessmentsUi.actions.edit.ar}
+                        ar={assessmentsUi.actions.edit.en}
                       />
                     </Button>
                     <Button
@@ -690,7 +690,7 @@ export function SectionManager({
                     <p className="mt-3 text-sm text-muted-foreground">
                       <Bi
                         en={assessmentsUi.builder.noQuestions.en}
-                        ar={assessmentsUi.builder.noQuestions.ar}
+                        ar={assessmentsUi.builder.noQuestions.en}
                       />
                     </p>
                   ) : (
@@ -711,14 +711,14 @@ export function SectionManager({
                               <span>
                                 <Bi
                                   en={questionTypeCopy[question.type].en}
-                                  ar={questionTypeCopy[question.type].ar}
+                                  ar={questionTypeCopy[question.type].en}
                                 />
                               </span>
                               <span aria-hidden="true">·</span>
                               <span>
                                 <Bi
                                   en={`${question.marks} ${assessmentsUi.builder.questionMarks.en}`}
-                                  ar={`${question.marks} ${assessmentsUi.builder.questionMarks.ar}`}
+                                  ar={`${question.marks} ${assessmentsUi.builder.questionMarks.en}`}
                                 />
                               </span>
                             </p>
@@ -805,7 +805,7 @@ export function SectionManager({
                               />
                               <Bi
                                 en={assessmentsUi.actions.editQuestion.en}
-                                ar={assessmentsUi.actions.editQuestion.ar}
+                                ar={assessmentsUi.actions.editQuestion.en}
                               />
                             </Link>
                             <Button
@@ -816,7 +816,7 @@ export function SectionManager({
                               onClick={() => {
                                 if (
                                   !window.confirm(
-                                    `${assessmentsUi.builder.confirmDeleteQuestion.en}\n${assessmentsUi.builder.confirmDeleteQuestion.ar}`,
+                                    `${assessmentsUi.builder.confirmDeleteQuestion.en}\n${assessmentsUi.builder.confirmDeleteQuestion.en}`,
                                   )
                                 ) {
                                   return;
@@ -850,7 +850,7 @@ export function SectionManager({
                       <Plus aria-hidden="true" className="size-3.5" />
                       <Bi
                         en={assessmentsUi.actions.addQuestion.en}
-                        ar={assessmentsUi.actions.addQuestion.ar}
+                        ar={assessmentsUi.actions.addQuestion.en}
                       />
                     </Link>
                     <Link
@@ -862,7 +862,7 @@ export function SectionManager({
                       <PenLine aria-hidden="true" className="size-3.5" />
                       <Bi
                         en={assessmentsUi.builder.addEssay.en}
-                        ar={assessmentsUi.builder.addEssay.ar}
+                        ar={assessmentsUi.builder.addEssay.en}
                       />
                     </Link>
                     <Link
@@ -874,7 +874,7 @@ export function SectionManager({
                       <PenLine aria-hidden="true" className="size-3.5" />
                       <Bi
                         en={assessmentsUi.builder.addParagraph.en}
-                        ar={assessmentsUi.builder.addParagraph.ar}
+                        ar={assessmentsUi.builder.addParagraph.en}
                       />
                     </Link>
                   </div>
@@ -886,7 +886,7 @@ export function SectionManager({
                   <p className="text-sm font-semibold text-foreground">
                     <Bi
                       en={assessmentsUi.builder.confirmDeleteSection.en}
-                      ar={assessmentsUi.builder.confirmDeleteSection.ar}
+                      ar={assessmentsUi.builder.confirmDeleteSection.en}
                     />
                   </p>
                   {section.questions.length > 0 && otherSections.length > 0 ? (
@@ -895,7 +895,7 @@ export function SectionManager({
                         <label className="text-xs font-semibold text-muted-foreground">
                           <Bi
                             en={assessmentsUi.builder.moveToGroup.en}
-                            ar={assessmentsUi.builder.moveToGroup.ar}
+                            ar={assessmentsUi.builder.moveToGroup.en}
                           />
                         </label>
                         <Select
@@ -921,7 +921,7 @@ export function SectionManager({
                         />
                         <Bi
                           en={assessmentsUi.builder.moveToGroup.en}
-                          ar={assessmentsUi.builder.moveToGroup.ar}
+                          ar={assessmentsUi.builder.moveToGroup.en}
                         />
                       </Button>
                     </div>
@@ -937,7 +937,7 @@ export function SectionManager({
                       <Trash2 aria-hidden="true" className="size-3.5" />
                       <Bi
                         en={assessmentsUi.actions.delete.en}
-                        ar={assessmentsUi.actions.delete.ar}
+                        ar={assessmentsUi.actions.delete.en}
                       />
                     </Button>
                     <Button
@@ -948,7 +948,7 @@ export function SectionManager({
                     >
                       <Bi
                         en={assessmentsUi.actions.cancel.en}
-                        ar={assessmentsUi.actions.cancel.ar}
+                        ar={assessmentsUi.actions.cancel.en}
                       />
                     </Button>
                   </div>
@@ -974,7 +974,7 @@ export function SectionManager({
               <Plus aria-hidden="true" className="size-3.5" />
               <Bi
                 en={assessmentsUi.actions.addSection.en}
-                ar={assessmentsUi.actions.addSection.ar}
+                ar={assessmentsUi.actions.addSection.en}
               />
             </Button>
             {sections.length > 0 ? (
@@ -986,7 +986,7 @@ export function SectionManager({
               >
                 <Bi
                   en={assessmentsUi.actions.cancel.en}
-                  ar={assessmentsUi.actions.cancel.ar}
+                  ar={assessmentsUi.actions.cancel.en}
                 />
               </Button>
             ) : null}
@@ -1005,7 +1005,7 @@ export function SectionManager({
             <Plus aria-hidden="true" className="size-4" />
             <Bi
               en={assessmentsUi.actions.addSection.en}
-              ar={assessmentsUi.actions.addSection.ar}
+              ar={assessmentsUi.actions.addSection.en}
             />
           </Button>
           <Button
@@ -1019,7 +1019,7 @@ export function SectionManager({
             <BookOpen aria-hidden="true" className="size-4" />
             <Bi
               en={assessmentsUi.builder.addReadingPassage.en}
-              ar={assessmentsUi.builder.addReadingPassage.ar}
+              ar={assessmentsUi.builder.addReadingPassage.en}
             />
           </Button>
           <Button
@@ -1033,7 +1033,7 @@ export function SectionManager({
             <MessagesSquare aria-hidden="true" className="size-4" />
             <Bi
               en={assessmentsUi.builder.addDialogue.en}
-              ar={assessmentsUi.builder.addDialogue.ar}
+              ar={assessmentsUi.builder.addDialogue.en}
             />
           </Button>
         </div>

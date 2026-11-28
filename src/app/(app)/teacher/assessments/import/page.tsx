@@ -17,7 +17,7 @@ import { formatAdminDateTime } from "@/lib/students/format";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Import an assessment · استيراد اختبار",
+  title: "Import an assessment",
 };
 
 export const dynamic = "force-dynamic";
@@ -35,10 +35,10 @@ export default async function AssessmentImportPage() {
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow={<Bi en={importsUi.eyebrow.en} ar={importsUi.eyebrow.ar} />}
-        title={<Bi en={importsUi.title.en} ar={importsUi.title.ar} />}
+        eyebrow={<Bi en={importsUi.eyebrow.en} ar={importsUi.eyebrow.en} />}
+        title={<Bi en={importsUi.title.en} ar={importsUi.title.en} />}
         description={
-          <Bi en={importsUi.subtitle.en} ar={importsUi.subtitle.ar} />
+          <Bi en={importsUi.subtitle.en} ar={importsUi.subtitle.en} />
         }
         actions={
           <Link
@@ -47,7 +47,7 @@ export default async function AssessmentImportPage() {
           >
             <Bi
               en={importsUi.common.backToAssessments.en}
-              ar={importsUi.common.backToAssessments.ar}
+              ar={importsUi.common.backToAssessments.en}
             />
           </Link>
         }
@@ -59,13 +59,13 @@ export default async function AssessmentImportPage() {
             <FileUp aria-hidden="true" className="size-4 text-primary" />
             <Bi
               en={importsUi.upload.formTitle.en}
-              ar={importsUi.upload.formTitle.ar}
+              ar={importsUi.upload.formTitle.en}
             />
           </h2>
           <p className="text-sm text-muted-foreground">
             <Bi
               en={importsUi.upload.formHint.en}
-              ar={importsUi.upload.formHint.ar}
+              ar={importsUi.upload.formHint.en}
             />
           </p>
         </div>
@@ -83,13 +83,13 @@ export default async function AssessmentImportPage() {
             <History aria-hidden="true" className="size-4 text-primary" />
             <Bi
               en={importsUi.upload.recentTitle.en}
-              ar={importsUi.upload.recentTitle.ar}
+              ar={importsUi.upload.recentTitle.en}
             />
           </h2>
           <p className="text-sm text-muted-foreground">
             <Bi
               en={importsUi.upload.recentHint.en}
-              ar={importsUi.upload.recentHint.ar}
+              ar={importsUi.upload.recentHint.en}
             />
           </p>
         </div>
@@ -100,13 +100,13 @@ export default async function AssessmentImportPage() {
             title={
               <Bi
                 en={importsUi.upload.recentEmpty.en}
-                ar={importsUi.upload.recentEmpty.ar}
+                ar={importsUi.upload.recentEmpty.en}
               />
             }
             description={
               <Bi
                 en={importsUi.upload.recentHint.en}
-                ar={importsUi.upload.recentHint.ar}
+                ar={importsUi.upload.recentHint.en}
               />
             }
           />
@@ -143,7 +143,7 @@ export default async function AssessmentImportPage() {
                 >
                   <Bi
                     en={importsUi.upload.openDraft.en}
-                    ar={importsUi.upload.openDraft.ar}
+                    ar={importsUi.upload.openDraft.en}
                   />
                 </Link>
               </li>

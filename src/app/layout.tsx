@@ -1,14 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Bi } from "@/components/bilingual";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "English Hub · منصة الإنجليزية",
+    default: "English Hub",
     template: "%s · English Hub",
   },
   description:
-    "Bilingual English teaching resources and assessments for teachers and students in Egypt. منصة ثنائية اللغة للمصادر والتقييمات.",
+    "English teaching resources and assessments for teachers and students in Egypt.",
   applicationName: "English Hub",
   robots: {
     index: false,
@@ -34,7 +33,7 @@ export default function RootLayout({
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-primary-foreground"
         >
-          <Bi en="Skip to content" ar="تجاوز إلى المحتوى" />
+          Skip to content
         </a>
         {children}
       </body>

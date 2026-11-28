@@ -41,14 +41,14 @@ export default async function SetPasswordPage() {
             <KeyRound aria-hidden="true" className="size-5" />
           </div>
           <CardTitle className="text-xl">
-            <Bi
+            <Bi bilingual
               en={studentsUi.password.title.en}
               ar={studentsUi.password.title.ar}
               layout="stacked"
             />
           </CardTitle>
           <CardDescription>
-            <Bi
+            <Bi bilingual
               en={
                 user
                   ? studentsUi.password.subtitle.en
@@ -72,7 +72,7 @@ export default async function SetPasswordPage() {
               href="/login"
               className={cn(buttonVariants({ variant: "outline" }), "w-full")}
             >
-              <Bi en={ui.common.signIn.en} ar={ui.common.signIn.ar} />
+              <Bi bilingual en={ui.common.signIn.en} ar={ui.common.signIn.ar} />
             </Link>
           )}
         </CardContent>

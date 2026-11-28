@@ -16,7 +16,7 @@ import { isUuid } from "@/lib/search";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "New question · سؤال جديد",
+  title: "New question",
 };
 
 export const dynamic = "force-dynamic";
@@ -64,13 +64,13 @@ export default async function NewQuestionPage({
         title={
           <Bi
             en={assessmentsUi.questionForm.newTitle.en}
-            ar={assessmentsUi.questionForm.newTitle.ar}
+            ar={assessmentsUi.questionForm.newTitle.en}
           />
         }
         description={
           <Bi
             en={assessmentsUi.questionForm.newSubtitle.en}
-            ar={assessmentsUi.questionForm.newSubtitle.ar}
+            ar={assessmentsUi.questionForm.newSubtitle.en}
           />
         }
         actions={
@@ -81,7 +81,7 @@ export default async function NewQuestionPage({
             <ArrowLeft aria-hidden="true" className="size-4" />
             <Bi
               en={assessmentsUi.actions.backToBuilder.en}
-              ar={assessmentsUi.actions.backToBuilder.ar}
+              ar={assessmentsUi.actions.backToBuilder.en}
             />
           </Link>
         }
@@ -93,13 +93,13 @@ export default async function NewQuestionPage({
           title={
             <Bi
               en={assessmentsUi.builder.emptySections.en}
-              ar={assessmentsUi.builder.emptySections.ar}
+              ar={assessmentsUi.builder.emptySections.en}
             />
           }
           description={
             <Bi
               en={assessmentsUi.builder.emptySectionsHint.en}
-              ar={assessmentsUi.builder.emptySectionsHint.ar}
+              ar={assessmentsUi.builder.emptySectionsHint.en}
             />
           }
           action={
@@ -109,7 +109,7 @@ export default async function NewQuestionPage({
             >
               <Bi
                 en={assessmentsUi.actions.addSection.en}
-                ar={assessmentsUi.actions.addSection.ar}
+                ar={assessmentsUi.actions.addSection.en}
               />
             </Link>
           }

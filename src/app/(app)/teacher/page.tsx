@@ -48,7 +48,7 @@ import { formatAdminDateTime } from "@/lib/students/format";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Teacher dashboard · لوحة تحكم المعلم",
+  title: "Teacher dashboard",
 };
 
 export const dynamic = "force-dynamic";
@@ -79,7 +79,7 @@ function ActivityRow({ attempt }: { attempt: ReportingAttemptRow }) {
               {" · "}
               <Bi
                 en={assessmentTypeCopy[attempt.assessment.type].en}
-                ar={assessmentTypeCopy[attempt.assessment.type].ar}
+                ar={assessmentTypeCopy[attempt.assessment.type].en}
                 hideSeparator
               />
             </>
@@ -90,7 +90,7 @@ function ActivityRow({ attempt }: { attempt: ReportingAttemptRow }) {
         <Badge variant={attempt.status === "graded" ? "success" : "outline"}>
           <Bi
             en={attemptStatusCopy[attempt.status].en}
-            ar={attemptStatusCopy[attempt.status].ar}
+            ar={attemptStatusCopy[attempt.status].en}
             hideSeparator
           />
         </Badge>
@@ -124,7 +124,7 @@ function ResultRow({ attempt }: { attempt: ReportingAttemptRow }) {
         >
           <Bi
             en={reportingUi.sections.openAttempt.en}
-            ar={reportingUi.sections.openAttempt.ar}
+            ar={reportingUi.sections.openAttempt.en}
           />
           <ArrowRight aria-hidden="true" className="size-3.5 rtl:rotate-180" />
         </Link>
@@ -155,20 +155,20 @@ export default async function TeacherDashboardPage({
         eyebrow={
           <Bi
             en={reportingUi.teacher.eyebrow.en}
-            ar={reportingUi.teacher.eyebrow.ar}
+            ar={reportingUi.teacher.eyebrow.en}
           />
         }
         title={
           <Bi
             en={`${reportingUi.teacher.welcome.en}, ${profile.full_name_en}`}
-            ar={`${reportingUi.teacher.welcome.ar}، ${profile.full_name_ar ?? profile.full_name_en}`}
+            ar={`${reportingUi.teacher.welcome.en}، ${profile.full_name_ar ?? profile.full_name_en}`}
             layout="stacked"
           />
         }
         description={
           <Bi
             en={reportingUi.teacher.subtitle.en}
-            ar={reportingUi.teacher.subtitle.ar}
+            ar={reportingUi.teacher.subtitle.en}
           />
         }
         actions={
@@ -180,7 +180,7 @@ export default async function TeacherDashboardPage({
               <BarChart3 aria-hidden="true" className="size-4" />
               <Bi
                 en={reportingUi.sections.viewAllResults.en}
-                ar={reportingUi.sections.viewAllResults.ar}
+                ar={reportingUi.sections.viewAllResults.en}
               />
             </Link>
             <Link
@@ -190,7 +190,7 @@ export default async function TeacherDashboardPage({
               <UserPlus aria-hidden="true" className="size-4" />
               <Bi
                 en={reportingUi.stats.students.en}
-                ar={reportingUi.stats.students.ar}
+                ar={reportingUi.stats.students.en}
               />
             </Link>
             {isAdmin ? (
@@ -201,13 +201,13 @@ export default async function TeacherDashboardPage({
                 <Settings2 aria-hidden="true" className="size-4" />
                 <Bi
                   en={reportingUi.admin.title.en}
-                  ar={reportingUi.admin.title.ar}
+                  ar={reportingUi.admin.title.en}
                 />
               </Link>
             ) : null}
             <Badge variant="success">
               <CheckCircle2 aria-hidden="true" className="size-3.5" />
-              <Bi en="Signed in" ar="تم تسجيل الدخول" />
+              <Bi en="Signed in" ar="Signed in" />
             </Badge>
           </>
         }
@@ -217,7 +217,7 @@ export default async function TeacherDashboardPage({
         <Alert variant="error">
           <Bi
             en="Some dashboard totals could not be loaded. Refresh the page or check the database connection."
-            ar="تعذّر تحميل بعض أرقام لوحة التحكم. حدّث الصفحة أو تحقق من اتصال قاعدة البيانات."
+            ar="Some dashboard totals could not be loaded. Refresh the page or check the database connection."
           />
         </Alert>
       ) : null}
@@ -230,7 +230,7 @@ export default async function TeacherDashboardPage({
       />
 
       <section
-        aria-label="Overview / نظرة عامة"
+        aria-label="Overview"
         className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
       >
         <StatCard
@@ -240,7 +240,7 @@ export default async function TeacherDashboardPage({
           hint={
             <Bi
               en={reportingUi.stats.studentsHint.en}
-              ar={reportingUi.stats.studentsHint.ar}
+              ar={reportingUi.stats.studentsHint.en}
             />
           }
         />
@@ -263,7 +263,7 @@ export default async function TeacherDashboardPage({
           hint={
             <Bi
               en={reportingUi.stats.assessmentsHint.en}
-              ar={reportingUi.stats.assessmentsHint.ar}
+              ar={reportingUi.stats.assessmentsHint.en}
             />
           }
         />
@@ -286,7 +286,7 @@ export default async function TeacherDashboardPage({
           hint={
             <Bi
               en={reportingUi.stats.attemptsHint.en}
-              ar={reportingUi.stats.attemptsHint.ar}
+              ar={reportingUi.stats.attemptsHint.en}
             />
           }
         />
@@ -297,7 +297,7 @@ export default async function TeacherDashboardPage({
           hint={
             <Bi
               en={reportingUi.stats.averageHint.en}
-              ar={reportingUi.stats.averageHint.ar}
+              ar={reportingUi.stats.averageHint.en}
             />
           }
         />
@@ -308,18 +308,18 @@ export default async function TeacherDashboardPage({
           hint={
             <Bi
               en={reportingUi.stats.pendingHint.en}
-              ar={reportingUi.stats.pendingHint.ar}
+              ar={reportingUi.stats.pendingHint.en}
             />
           }
         />
         <StatCard
           icon={CheckCircle2}
-          label={{ en: "Graded attempts", ar: "محاولات مصححة" }}
+          label={{ en: "Graded attempts", ar: "Graded attempts" }}
           value={totals.gradedAttemptCount}
           hint={
             <Bi
               en="Included in the average"
-              ar="مشمولة في المتوسط"
+              ar="Included in the average"
               hideSeparator
             />
           }
@@ -333,13 +333,13 @@ export default async function TeacherDashboardPage({
               <CardTitle>
                 <Bi
                   en={reportingUi.stats.studentsByGrade.en}
-                  ar={reportingUi.stats.studentsByGrade.ar}
+                  ar={reportingUi.stats.studentsByGrade.en}
                 />
               </CardTitle>
               <CardDescription>
                 <Bi
                   en="Active students grouped by grade, with class counts inside each grade."
-                  ar="الطلاب النشطون مجمّعون حسب الصف، مع عدد كل فصل داخل الصف."
+                  ar="Active students grouped by grade, with class counts inside each grade."
                 />
               </CardDescription>
             </div>
@@ -349,11 +349,11 @@ export default async function TeacherDashboardPage({
             {totals.studentsByGrade.length === 0 ? (
               <EmptyState
                 icon={GraduationCap}
-                title={<Bi en="No grades yet" ar="لا توجد صفوف بعد" />}
+                title={<Bi en="No grades yet" ar="No grades yet" />}
                 description={
                   <Bi
                     en="Create a grade and classes to start adding students."
-                    ar="أنشئ صفًا وفصولًا لبدء إضافة الطلاب."
+                    ar="Create a grade and classes to start adding students."
                   />
                 }
               />
@@ -370,13 +370,6 @@ export default async function TeacherDashboardPage({
                         <div className="min-w-0">
                           <p className="truncate text-sm font-semibold text-foreground">
                             {grade.name_en}
-                          </p>
-                          <p
-                            lang="ar"
-                            dir="rtl"
-                            className="font-arabic truncate text-xs text-muted-foreground"
-                          >
-                            {grade.name_ar}
                           </p>
                         </div>
                         <Badge variant="outline">
@@ -418,13 +411,13 @@ export default async function TeacherDashboardPage({
             <CardTitle>
               <Bi
                 en={reportingUi.sections.recentActivity.en}
-                ar={reportingUi.sections.recentActivity.ar}
+                ar={reportingUi.sections.recentActivity.en}
               />
             </CardTitle>
             <CardDescription>
               <Bi
                 en={reportingUi.sections.recentActivityHint.en}
-                ar={reportingUi.sections.recentActivityHint.ar}
+                ar={reportingUi.sections.recentActivityHint.en}
               />
             </CardDescription>
           </CardHeader>
@@ -435,13 +428,13 @@ export default async function TeacherDashboardPage({
                 title={
                   <Bi
                     en={reportingUi.sections.noActivity.en}
-                    ar={reportingUi.sections.noActivity.ar}
+                    ar={reportingUi.sections.noActivity.en}
                   />
                 }
                 description={
                   <Bi
                     en={reportingUi.sections.emptyHint.en}
-                    ar={reportingUi.sections.emptyHint.ar}
+                    ar={reportingUi.sections.emptyHint.en}
                   />
                 }
               />
@@ -462,13 +455,13 @@ export default async function TeacherDashboardPage({
             <CardTitle>
               <Bi
                 en={reportingUi.sections.recentResults.en}
-                ar={reportingUi.sections.recentResults.ar}
+                ar={reportingUi.sections.recentResults.en}
               />
             </CardTitle>
             <CardDescription>
               <Bi
                 en={reportingUi.sections.recentResultsHint.en}
-                ar={reportingUi.sections.recentResultsHint.ar}
+                ar={reportingUi.sections.recentResultsHint.en}
               />
             </CardDescription>
           </div>
@@ -478,7 +471,7 @@ export default async function TeacherDashboardPage({
           >
             <Bi
               en={reportingUi.sections.viewAllResults.en}
-              ar={reportingUi.sections.viewAllResults.ar}
+              ar={reportingUi.sections.viewAllResults.en}
             />
             <ArrowRight aria-hidden="true" className="size-3.5 rtl:rotate-180" />
           </Link>
@@ -490,7 +483,7 @@ export default async function TeacherDashboardPage({
               title={
                 <Bi
                   en={reportingUi.sections.noResults.en}
-                  ar={reportingUi.sections.noResults.ar}
+                  ar={reportingUi.sections.noResults.en}
                 />
               }
               description={
@@ -502,8 +495,8 @@ export default async function TeacherDashboardPage({
                   }
                   ar={
                     filtered
-                      ? reportingUi.sections.emptyHint.ar
-                      : "ستظهر المحاولات المصححة هنا بمجرد مراجعة الإرسالات."
+                      ? reportingUi.sections.emptyHint.en
+                      : "Graded attempts will appear here as soon as submissions are reviewed."
                   }
                 />
               }

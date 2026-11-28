@@ -265,7 +265,7 @@ export function QuestionForm({
         <Alert variant="error">
           <Bi
             en={assessmentErrorCopy[formError].en}
-            ar={assessmentErrorCopy[formError].ar}
+            ar={assessmentErrorCopy[formError].en}
           />
         </Alert>
       ) : null}
@@ -293,7 +293,7 @@ export function QuestionForm({
               Object.keys(questionTypeCopy) as Array<keyof typeof questionTypeCopy>
             ).map((type) => (
               <option key={type} value={type}>
-                {questionTypeCopy[type].en} · {questionTypeCopy[type].ar}
+                {questionTypeCopy[type].en} · {questionTypeCopy[type].en}
               </option>
             ))}
           </Select>
@@ -375,12 +375,12 @@ export function QuestionForm({
               {allowAutomatic || values.grading_method === "automatic" ? (
                 <option value="automatic">
                   {assessmentsUi.questionForm.automatic.en} ·{" "}
-                  {assessmentsUi.questionForm.automatic.ar}
+                  {assessmentsUi.questionForm.automatic.en}
                 </option>
               ) : null}
               <option value="manual">
                 {assessmentsUi.questionForm.manual.en} ·{" "}
-                {assessmentsUi.questionForm.manual.ar}
+                {assessmentsUi.questionForm.manual.en}
               </option>
             </Select>
           </Field>
@@ -395,7 +395,7 @@ export function QuestionForm({
               />
               <Bi
                 en={assessmentsUi.questionForm.required.en}
-                ar={assessmentsUi.questionForm.required.ar}
+                ar={assessmentsUi.questionForm.required.en}
               />
             </label>
           </div>
@@ -408,13 +408,13 @@ export function QuestionForm({
             <h2 className="text-sm font-bold text-foreground">
               <Bi
                 en={assessmentsUi.questionForm.options.en}
-                ar={assessmentsUi.questionForm.options.ar}
+                ar={assessmentsUi.questionForm.options.en}
               />
             </h2>
             <p className="mt-1 text-xs text-muted-foreground">
               <Bi
                 en={assessmentsUi.questionForm.optionsHint.en}
-                ar={assessmentsUi.questionForm.optionsHint.ar}
+                ar={assessmentsUi.questionForm.optionsHint.en}
               />
             </p>
           </div>
@@ -471,7 +471,7 @@ export function QuestionForm({
             <p role="alert" className="text-xs text-destructive">
               <Bi
                 en={assessmentErrorCopy.question_options_invalid.en}
-                ar={assessmentErrorCopy.question_options_invalid.ar}
+                ar={assessmentErrorCopy.question_options_invalid.en}
               />
             </p>
           ) : null}
@@ -490,7 +490,7 @@ export function QuestionForm({
             <Plus aria-hidden="true" className="size-3.5" />
             <Bi
               en={assessmentsUi.questionForm.addOption.en}
-              ar={assessmentsUi.questionForm.addOption.ar}
+              ar={assessmentsUi.questionForm.addOption.en}
             />
           </Button>
         </div>
@@ -501,7 +501,7 @@ export function QuestionForm({
           <p className="text-sm font-bold text-foreground">
             <Bi
               en={assessmentsUi.questionForm.correct.en}
-              ar={assessmentsUi.questionForm.correct.ar}
+              ar={assessmentsUi.questionForm.correct.en}
             />
           </p>
           <div className="flex flex-wrap gap-4">
@@ -522,8 +522,8 @@ export function QuestionForm({
                   }
                   ar={
                     value === "true"
-                      ? assessmentsUi.questionForm.trueLabel.ar
-                      : assessmentsUi.questionForm.falseLabel.ar
+                      ? assessmentsUi.questionForm.trueLabel.en
+                      : assessmentsUi.questionForm.falseLabel.en
                   }
                 />
               </label>
@@ -538,13 +538,13 @@ export function QuestionForm({
             <h2 className="text-sm font-bold text-foreground">
               <Bi
                 en={assessmentsUi.questionForm.pairs.en}
-                ar={assessmentsUi.questionForm.pairs.ar}
+                ar={assessmentsUi.questionForm.pairs.en}
               />
             </h2>
             <p className="mt-1 text-xs text-muted-foreground">
               <Bi
                 en={assessmentsUi.questionForm.pairsHint.en}
-                ar={assessmentsUi.questionForm.pairsHint.ar}
+                ar={assessmentsUi.questionForm.pairsHint.en}
               />
             </p>
           </div>
@@ -585,7 +585,7 @@ export function QuestionForm({
                   <Trash2 aria-hidden="true" className="size-3.5" />
                   <Bi
                     en={assessmentsUi.questionForm.remove.en}
-                    ar={assessmentsUi.questionForm.remove.ar}
+                    ar={assessmentsUi.questionForm.remove.en}
                   />
                 </Button>
               </div>
@@ -595,7 +595,7 @@ export function QuestionForm({
             <p role="alert" className="text-xs text-destructive">
               <Bi
                 en={assessmentErrorCopy.question_pairs_invalid.en}
-                ar={assessmentErrorCopy.question_pairs_invalid.ar}
+                ar={assessmentErrorCopy.question_pairs_invalid.en}
               />
             </p>
           ) : null}
@@ -620,7 +620,7 @@ export function QuestionForm({
             <Plus aria-hidden="true" className="size-3.5" />
             <Bi
               en={assessmentsUi.questionForm.addPair.en}
-              ar={assessmentsUi.questionForm.addPair.ar}
+              ar={assessmentsUi.questionForm.addPair.en}
             />
           </Button>
         </div>
@@ -651,7 +651,7 @@ export function QuestionForm({
             />
             <Bi
               en={assessmentsUi.questionForm.caseSensitive.en}
-              ar={assessmentsUi.questionForm.caseSensitive.ar}
+              ar={assessmentsUi.questionForm.caseSensitive.en}
             />
           </label>
         </div>
@@ -668,8 +668,8 @@ export function QuestionForm({
               }
               ar={
                 values.type === "essay"
-                  ? assessmentsUi.questionForm.essayHint.ar
-                  : assessmentsUi.questionForm.paragraphHint.ar
+                  ? assessmentsUi.questionForm.essayHint.en
+                  : assessmentsUi.questionForm.paragraphHint.en
               }
             />
           </Alert>
@@ -730,7 +730,7 @@ export function QuestionForm({
           <p className="text-xs text-muted-foreground">
             <Bi
               en={assessmentsUi.questionForm.wordLimitsHint.en}
-              ar={assessmentsUi.questionForm.wordLimitsHint.ar}
+              ar={assessmentsUi.questionForm.wordLimitsHint.en}
             />
           </p>
 
@@ -755,7 +755,7 @@ export function QuestionForm({
         <Alert variant="info">
           <Bi
             en={assessmentsUi.questionForm.fileHint.en}
-            ar={assessmentsUi.questionForm.fileHint.ar}
+            ar={assessmentsUi.questionForm.fileHint.en}
           />
         </Alert>
       ) : null}
@@ -790,8 +790,8 @@ export function QuestionForm({
             }
             ar={
               pending
-                ? assessmentsUi.actions.saving.ar
-                : assessmentsUi.actions.saveQuestion.ar
+                ? assessmentsUi.actions.saving.en
+                : assessmentsUi.actions.saveQuestion.en
             }
           />
         </Button>
@@ -801,7 +801,7 @@ export function QuestionForm({
         >
           <Bi
             en={assessmentsUi.actions.cancel.en}
-            ar={assessmentsUi.actions.cancel.ar}
+            ar={assessmentsUi.actions.cancel.en}
           />
         </Link>
       </div>

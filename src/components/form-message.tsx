@@ -5,9 +5,11 @@ import { cn } from "@/lib/utils";
 export function FormMessage({
   message,
   className,
+  bilingual = false,
 }: {
   message?: string;
   className?: string;
+  bilingual?: boolean;
 }) {
   if (!message) {
     return null;
@@ -20,7 +22,12 @@ export function FormMessage({
       className={cn("text-destructive", className)}
       role="alert"
     >
-      <Bi en={copy.en} ar={copy.ar} className="text-xs font-medium" />
+      <Bi
+        en={copy.en}
+        ar={copy.ar}
+        bilingual={bilingual}
+        className="text-xs font-medium"
+      />
     </p>
   );
 }

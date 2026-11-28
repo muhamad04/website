@@ -24,7 +24,7 @@ import {
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Resources · المصادر",
+  title: "Resources",
 };
 
 export const dynamic = "force-dynamic";
@@ -54,20 +54,20 @@ export default async function StudentResourcesPage({
     <div className="space-y-5">
       <PageHeader
         eyebrow={
-          <Bi en={resourcesUi.eyebrow.en} ar={resourcesUi.eyebrow.ar} />
+          <Bi en={resourcesUi.eyebrow.en} ar={resourcesUi.eyebrow.en} />
         }
-        title={<Bi en={resourcesUi.student.title.en} ar={resourcesUi.student.title.ar} />}
+        title={<Bi en={resourcesUi.student.title.en} ar={resourcesUi.student.title.en} />}
         description={
           <Bi
             en={`${resourcesUi.student.subtitle.en} ${grade.name_en}.`}
-            ar={`${resourcesUi.student.subtitle.ar} ${grade.name_ar}.`}
+            ar={`${resourcesUi.student.subtitle.en} ${grade.name_en}.`}
           />
         }
         actions={
           <Badge variant="success">
             <Bi
               en={resourcesUi.student.gradeLocked.en}
-              ar={resourcesUi.student.gradeLocked.ar}
+              ar={resourcesUi.student.gradeLocked.en}
             />
           </Badge>
         }
@@ -77,7 +77,7 @@ export default async function StudentResourcesPage({
         <Alert variant="error">
           <Bi
             en={resourcesUi.messages.loadFailed.en}
-            ar={resourcesUi.messages.loadFailed.ar}
+            ar={resourcesUi.messages.loadFailed.en}
           />
         </Alert>
       ) : null}
@@ -86,7 +86,7 @@ export default async function StudentResourcesPage({
         <Alert variant="error">
           <Bi
             en={resourcesUi.messages.categoriesLoadFailed.en}
-            ar={resourcesUi.messages.categoriesLoadFailed.ar}
+            ar={resourcesUi.messages.categoriesLoadFailed.en}
           />
         </Alert>
       ) : null}
@@ -103,11 +103,11 @@ export default async function StudentResourcesPage({
       <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground">
         <p>
           {list.total === 0 ? (
-            <Bi en="No resources found" ar="لم يُعثر على مصادر" />
+            <Bi en="No resources found" ar="No resources found" />
           ) : (
             <Bi
               en={`Showing ${start}–${end} of ${list.total} resources`}
-              ar={`عرض ${start}–${end} من ${list.total} مصدرًا`}
+              ar={`Showing ${start}–${end} of ${list.total} resources`}
             />
           )}
         </p>
@@ -115,7 +115,7 @@ export default async function StudentResourcesPage({
           <p>
             <Bi
               en={`Page ${list.page} of ${list.pageCount}`}
-              ar={`صفحة ${list.page} من ${list.pageCount}`}
+              ar={`Page ${list.page} of ${list.pageCount}`}
             />
           </p>
         ) : null}
@@ -128,12 +128,12 @@ export default async function StudentResourcesPage({
             hasFilters ? (
               <Bi
                 en={resourcesUi.list.emptyFiltered.en}
-                ar={resourcesUi.list.emptyFiltered.ar}
+                ar={resourcesUi.list.emptyFiltered.en}
               />
             ) : (
               <Bi
                 en={resourcesUi.list.studentEmpty.en}
-                ar={resourcesUi.list.studentEmpty.ar}
+                ar={resourcesUi.list.studentEmpty.en}
               />
             )
           }
@@ -141,12 +141,12 @@ export default async function StudentResourcesPage({
             hasFilters ? (
               <Bi
                 en={resourcesUi.list.emptyFilteredHint.en}
-                ar={resourcesUi.list.emptyFilteredHint.ar}
+                ar={resourcesUi.list.emptyFilteredHint.en}
               />
             ) : (
               <Bi
                 en={resourcesUi.list.studentEmptyHint.en}
-                ar={resourcesUi.list.studentEmptyHint.ar}
+                ar={resourcesUi.list.studentEmptyHint.en}
               />
             )
           }
@@ -158,7 +158,7 @@ export default async function StudentResourcesPage({
               >
                 <Bi
                   en={resourcesUi.filters.clear.en}
-                  ar={resourcesUi.filters.clear.ar}
+                  ar={resourcesUi.filters.clear.en}
                 />
               </Link>
             ) : null
@@ -181,7 +181,7 @@ export default async function StudentResourcesPage({
 
       {list.pageCount > 1 ? (
         <nav
-          aria-label="Pagination / التنقل بين الصفحات"
+          aria-label="Pagination"
           className="flex items-center justify-between gap-3"
         >
           {list.page > 1 ? (
@@ -193,7 +193,7 @@ export default async function StudentResourcesPage({
               )}`}
               className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
             >
-              <Bi en={resourcesUi.list.previous.en} ar={resourcesUi.list.previous.ar} />
+              <Bi en={resourcesUi.list.previous.en} ar={resourcesUi.list.previous.en} />
             </Link>
           ) : (
             <span />
@@ -216,7 +216,7 @@ export default async function StudentResourcesPage({
               )}`}
               className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
             >
-              <Bi en={resourcesUi.list.next.en} ar={resourcesUi.list.next.ar} />
+              <Bi en={resourcesUi.list.next.en} ar={resourcesUi.list.next.en} />
             </Link>
           ) : (
             <span />

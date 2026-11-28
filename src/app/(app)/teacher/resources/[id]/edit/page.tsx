@@ -17,7 +17,7 @@ import { isUuid } from "@/lib/search";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Edit resource · تعديل المصدر",
+  title: "Edit resource",
 };
 
 export const dynamic = "force-dynamic";
@@ -48,14 +48,14 @@ export default async function EditResourcePage({
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow={<Bi en={resourcesUi.eyebrow.en} ar={resourcesUi.eyebrow.ar} />}
+        eyebrow={<Bi en={resourcesUi.eyebrow.en} ar={resourcesUi.eyebrow.en} />}
         title={
-          <Bi en={resourcesUi.form.editTitle.en} ar={resourcesUi.form.editTitle.ar} />
+          <Bi en={resourcesUi.form.editTitle.en} ar={resourcesUi.form.editTitle.en} />
         }
         description={
           <Bi
             en={resourcesUi.form.editSubtitle.en}
-            ar={resourcesUi.form.editSubtitle.ar}
+            ar={resourcesUi.form.editSubtitle.en}
           />
         }
         actions={
@@ -67,7 +67,7 @@ export default async function EditResourcePage({
               <ExternalLink aria-hidden="true" className="size-4" />
               <Bi
                 en={resourcesUi.actions.open.en}
-                ar={resourcesUi.actions.open.ar}
+                ar={resourcesUi.actions.open.en}
               />
             </Link>
             <Link
@@ -77,7 +77,7 @@ export default async function EditResourcePage({
               <ArrowLeft aria-hidden="true" className="size-4" />
               <Bi
                 en={resourcesUi.actions.backToList.en}
-                ar={resourcesUi.actions.backToList.ar}
+                ar={resourcesUi.actions.backToList.en}
               />
             </Link>
           </>
@@ -100,7 +100,7 @@ export default async function EditResourcePage({
         >
           <Bi
             en={resourcesUi.actions.backToList.en}
-            ar={resourcesUi.actions.backToList.ar}
+            ar={resourcesUi.actions.backToList.en}
           />
         </Link>
       </div>

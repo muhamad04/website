@@ -69,10 +69,19 @@ export function StaffForm({
     startTransition(async () => {
       const payload =
         mode === "create"
-          ? values
+          ? {
+              full_name_en: values.full_name_en,
+              // English-only authoring; mirror the English name into the
+              // legacy Arabic column so validation and the schema stay happy.
+              full_name_ar: values.full_name_en,
+              email: values.email,
+              role: values.role,
+              is_active: values.is_active,
+            }
           : {
               staff_id: staff?.id ?? "",
               full_name_en: values.full_name_en,
+              // Keep the stored Arabic name untouched on edit.
               full_name_ar: values.full_name_ar,
               email: values.email,
             };
@@ -103,7 +112,7 @@ export function StaffForm({
         <Alert variant="error">
           <Bi
             en={staffErrorCopy[formError].en}
-            ar={staffErrorCopy[formError].ar}
+            ar={staffErrorCopy[formError].en}
           />
         </Alert>
       ) : null}
@@ -112,7 +121,7 @@ export function StaffForm({
         <Alert variant="success">
           <Bi
             en={staffUi.messages.updated.en}
-            ar={staffUi.messages.updated.ar}
+            ar={staffUi.messages.updated.en}
           />
         </Alert>
       ) : null}
@@ -128,8 +137,8 @@ export function StaffForm({
               }
               ar={
                 result.accessUrl
-                  ? staffUi.messages.created.ar
-                  : staffUi.messages.createdNoLink.ar
+                  ? staffUi.messages.created.en
+                  : staffUi.messages.createdNoLink.en
               }
             />
           </Alert>
@@ -145,7 +154,7 @@ export function StaffForm({
             >
               <Bi
                 en={staffUi.actions.openProfile.en}
-                ar={staffUi.actions.openProfile.ar}
+                ar={staffUi.actions.openProfile.en}
               />
             </Link>
             <Link
@@ -154,7 +163,7 @@ export function StaffForm({
             >
               <Bi
                 en={staffUi.actions.backToList.en}
-                ar={staffUi.actions.backToList.ar}
+                ar={staffUi.actions.backToList.en}
               />
             </Link>
           </div>
@@ -175,25 +184,6 @@ export function StaffForm({
             autoComplete="off"
             dir="ltr"
             aria-invalid={Boolean(errors.full_name_en)}
-            required
-          />
-        </Field>
-
-        <Field
-          id="full_name_ar"
-          label={staffUi.form.nameAr}
-          error={errors.full_name_ar}
-          errorCopy={staffErrorCopy}
-        >
-          <Input
-            id="full_name_ar"
-            value={values.full_name_ar}
-            onChange={(event) => update("full_name_ar", event.target.value)}
-            autoComplete="off"
-            dir="rtl"
-            lang="ar"
-            className="font-arabic"
-            aria-invalid={Boolean(errors.full_name_ar)}
             required
           />
         </Field>
@@ -269,7 +259,7 @@ export function StaffForm({
           <p className="text-xs leading-relaxed text-muted-foreground sm:col-span-2">
             <Bi
               en={staffUi.form.statusNote.en}
-              ar={staffUi.form.statusNote.ar}
+              ar={staffUi.form.statusNote.en}
             />
           </p>
         )}
@@ -280,7 +270,7 @@ export function StaffForm({
           {pending ? (
             <Bi
               en={staffUi.actions.saving.en}
-              ar={staffUi.actions.saving.ar}
+              ar={staffUi.actions.saving.en}
             />
           ) : (
             <Bi
@@ -291,8 +281,8 @@ export function StaffForm({
               }
               ar={
                 mode === "create"
-                  ? staffUi.actions.create.ar
-                  : staffUi.actions.save.ar
+                  ? staffUi.actions.create.en
+                  : staffUi.actions.save.en
               }
             />
           )}
@@ -303,7 +293,7 @@ export function StaffForm({
         >
           <Bi
             en={staffUi.actions.backToList.en}
-            ar={staffUi.actions.backToList.ar}
+            ar={staffUi.actions.backToList.en}
           />
         </Link>
       </div>

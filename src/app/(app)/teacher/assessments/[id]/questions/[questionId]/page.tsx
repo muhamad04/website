@@ -16,7 +16,7 @@ import { isUuid } from "@/lib/search";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Edit question · تعديل السؤال",
+  title: "Edit question",
 };
 
 export const dynamic = "force-dynamic";
@@ -60,13 +60,13 @@ export default async function EditQuestionPage({
         title={
           <Bi
             en={assessmentsUi.questionForm.editTitle.en}
-            ar={assessmentsUi.questionForm.editTitle.ar}
+            ar={assessmentsUi.questionForm.editTitle.en}
           />
         }
         description={
           <Bi
             en={assessmentsUi.questionForm.editSubtitle.en}
-            ar={assessmentsUi.questionForm.editSubtitle.ar}
+            ar={assessmentsUi.questionForm.editSubtitle.en}
           />
         }
         actions={
@@ -77,7 +77,7 @@ export default async function EditQuestionPage({
             <ArrowLeft aria-hidden="true" className="size-4" />
             <Bi
               en={assessmentsUi.actions.backToBuilder.en}
-              ar={assessmentsUi.actions.backToBuilder.ar}
+              ar={assessmentsUi.actions.backToBuilder.en}
             />
           </Link>
         }

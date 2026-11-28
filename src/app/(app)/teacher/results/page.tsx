@@ -30,7 +30,7 @@ import {
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Results reporting · تقارير النتائج",
+  title: "Results reporting",
 };
 
 export const dynamic = "force-dynamic";
@@ -61,19 +61,19 @@ export default async function TeacherResultsPage({
         eyebrow={
           <Bi
             en={reportingUi.results.eyebrow.en}
-            ar={reportingUi.results.eyebrow.ar}
+            ar={reportingUi.results.eyebrow.en}
           />
         }
         title={
           <Bi
             en={reportingUi.results.title.en}
-            ar={reportingUi.results.title.ar}
+            ar={reportingUi.results.title.en}
           />
         }
         description={
           <Bi
             en={reportingUi.results.subtitle.en}
-            ar={reportingUi.results.subtitle.ar}
+            ar={reportingUi.results.subtitle.en}
           />
         }
         actions={
@@ -93,7 +93,7 @@ export default async function TeacherResultsPage({
               <Download aria-hidden="true" className="size-4" />
               <Bi
                 en={reportingUi.results.exportCsv.en}
-                ar={reportingUi.results.exportCsv.ar}
+                ar={reportingUi.results.exportCsv.en}
               />
             </Link>
           </>
@@ -104,7 +104,7 @@ export default async function TeacherResultsPage({
         <Alert variant="error">
           <Bi
             en={reportingUi.results.error.en}
-            ar={reportingUi.results.error.ar}
+            ar={reportingUi.results.error.en}
           />
         </Alert>
       ) : null}
@@ -120,7 +120,7 @@ export default async function TeacherResultsPage({
       <p className="text-xs text-muted-foreground">
         <Bi
           en={reportingUi.results.exportHint.en}
-          ar={reportingUi.results.exportHint.ar}
+          ar={reportingUi.results.exportHint.en}
         />
       </p>
 
@@ -129,12 +129,12 @@ export default async function TeacherResultsPage({
           {results.total === 0 ? (
             <Bi
               en={reportingUi.results.noRows.en}
-              ar={reportingUi.results.noRows.ar}
+              ar={reportingUi.results.noRows.en}
             />
           ) : (
             <Bi
               en={`${reportingUi.results.showing.en} ${start}–${end} ${reportingUi.results.of.en} ${results.total}`}
-              ar={`${reportingUi.results.showing.ar} ${start}–${end} ${reportingUi.results.of.ar} ${results.total}`}
+              ar={`${reportingUi.results.showing.en} ${start}–${end} ${reportingUi.results.of.en} ${results.total}`}
             />
           )}
         </p>
@@ -142,7 +142,7 @@ export default async function TeacherResultsPage({
           <p>
             <Bi
               en={`${reportingUi.results.page.en} ${results.page} ${reportingUi.results.of.en} ${results.pageCount}`}
-              ar={`${reportingUi.results.page.ar} ${results.page} ${reportingUi.results.of.ar} ${results.pageCount}`}
+              ar={`${reportingUi.results.page.en} ${results.page} ${reportingUi.results.of.en} ${results.pageCount}`}
             />
           </p>
         ) : null}
@@ -154,7 +154,7 @@ export default async function TeacherResultsPage({
 
       {results.pageCount > 1 ? (
         <nav
-          aria-label="Results pagination / ترقيم صفحات النتائج"
+          aria-label="Results pagination"
           className="flex items-center justify-between gap-2"
         >
           {results.page > 1 ? (
@@ -167,7 +167,7 @@ export default async function TeacherResultsPage({
               <ChevronLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
               <Bi
                 en={reportingUi.results.previous.en}
-                ar={reportingUi.results.previous.ar}
+                ar={reportingUi.results.previous.en}
               />
             </Link>
           ) : (
@@ -181,7 +181,7 @@ export default async function TeacherResultsPage({
               <ChevronLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
               <Bi
                 en={reportingUi.results.previous.en}
-                ar={reportingUi.results.previous.ar}
+                ar={reportingUi.results.previous.en}
               />
             </span>
           )}
@@ -195,7 +195,7 @@ export default async function TeacherResultsPage({
             >
               <Bi
                 en={reportingUi.results.next.en}
-                ar={reportingUi.results.next.ar}
+                ar={reportingUi.results.next.en}
               />
               <ChevronRight aria-hidden="true" className="size-4 rtl:rotate-180" />
             </Link>
@@ -209,7 +209,7 @@ export default async function TeacherResultsPage({
             >
               <Bi
                 en={reportingUi.results.next.en}
-                ar={reportingUi.results.next.ar}
+                ar={reportingUi.results.next.en}
               />
               <ChevronRight aria-hidden="true" className="size-4 rtl:rotate-180" />
             </span>

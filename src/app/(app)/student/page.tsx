@@ -39,7 +39,7 @@ import { formatAdminDateTime } from "@/lib/students/format";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Student dashboard · لوحة تحكم الطالب",
+  title: "Student dashboard",
 };
 
 export const dynamic = "force-dynamic";
@@ -71,20 +71,20 @@ export default async function StudentDashboardPage() {
         eyebrow={
           <Bi
             en={reportingUi.student.eyebrow.en}
-            ar={reportingUi.student.eyebrow.ar}
+            ar={reportingUi.student.eyebrow.en}
           />
         }
         title={
           <Bi
             en={`${reportingUi.student.hello.en}, ${profile.full_name_en}`}
-            ar={`${reportingUi.student.hello.ar}، ${profile.full_name_ar ?? profile.full_name_en}`}
+            ar={`${reportingUi.student.hello.en}, ${profile.full_name_en}`}
             layout="stacked"
           />
         }
         description={
           <Bi
             en={reportingUi.student.subtitle.en}
-            ar={reportingUi.student.subtitle.ar}
+            ar={reportingUi.student.subtitle.en}
           />
         }
         actions={
@@ -100,7 +100,7 @@ export default async function StudentDashboardPage() {
               <FolderOpen aria-hidden="true" className="size-4" />
               <Bi
                 en={reportingUi.student.browseResources.en}
-                ar={reportingUi.student.browseResources.ar}
+                ar={reportingUi.student.browseResources.en}
               />
             </Link>
             <Link
@@ -110,7 +110,7 @@ export default async function StudentDashboardPage() {
               <ClipboardList aria-hidden="true" className="size-4" />
               <Bi
                 en={reportingUi.student.availableAssessments.en}
-                ar={reportingUi.student.availableAssessments.ar}
+                ar={reportingUi.student.availableAssessments.en}
               />
             </Link>
           </>
@@ -127,7 +127,7 @@ export default async function StudentDashboardPage() {
       ) : null}
 
       <section
-        aria-label="My overview / نظرة عامة"
+        aria-label="My overview"
         className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
       >
         <StatCard
@@ -218,7 +218,7 @@ export default async function StudentDashboardPage() {
             <CardTitle>
               <Bi
                 en={reportingUi.student.placement.en}
-                ar={reportingUi.student.placement.ar}
+                ar={reportingUi.student.placement.en}
               />
             </CardTitle>
             <CardDescription>
@@ -240,7 +240,7 @@ export default async function StudentDashboardPage() {
                     <Bi en="Grade" ar="الصف" />
                   </dt>
                   <dd className="mt-0.5 text-sm font-semibold">
-                    <Bi en={grade.name_en} ar={grade.name_ar} layout="stacked" />
+                    <Bi en={grade.name_en} ar={grade.name_en} layout="stacked" />
                   </dd>
                 </div>
               </div>
@@ -258,7 +258,7 @@ export default async function StudentDashboardPage() {
                     {profile.class ? (
                       <Bi
                         en={profile.class.name_en}
-                        ar={profile.class.name_ar}
+                        ar={profile.class.name_en}
                         layout="stacked"
                       />
                     ) : (
@@ -305,7 +305,7 @@ export default async function StudentDashboardPage() {
             <p className="mt-4 rounded-lg border border-border bg-secondary/40 p-3 text-xs leading-relaxed text-muted-foreground">
               <Bi
                 en={reportingUi.student.gradeLockedHint.en}
-                ar={reportingUi.student.gradeLockedHint.ar}
+                ar={reportingUi.student.gradeLockedHint.en}
               />
             </p>
           </CardContent>
@@ -317,7 +317,7 @@ export default async function StudentDashboardPage() {
               <CardTitle>
                 <Bi
                   en={reportingUi.student.recentActivity.en}
-                  ar={reportingUi.student.recentActivity.ar}
+                  ar={reportingUi.student.recentActivity.en}
                 />
               </CardTitle>
               <CardDescription>
@@ -342,13 +342,13 @@ export default async function StudentDashboardPage() {
                 title={
                   <Bi
                     en={reportingUi.student.noActivity.en}
-                    ar={reportingUi.student.noActivity.ar}
+                    ar={reportingUi.student.noActivity.en}
                   />
                 }
                 description={
                   <Bi
                     en={reportingUi.student.noActivityHint.en}
-                    ar={reportingUi.student.noActivityHint.ar}
+                    ar={reportingUi.student.noActivityHint.en}
                   />
                 }
               />
@@ -376,20 +376,20 @@ export default async function StudentDashboardPage() {
                         <p className="text-xs text-muted-foreground">
                           <Bi
                             en={assessmentTypeCopy[item.type].en}
-                            ar={assessmentTypeCopy[item.type].ar}
+                            ar={assessmentTypeCopy[item.type].en}
                             hideSeparator
                           />
                           {" · "}
                           {item.status ? (
                             <Bi
                               en={attemptStatusCopy[item.status].en}
-                              ar={attemptStatusCopy[item.status].ar}
+                              ar={attemptStatusCopy[item.status].en}
                               hideSeparator
                             />
                           ) : (
                             <Bi
                               en={reportingUi.student.notStarted.en}
-                              ar={reportingUi.student.notStarted.ar}
+                              ar={reportingUi.student.notStarted.en}
                               hideSeparator
                             />
                           )}
@@ -400,7 +400,7 @@ export default async function StudentDashboardPage() {
                         <p className="mt-1 text-[11px] text-muted-foreground">
                           <Bi
                             en={`${reportingUi.student.attemptsUsed.en} ${item.attemptsUsed}/${item.maxAttempts}`}
-                            ar={`${reportingUi.student.attemptsUsed.ar} ${item.attemptsUsed}/${item.maxAttempts}`}
+                            ar={`${reportingUi.student.attemptsUsed.en} ${item.attemptsUsed}/${item.maxAttempts}`}
                             hideSeparator
                           />
                         </p>
@@ -414,7 +414,7 @@ export default async function StudentDashboardPage() {
                           <Badge variant="outline">
                             <Bi
                               en={reportingUi.student.awaitingReview.en}
-                              ar={reportingUi.student.awaitingReview.ar}
+                              ar={reportingUi.student.awaitingReview.en}
                               hideSeparator
                             />
                           </Badge>
@@ -422,7 +422,7 @@ export default async function StudentDashboardPage() {
                           <Badge variant="muted">
                             <Bi
                               en={reportingUi.student.resultHidden.en}
-                              ar={reportingUi.student.resultHidden.ar}
+                              ar={reportingUi.student.resultHidden.en}
                               hideSeparator
                             />
                           </Badge>
@@ -443,10 +443,10 @@ export default async function StudentDashboardPage() {
                             }
                             ar={
                               item.inProgressAttemptId
-                                ? reportingUi.student.openAssessment.ar
+                                ? reportingUi.student.openAssessment.en
                                 : item.resultVisible && item.lastAttemptId
-                                  ? reportingUi.student.viewResult.ar
-                                  : reportingUi.student.openAssessment.ar
+                                  ? reportingUi.student.viewResult.en
+                                  : reportingUi.student.openAssessment.en
                             }
                           />
                           <ArrowRight
@@ -470,7 +470,7 @@ export default async function StudentDashboardPage() {
             <CardTitle>
               <Bi
                 en={reportingUi.student.teacherFeedback.en}
-                ar={reportingUi.student.teacherFeedback.ar}
+                ar={reportingUi.student.teacherFeedback.en}
               />
             </CardTitle>
             <CardDescription>
@@ -487,13 +487,13 @@ export default async function StudentDashboardPage() {
                 title={
                   <Bi
                     en={reportingUi.student.noFeedback.en}
-                    ar={reportingUi.student.noFeedback.ar}
+                    ar={reportingUi.student.noFeedback.en}
                   />
                 }
                 description={
                   <Bi
                     en={reportingUi.student.noFeedbackHint.en}
-                    ar={reportingUi.student.noFeedbackHint.ar}
+                    ar={reportingUi.student.noFeedbackHint.en}
                   />
                 }
               />
@@ -523,7 +523,7 @@ export default async function StudentDashboardPage() {
                     >
                       <Bi
                         en={reportingUi.student.viewResult.en}
-                        ar={reportingUi.student.viewResult.ar}
+                        ar={reportingUi.student.viewResult.en}
                       />
                       <ArrowRight
                         aria-hidden="true"
@@ -543,7 +543,7 @@ export default async function StudentDashboardPage() {
               <CardTitle>
                 <Bi
                   en={reportingUi.student.recentResources.en}
-                  ar={reportingUi.student.recentResources.ar}
+                  ar={reportingUi.student.recentResources.en}
                 />
               </CardTitle>
               <CardDescription>
@@ -567,7 +567,7 @@ export default async function StudentDashboardPage() {
                 title={
                   <Bi
                     en={reportingUi.student.noResources.en}
-                    ar={reportingUi.student.noResources.ar}
+                    ar={reportingUi.student.noResources.en}
                   />
                 }
                 description={
@@ -587,9 +587,6 @@ export default async function StudentDashboardPage() {
                     <div className="min-w-0">
                       <p className="truncate text-sm font-semibold text-foreground">
                         {resource.title_en}
-                      </p>
-                      <p className="truncate text-xs text-muted-foreground">
-                        {resource.title_ar}
                       </p>
                     </div>
                     <Link

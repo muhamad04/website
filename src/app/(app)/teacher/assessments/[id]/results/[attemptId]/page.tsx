@@ -20,7 +20,7 @@ import { isUuid } from "@/lib/search";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Grade attempt · تصحيح المحاولة",
+  title: "Grade attempt",
 };
 
 export const dynamic = "force-dynamic";
@@ -118,13 +118,13 @@ export default async function GradeAttemptPage({
         title={
           <Bi
             en={assessmentsUi.results.gradingTitle.en}
-            ar={assessmentsUi.results.gradingTitle.ar}
+            ar={assessmentsUi.results.gradingTitle.en}
           />
         }
         description={
           <Bi
             en={assessmentsUi.results.gradingSubtitle.en}
-            ar={assessmentsUi.results.gradingSubtitle.ar}
+            ar={assessmentsUi.results.gradingSubtitle.en}
           />
         }
         actions={
@@ -135,7 +135,7 @@ export default async function GradeAttemptPage({
             <ArrowLeft aria-hidden="true" className="size-4" />
             <Bi
               en={assessmentsUi.results.backToResults.en}
-              ar={assessmentsUi.results.backToResults.ar}
+              ar={assessmentsUi.results.backToResults.en}
             />
           </Link>
         }
@@ -156,7 +156,7 @@ export default async function GradeAttemptPage({
           <Badge variant="muted">
             <Bi
               en={`${assessmentsUi.results.attempt.en} #${data.attempt.attempt_number}`}
-              ar={`${assessmentsUi.results.attempt.ar} #${data.attempt.attempt_number}`}
+              ar={`${assessmentsUi.results.attempt.en} #${data.attempt.attempt_number}`}
             />
           </Badge>
           <Badge variant="muted">
@@ -166,14 +166,14 @@ export default async function GradeAttemptPage({
               ]?.en ?? data.attempt.status}
               ar={attemptStatusCopy[
                 data.attempt.status as keyof typeof attemptStatusCopy
-              ]?.ar ?? data.attempt.status}
+              ]?.en ?? data.attempt.status}
             />
           </Badge>
           {data.attempt.manual_review_status === "pending" ? (
             <Badge variant="outline">
               <Bi
                 en={assessmentsUi.results.pending.en}
-                ar={assessmentsUi.results.pending.ar}
+                ar={assessmentsUi.results.pending.en}
               />
             </Badge>
           ) : null}
@@ -195,7 +195,7 @@ export default async function GradeAttemptPage({
         <Alert variant="info">
           <Bi
             en={assessmentsUi.results.awaitingManual.en}
-            ar={assessmentsUi.results.awaitingManual.ar}
+            ar={assessmentsUi.results.awaitingManual.en}
           />
         </Alert>
       ) : gradableRows.length === 0 ? (

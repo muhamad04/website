@@ -150,13 +150,116 @@ describe("assessment authoring is English-only without overwriting Arabic data",
   });
 });
 
-describe("unrelated website sections remain bilingual", () => {
-  it.each([
-    ["src/components/layout/app-header.tsx", /ar=\{/],
-    ["src/components/resources/resource-card.tsx", /title_ar/],
-    ["src/app/(app)/student/page.tsx", /\.ar\b/],
-    ["src/app/(app)/teacher/page.tsx", /\.ar\b/],
-  ])("%s still renders Arabic", (relativePath, pattern) => {
-    expect(readSource(join(root, relativePath))).toMatch(pattern);
+function readAllTsx(directory: string): Array<{
+  relativePath: string;
+  source: string;
+}> {
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const fullPath = join(directory, entry.name);
+
+    if (entry.isDirectory()) {
+      return readAllTsx(fullPath);
+    }
+
+    return /\.tsx$/.test(entry.name)
+      ? [
+          {
+            relativePath: fullPath.slice(root.length + 1).replace(/\\/g, "/"),
+            source: readFileSync(fullPath, "utf-8"),
+          },
+        ]
+      : [];
+  });
+}
+
+describe("website language policy", () => {
+  it("keeps authentication and the main navigation bilingual", () => {
+    for (const relativePath of [
+      "src/app/login/page.tsx",
+      "src/app/login/login-form.tsx",
+      "src/app/set-password/page.tsx",
+      "src/app/set-password/set-password-form.tsx",
+      "src/app/account-pending/page.tsx",
+      "src/app/account-disabled/page.tsx",
+      "src/components/layout/app-header.tsx",
+    ]) {
+      const source = readSource(join(root, relativePath));
+
+      expect(source, relativePath).toContain("bilingual");
+      // Either inline Arabic copy or an explicit `.ar` dictionary reference.
+      expect(source, relativePath).toMatch(/([\u0600-\u06FF]|\.ar\b)/);
+    }
+  });
+
+  it("removes Arabic authoring inputs from English-only forms", () => {
+    for (const relativePath of [
+      "src/app/(app)/teacher/students/student-form.tsx",
+      "src/app/(app)/teacher/staff/staff-form.tsx",
+      "src/app/(app)/teacher/resources/resource-form.tsx",
+      "src/app/(app)/teacher/resources/categories/category-manager.tsx",
+      "src/components/assessments/manual-grading-form.tsx",
+    ]) {
+      const source = readSource(join(root, relativePath));
+
+      expect(source, relativePath).not.toMatch(/dir="rtl"/);
+      expect(source, relativePath).not.toMatch(/lang="ar"/);
+    }
+  });
+
+  it("does not render stored Arabic columns in English-only pages", () => {
+    for (const relativePath of [
+      "src/app/(app)/teacher/students/page.tsx",
+      "src/app/(app)/teacher/staff/page.tsx",
+      "src/components/resources/resource-card.tsx",
+      "src/components/resources/resource-filters-bar.tsx",
+      "src/components/reporting/report-filters.tsx",
+      "src/components/assessments/import-review.tsx",
+    ]) {
+      const source = readSource(join(root, relativePath));
+
+      expect(source, relativePath).not.toMatch(
+        /\{[^}]*\.(full_name_ar|name_ar|title_ar|description_ar|feedback_ar)\b/,
+      );
+    }
+  });
+
+  it("keeps metadata, captions and aria labels English-only outside auth and nav", () => {
+    const approved = new Set([
+      "src/components/layout/app-header.tsx",
+      "src/components/layout/auth-shell.tsx",
+      "src/components/layout/supabase-setup-notice.tsx",
+      "src/app/login/page.tsx",
+      "src/app/login/login-form.tsx",
+      "src/app/set-password/page.tsx",
+      "src/app/account-pending/page.tsx",
+      "src/app/account-disabled/page.tsx",
+    ]);
+
+    const files = [
+      ...readAllTsx(join(root, "src", "app", "(app)")),
+      ...readAllTsx(join(root, "src", "components")),
+      {
+        relativePath: "src/app/not-found.tsx",
+        source: readSource(join(root, "src", "app", "not-found.tsx")),
+      },
+      {
+        relativePath: "src/app/error.tsx",
+        source: readSource(join(root, "src", "app", "error.tsx")),
+      },
+    ].filter((file) => !approved.has(file.relativePath));
+
+    for (const file of files) {
+      for (const line of file.source.split("\n")) {
+        if (
+          /title:\s*"/.test(line) ||
+          /aria-label=/.test(line) ||
+          /<caption/.test(line)
+        ) {
+          expect(line, `${file.relativePath}: ${line.trim()}`).not.toMatch(
+            /[\u0600-\u06FF]/,
+          );
+        }
+      }
+    }
   });
 });

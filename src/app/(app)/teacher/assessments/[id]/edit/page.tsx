@@ -14,7 +14,7 @@ import { isUuid } from "@/lib/search";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Edit assessment · تعديل الاختبار",
+  title: "Edit assessment",
 };
 
 export const dynamic = "force-dynamic";
@@ -45,18 +45,18 @@ export default async function EditAssessmentPage({
     <div className="space-y-5">
       <PageHeader
         eyebrow={
-          <Bi en={assessmentsUi.eyebrow.en} ar={assessmentsUi.eyebrow.ar} />
+          <Bi en={assessmentsUi.eyebrow.en} ar={assessmentsUi.eyebrow.en} />
         }
         title={
           <Bi
             en={assessmentsUi.form.editTitle.en}
-            ar={assessmentsUi.form.editTitle.ar}
+            ar={assessmentsUi.form.editTitle.en}
           />
         }
         description={
           <Bi
             en={assessmentsUi.form.editSubtitle.en}
-            ar={assessmentsUi.form.editSubtitle.ar}
+            ar={assessmentsUi.form.editSubtitle.en}
           />
         }
         actions={
@@ -68,7 +68,7 @@ export default async function EditAssessmentPage({
               <ExternalLink aria-hidden="true" className="size-4" />
               <Bi
                 en={assessmentsUi.actions.open.en}
-                ar={assessmentsUi.actions.open.ar}
+                ar={assessmentsUi.actions.open.en}
               />
             </Link>
             <Link
@@ -78,7 +78,7 @@ export default async function EditAssessmentPage({
               <ArrowLeft aria-hidden="true" className="size-4" />
               <Bi
                 en={assessmentsUi.actions.backToList.en}
-                ar={assessmentsUi.actions.backToList.ar}
+                ar={assessmentsUi.actions.backToList.en}
               />
             </Link>
           </>
@@ -96,7 +96,7 @@ export default async function EditAssessmentPage({
         >
           <Bi
             en={assessmentsUi.actions.backToBuilder.en}
-            ar={assessmentsUi.actions.backToBuilder.ar}
+            ar={assessmentsUi.actions.backToBuilder.en}
           />
         </Link>
       </div>

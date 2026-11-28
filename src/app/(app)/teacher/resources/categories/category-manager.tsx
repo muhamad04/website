@@ -90,24 +90,6 @@ function CategoryFields({
         </Field>
 
         <Field
-          id={`${idPrefix}-name-ar`}
-          label={resourcesUi.categories.nameAr}
-          error={errors.name_ar}
-          errorCopy={resourceErrorCopy}
-        >
-          <Input
-            id={`${idPrefix}-name-ar`}
-            value={values.name_ar}
-            onChange={(event) => update("name_ar", event.target.value)}
-            dir="rtl"
-            lang="ar"
-            className="font-arabic"
-            aria-invalid={Boolean(errors.name_ar)}
-            required
-          />
-        </Field>
-
-        <Field
           id={`${idPrefix}-slug`}
           label={resourcesUi.categories.slug}
           hint={resourcesUi.categories.slugHint}
@@ -158,24 +140,6 @@ function CategoryFields({
           />
         </Field>
 
-        <Field
-          id={`${idPrefix}-description-ar`}
-          label={resourcesUi.categories.descriptionAr}
-          error={errors.description_ar}
-          errorCopy={resourceErrorCopy}
-        >
-          <Textarea
-            id={`${idPrefix}-description-ar`}
-            value={values.description_ar}
-            onChange={(event) =>
-              update("description_ar", event.target.value)
-            }
-            rows={3}
-            dir="rtl"
-            lang="ar"
-            className="font-arabic"
-          />
-        </Field>
       </div>
 
       <label className="flex items-start gap-2 rounded-lg border border-border bg-card p-3 text-sm">
@@ -189,13 +153,13 @@ function CategoryFields({
           <span className="font-semibold text-foreground">
             <Bi
               en={resourcesUi.categories.active.en}
-              ar={resourcesUi.categories.active.ar}
+              ar={resourcesUi.categories.active.en}
             />
           </span>
           <span className="block text-xs text-muted-foreground">
             <Bi
               en={resourcesUi.categories.activeHint.en}
-              ar={resourcesUi.categories.activeHint.ar}
+              ar={resourcesUi.categories.activeHint.en}
             />
           </span>
         </span>
@@ -226,7 +190,12 @@ export function CategoryCreateForm() {
     setSuccess(false);
 
     startTransition(async () => {
-      const outcome = await createCategoryAction(values);
+      const outcome = await createCategoryAction({
+        ...values,
+        // English-only authoring; mirror into the legacy Arabic columns.
+        name_ar: values.name_en,
+        description_ar: values.description_en,
+      });
 
       if (!outcome.ok) {
         setErrors(outcome.fieldErrors ?? {});
@@ -244,14 +213,14 @@ export function CategoryCreateForm() {
     <form onSubmit={submit} className="space-y-4" noValidate>
       {error ? (
         <Alert variant="error">
-          <Bi en={resourceErrorCopy[error].en} ar={resourceErrorCopy[error].ar} />
+          <Bi en={resourceErrorCopy[error].en} ar={resourceErrorCopy[error].en} />
         </Alert>
       ) : null}
       {success ? (
         <Alert variant="success">
           <Bi
             en={resourcesUi.categories.created.en}
-            ar={resourcesUi.categories.created.ar}
+            ar={resourcesUi.categories.created.en}
           />
         </Alert>
       ) : null}
@@ -273,8 +242,8 @@ export function CategoryCreateForm() {
           }
           ar={
             pending
-              ? resourcesUi.actions.saving.ar
-              : resourcesUi.categories.create.ar
+              ? resourcesUi.actions.saving.en
+              : resourcesUi.categories.create.en
           }
         />
       </Button>
@@ -332,7 +301,7 @@ export function CategoryRow({
 
   const remove = () => {
     const confirmed = window.confirm(
-      `${resourcesUi.categories.confirmDelete.en}\n${resourcesUi.categories.deleteWarning.en}\n\n${resourcesUi.categories.confirmDelete.ar}\n${resourcesUi.categories.deleteWarning.ar}`,
+      `${resourcesUi.categories.confirmDelete.en}\n${resourcesUi.categories.deleteWarning.en}`,
     );
 
     if (!confirmed) {
@@ -361,7 +330,7 @@ export function CategoryRow({
             <Alert variant="error">
               <Bi
                 en={resourceErrorCopy[error].en}
-                ar={resourceErrorCopy[error].ar}
+                ar={resourceErrorCopy[error].en}
               />
             </Alert>
           ) : null}
@@ -383,8 +352,8 @@ export function CategoryRow({
                 }
                 ar={
                   pending
-                    ? resourcesUi.actions.saving.ar
-                    : resourcesUi.categories.save.ar
+                    ? resourcesUi.actions.saving.en
+                    : resourcesUi.categories.save.en
                 }
               />
             </Button>
@@ -402,7 +371,7 @@ export function CategoryRow({
               <X aria-hidden="true" className="size-3.5" />
               <Bi
                 en={resourcesUi.categories.cancel.en}
-                ar={resourcesUi.categories.cancel.ar}
+                ar={resourcesUi.categories.cancel.en}
               />
             </Button>
           </div>
@@ -413,13 +382,6 @@ export function CategoryRow({
             <div className="min-w-0">
               <p className="text-sm font-semibold text-foreground">
                 {category.name_en}
-              </p>
-              <p
-                lang="ar"
-                dir="rtl"
-                className="font-arabic text-xs text-muted-foreground"
-              >
-                {category.name_ar}
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-1.5">
@@ -433,8 +395,8 @@ export function CategoryRow({
                   }
                   ar={
                     category.is_active
-                      ? resourcesUi.categories.active.ar
-                      : resourcesUi.categories.inactive.ar
+                      ? resourcesUi.categories.active.en
+                      : resourcesUi.categories.inactive.en
                   }
                   hideSeparator
                 />
@@ -442,23 +404,16 @@ export function CategoryRow({
               <Badge variant="default">
                 <Bi
                   en={`${category.resourceCount} ${resourcesUi.categories.count.en}`}
-                  ar={`${category.resourceCount} ${resourcesUi.categories.count.ar}`}
+                  ar={`${category.resourceCount} ${resourcesUi.categories.count.en}`}
                   hideSeparator
                 />
               </Badge>
             </div>
           </div>
 
-          {category.description_en || category.description_ar ? (
+          {category.description_en ? (
             <div className="space-y-1 text-xs text-muted-foreground">
-              {category.description_en ? (
-                <p>{category.description_en}</p>
-              ) : null}
-              {category.description_ar ? (
-                <p lang="ar" dir="rtl" className="font-arabic">
-                  {category.description_ar}
-                </p>
-              ) : null}
+              <p>{category.description_en}</p>
             </div>
           ) : null}
 
@@ -466,7 +421,7 @@ export function CategoryRow({
             <Alert variant="error">
               <Bi
                 en={resourceErrorCopy[error].en}
-                ar={resourceErrorCopy[error].ar}
+                ar={resourceErrorCopy[error].en}
               />
             </Alert>
           ) : null}
@@ -482,7 +437,7 @@ export function CategoryRow({
               <Pencil aria-hidden="true" className="size-3.5" />
               <Bi
                 en={resourcesUi.categories.edit.en}
-                ar={resourcesUi.categories.edit.ar}
+                ar={resourcesUi.categories.edit.en}
               />
             </Button>
             <Button
@@ -501,8 +456,8 @@ export function CategoryRow({
                 }
                 ar={
                   pending
-                    ? resourcesUi.actions.deleting.ar
-                    : resourcesUi.categories.delete.ar
+                    ? resourcesUi.actions.deleting.en
+                    : resourcesUi.categories.delete.en
                 }
               />
             </Button>

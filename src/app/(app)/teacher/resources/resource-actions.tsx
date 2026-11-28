@@ -65,16 +65,16 @@ export function ResourcePublishToggle({
           }
           ar={
             pending
-              ? resourcesUi.actions.working.ar
+              ? resourcesUi.actions.working.en
               : isPublished
-                ? resourcesUi.actions.unpublish.ar
-                : resourcesUi.actions.publish.ar
+                ? resourcesUi.actions.unpublish.en
+                : resourcesUi.actions.publish.en
           }
         />
       </Button>
       {error ? (
         <span role="alert" className="text-[11px] text-destructive">
-          <Bi en={resourceErrorCopy[error].en} ar={resourceErrorCopy[error].ar} />
+          <Bi en={resourceErrorCopy[error].en} ar={resourceErrorCopy[error].en} />
         </span>
       ) : null}
     </span>
@@ -94,7 +94,7 @@ export function DeleteResourceButton({
 
   const remove = () => {
     const confirmed = window.confirm(
-      `${resourcesUi.actions.confirmDelete.en}\n${resourcesUi.actions.deleteWarning.en}\n\n${resourcesUi.actions.confirmDelete.ar}\n${resourcesUi.actions.deleteWarning.ar}`,
+      `${resourcesUi.actions.confirmDelete.en}\n${resourcesUi.actions.deleteWarning.en}`,
     );
 
     if (!confirmed) {
@@ -137,14 +137,14 @@ export function DeleteResourceButton({
           }
           ar={
             pending
-              ? resourcesUi.actions.deleting.ar
-              : resourcesUi.actions.delete.ar
+              ? resourcesUi.actions.deleting.en
+              : resourcesUi.actions.delete.en
           }
         />
       </Button>
       {error ? (
         <span role="alert" className="text-[11px] text-destructive">
-          <Bi en={resourceErrorCopy[error].en} ar={resourceErrorCopy[error].ar} />
+          <Bi en={resourceErrorCopy[error].en} ar={resourceErrorCopy[error].en} />
         </span>
       ) : null}
     </span>

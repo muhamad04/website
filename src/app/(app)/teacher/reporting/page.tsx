@@ -44,7 +44,7 @@ import {
 } from "@/app/(app)/teacher/reporting/reporting-actions";
 
 export const metadata: Metadata = {
-  title: "Google Sheets reporting · تقارير Google Sheets",
+  title: "Google Sheets reporting",
 };
 
 export const dynamic = "force-dynamic";
@@ -114,16 +114,16 @@ export default async function ReportingAdminPage({
         eyebrow={
           <Bi
             en={reportingUi.admin.eyebrow.en}
-            ar={reportingUi.admin.eyebrow.ar}
+            ar={reportingUi.admin.eyebrow.en}
           />
         }
         title={
-          <Bi en={reportingUi.admin.title.en} ar={reportingUi.admin.title.ar} />
+          <Bi en={reportingUi.admin.title.en} ar={reportingUi.admin.title.en} />
         }
         description={
           <Bi
             en={reportingUi.admin.subtitle.en}
-            ar={reportingUi.admin.subtitle.ar}
+            ar={reportingUi.admin.subtitle.en}
           />
         }
         actions={
@@ -133,11 +133,11 @@ export default async function ReportingAdminPage({
               className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
             >
               <ArrowLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
-              <Bi en="Results" ar="النتائج" />
+              <Bi en="Results" ar="Results" />
             </Link>
             <Badge variant="muted">
               <ShieldCheck aria-hidden="true" className="size-3.5" />
-              <Bi en="Administrators only" ar="للمسؤولين فقط" />
+              <Bi en="Administrators only" ar="Administrators only" />
             </Badge>
           </>
         }
@@ -147,7 +147,7 @@ export default async function ReportingAdminPage({
         <Alert variant="success">
           <Bi
             en={reportingUi.admin.saved.en}
-            ar={reportingUi.admin.saved.ar}
+            ar={reportingUi.admin.saved.en}
           />
         </Alert>
       ) : null}
@@ -156,7 +156,7 @@ export default async function ReportingAdminPage({
         <Alert variant="error">
           <Bi
             en={reportingUi.errors[failureCode].en}
-            ar={reportingUi.errors[failureCode].ar}
+            ar={reportingUi.errors[failureCode].en}
           />
         </Alert>
       ) : null}
@@ -168,13 +168,13 @@ export default async function ReportingAdminPage({
               <Settings2 aria-hidden="true" className="size-4 text-primary" />
               <Bi
                 en={reportingUi.admin.settings.en}
-                ar={reportingUi.admin.settings.ar}
+                ar={reportingUi.admin.settings.en}
               />
             </CardTitle>
             <CardDescription>
               <Bi
                 en={reportingUi.admin.settingsHint.en}
-                ar={reportingUi.admin.settingsHint.ar}
+                ar={reportingUi.admin.settingsHint.en}
               />
             </CardDescription>
           </CardHeader>
@@ -191,13 +191,13 @@ export default async function ReportingAdminPage({
                   <span className="block font-semibold text-foreground">
                     <Bi
                       en={reportingUi.admin.syncEnabled.en}
-                      ar={reportingUi.admin.syncEnabled.ar}
+                      ar={reportingUi.admin.syncEnabled.en}
                     />
                   </span>
                   <span className="block text-xs text-muted-foreground">
                     <Bi
                       en={reportingUi.admin.syncEnabledHint.en}
-                      ar={reportingUi.admin.syncEnabledHint.ar}
+                      ar={reportingUi.admin.syncEnabledHint.en}
                     />
                   </span>
                 </span>
@@ -214,13 +214,13 @@ export default async function ReportingAdminPage({
                   <span className="block font-semibold text-foreground">
                     <Bi
                       en={reportingUi.admin.mockMode.en}
-                      ar={reportingUi.admin.mockMode.ar}
+                      ar={reportingUi.admin.mockMode.en}
                     />
                   </span>
                   <span className="block text-xs text-muted-foreground">
                     <Bi
                       en={reportingUi.admin.mockModeHint.en}
-                      ar={reportingUi.admin.mockModeHint.ar}
+                      ar={reportingUi.admin.mockModeHint.en}
                     />
                   </span>
                 </span>
@@ -230,7 +230,7 @@ export default async function ReportingAdminPage({
                 <Label htmlFor="sheet-name">
                   <Bi
                     en={reportingUi.admin.sheetName.en}
-                    ar={reportingUi.admin.sheetName.ar}
+                    ar={reportingUi.admin.sheetName.en}
                   />
                 </Label>
                 <Input
@@ -244,14 +244,14 @@ export default async function ReportingAdminPage({
                 <p className="text-xs text-muted-foreground">
                   <Bi
                     en={reportingUi.admin.sheetNameHint.en}
-                    ar={reportingUi.admin.sheetNameHint.ar}
+                    ar={reportingUi.admin.sheetNameHint.en}
                   />
                 </p>
               </div>
 
               <Button type="submit" size="sm">
                 <Settings2 aria-hidden="true" className="size-3.5" />
-                <Bi en={reportingUi.admin.save.en} ar={reportingUi.admin.save.ar} />
+                <Bi en={reportingUi.admin.save.en} ar={reportingUi.admin.save.en} />
               </Button>
             </form>
           </CardContent>
@@ -263,13 +263,13 @@ export default async function ReportingAdminPage({
               <KeyRound aria-hidden="true" className="size-4 text-primary" />
               <Bi
                 en={reportingUi.admin.credentials.en}
-                ar={reportingUi.admin.credentials.ar}
+                ar={reportingUi.admin.credentials.en}
               />
             </CardTitle>
             <CardDescription>
               <Bi
                 en={reportingUi.admin.credentialsHint.en}
-                ar={reportingUi.admin.credentialsHint.ar}
+                ar={reportingUi.admin.credentialsHint.en}
               />
             </CardDescription>
           </CardHeader>
@@ -294,7 +294,7 @@ export default async function ReportingAdminPage({
                   className="flex items-center justify-between gap-3 rounded-lg border border-border bg-secondary/30 px-3 py-2"
                 >
                   <dt className="min-w-0">
-                    <Bi en={row.label.en} ar={row.label.ar} />
+                    <Bi en={row.label.en} ar={row.label.en} />
                   </dt>
                   <dd>
                     <Badge variant={row.value ? "success" : "outline"}>
@@ -311,8 +311,8 @@ export default async function ReportingAdminPage({
                         }
                         ar={
                           row.value
-                            ? reportingUi.admin.configured.ar
-                            : reportingUi.admin.notConfigured.ar
+                            ? reportingUi.admin.configured.en
+                            : reportingUi.admin.notConfigured.en
                         }
                         hideSeparator
                       />
@@ -327,7 +327,7 @@ export default async function ReportingAdminPage({
                 <p className="font-semibold text-foreground">
                   <Bi
                     en={reportingUi.admin.sheetName.en}
-                    ar={reportingUi.admin.sheetName.ar}
+                    ar={reportingUi.admin.sheetName.en}
                   />
                 </p>
                 <p dir="ltr" className="break-all">
@@ -338,7 +338,7 @@ export default async function ReportingAdminPage({
                 <Badge variant="muted">
                   <Bi
                     en={reportingUi.admin.connectivitySkipped.en}
-                    ar={reportingUi.admin.connectivitySkipped.ar}
+                    ar={reportingUi.admin.connectivitySkipped.en}
                     hideSeparator
                   />
                 </Badge>
@@ -352,13 +352,13 @@ export default async function ReportingAdminPage({
                 <p className="font-semibold text-foreground">
                   <Bi
                     en={reportingUi.admin.logs.en}
-                    ar={reportingUi.admin.logs.ar}
+                    ar={reportingUi.admin.logs.en}
                   />
                 </p>
                 <p>
                   <Bi
                     en={`${failedCount} failed row${failedCount === 1 ? "" : "s"} waiting for a retry`}
-                    ar={`${failedCount} صف فاشل بانتظار إعادة المحاولة`}
+                    ar={`${failedCount} failed rows waiting to retry`}
                     hideSeparator
                   />
                 </p>
@@ -374,12 +374,12 @@ export default async function ReportingAdminPage({
           <div>
             <CardTitle className="flex items-center gap-2">
               <Sheet aria-hidden="true" className="size-4 text-primary" />
-              <Bi en={reportingUi.admin.logs.en} ar={reportingUi.admin.logs.ar} />
+              <Bi en={reportingUi.admin.logs.en} ar={reportingUi.admin.logs.en} />
             </CardTitle>
             <CardDescription>
               <Bi
                 en={reportingUi.admin.logsHint.en}
-                ar={reportingUi.admin.logsHint.ar}
+                ar={reportingUi.admin.logsHint.en}
               />
             </CardDescription>
           </div>
@@ -394,7 +394,7 @@ export default async function ReportingAdminPage({
               <Alert variant="error">
                 <Bi
                   en={reportingUi.admin.logsError.en}
-                  ar={reportingUi.admin.logsError.ar}
+                  ar={reportingUi.admin.logsError.en}
                 />
               </Alert>
             </div>
@@ -405,13 +405,13 @@ export default async function ReportingAdminPage({
                 title={
                   <Bi
                     en={reportingUi.admin.noLogs.en}
-                    ar={reportingUi.admin.noLogs.ar}
+                    ar={reportingUi.admin.noLogs.en}
                   />
                 }
                 description={
                   <Bi
                     en={reportingUi.admin.noLogsHint.en}
-                    ar={reportingUi.admin.noLogsHint.ar}
+                    ar={reportingUi.admin.noLogsHint.en}
                   />
                 }
               />
@@ -420,44 +420,44 @@ export default async function ReportingAdminPage({
             <div className="overflow-x-auto">
               <table className="w-full min-w-[54rem] text-sm">
                 <caption className="sr-only">
-                  Sync log / سجل المزامنة
+                  Sync log
                 </caption>
                 <thead className="bg-secondary/50 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
                   <tr>
                     <th scope="col" className="px-4 py-2.5">
                       <Bi
                         en={reportingUi.admin.columns.attempt.en}
-                        ar={reportingUi.admin.columns.attempt.ar}
+                        ar={reportingUi.admin.columns.attempt.en}
                       />
                     </th>
                     <th scope="col" className="px-4 py-2.5">
                       <Bi
                         en={reportingUi.admin.columns.status.en}
-                        ar={reportingUi.admin.columns.status.ar}
+                        ar={reportingUi.admin.columns.status.en}
                       />
                     </th>
                     <th scope="col" className="px-4 py-2.5">
                       <Bi
                         en={reportingUi.admin.columns.tries.en}
-                        ar={reportingUi.admin.columns.tries.ar}
+                        ar={reportingUi.admin.columns.tries.en}
                       />
                     </th>
                     <th scope="col" className="px-4 py-2.5">
                       <Bi
                         en={reportingUi.admin.columns.updated.en}
-                        ar={reportingUi.admin.columns.updated.ar}
+                        ar={reportingUi.admin.columns.updated.en}
                       />
                     </th>
                     <th scope="col" className="px-4 py-2.5">
                       <Bi
                         en={reportingUi.admin.columns.error.en}
-                        ar={reportingUi.admin.columns.error.ar}
+                        ar={reportingUi.admin.columns.error.en}
                       />
                     </th>
                     <th scope="col" className="px-4 py-2.5">
                       <Bi
                         en={reportingUi.admin.columns.action.en}
-                        ar={reportingUi.admin.columns.action.ar}
+                        ar={reportingUi.admin.columns.action.en}
                       />
                     </th>
                   </tr>
@@ -480,7 +480,7 @@ export default async function ReportingAdminPage({
                         <Badge variant={syncVariant(log.status)}>
                           <Bi
                             en={reportingUi.syncStatus[log.status].en}
-                            ar={reportingUi.syncStatus[log.status].ar}
+                            ar={reportingUi.syncStatus[log.status].en}
                             hideSeparator
                           />
                         </Badge>
@@ -529,13 +529,13 @@ export default async function ReportingAdminPage({
             <ShieldCheck aria-hidden="true" className="size-4 text-primary" />
             <Bi
               en={reportingUi.admin.events.en}
-              ar={reportingUi.admin.events.ar}
+              ar={reportingUi.admin.events.en}
             />
           </CardTitle>
           <CardDescription>
             <Bi
               en={reportingUi.admin.eventsHint.en}
-              ar={reportingUi.admin.eventsHint.ar}
+              ar={reportingUi.admin.eventsHint.en}
             />
           </CardDescription>
         </CardHeader>
@@ -545,7 +545,7 @@ export default async function ReportingAdminPage({
               <Alert variant="error">
                 <Bi
                   en={reportingUi.admin.eventsError.en}
-                  ar={reportingUi.admin.eventsError.ar}
+                  ar={reportingUi.admin.eventsError.en}
                 />
               </Alert>
             </div>
@@ -556,13 +556,13 @@ export default async function ReportingAdminPage({
                 title={
                   <Bi
                     en={reportingUi.admin.noEvents.en}
-                    ar={reportingUi.admin.noEvents.ar}
+                    ar={reportingUi.admin.noEvents.en}
                   />
                 }
                 description={
                   <Bi
                     en={reportingUi.admin.eventsHint.en}
-                    ar={reportingUi.admin.eventsHint.ar}
+                    ar={reportingUi.admin.eventsHint.en}
                   />
                 }
               />
@@ -571,32 +571,32 @@ export default async function ReportingAdminPage({
             <div className="overflow-x-auto">
               <table className="w-full min-w-[40rem] text-sm">
                 <caption className="sr-only">
-                  Reporting audit / سجل إدارة التقارير
+                  Reporting audit
                 </caption>
                 <thead className="bg-secondary/50 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
                   <tr>
                     <th scope="col" className="px-4 py-2.5">
                       <Bi
                         en={reportingUi.admin.eventsColumns.action.en}
-                        ar={reportingUi.admin.eventsColumns.action.ar}
+                        ar={reportingUi.admin.eventsColumns.action.en}
                       />
                     </th>
                     <th scope="col" className="px-4 py-2.5">
                       <Bi
                         en={reportingUi.admin.eventsColumns.actor.en}
-                        ar={reportingUi.admin.eventsColumns.actor.ar}
+                        ar={reportingUi.admin.eventsColumns.actor.en}
                       />
                     </th>
                     <th scope="col" className="px-4 py-2.5">
                       <Bi
                         en={reportingUi.admin.eventsColumns.when.en}
-                        ar={reportingUi.admin.eventsColumns.when.ar}
+                        ar={reportingUi.admin.eventsColumns.when.en}
                       />
                     </th>
                     <th scope="col" className="px-4 py-2.5">
                       <Bi
                         en={reportingUi.admin.eventsColumns.detail.en}
-                        ar={reportingUi.admin.eventsColumns.detail.ar}
+                        ar={reportingUi.admin.eventsColumns.detail.en}
                       />
                     </th>
                   </tr>
@@ -608,7 +608,7 @@ export default async function ReportingAdminPage({
                         <Badge variant="outline">
                           <Bi
                             en={reportingUi.admin.actionLabels[event.action].en}
-                            ar={reportingUi.admin.actionLabels[event.action].ar}
+                            ar={reportingUi.admin.actionLabels[event.action].en}
                             hideSeparator
                           />
                         </Badge>

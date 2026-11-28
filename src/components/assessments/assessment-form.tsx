@@ -235,7 +235,7 @@ export function AssessmentForm({
         <Alert variant="error">
           <Bi
             en={assessmentErrorCopy[formError].en}
-            ar={assessmentErrorCopy[formError].ar}
+            ar={assessmentErrorCopy[formError].en}
           />
         </Alert>
       ) : null}
@@ -258,10 +258,10 @@ export function AssessmentForm({
               }
             >
               <option value="quiz">
-                {assessmentTypeCopy.quiz.en} · {assessmentTypeCopy.quiz.ar}
+                {assessmentTypeCopy.quiz.en} · {assessmentTypeCopy.quiz.en}
               </option>
               <option value="exam">
-                {assessmentTypeCopy.exam.en} · {assessmentTypeCopy.exam.ar}
+                {assessmentTypeCopy.exam.en} · {assessmentTypeCopy.exam.en}
               </option>
             </Select>
           </Field>
@@ -281,7 +281,7 @@ export function AssessmentForm({
             >
               {grades.map((grade) => (
                 <option key={grade.id} value={grade.id}>
-                  {grade.name_en} · {grade.name_ar}
+                  {grade.name_en}
                 </option>
               ))}
             </Select>
@@ -361,15 +361,15 @@ export function AssessmentForm({
             >
               <option value="immediately">
                 {assessmentsUi.form.visibilityImmediately.en} ·{" "}
-                {assessmentsUi.form.visibilityImmediately.ar}
+                {assessmentsUi.form.visibilityImmediately.en}
               </option>
               <option value="after_review">
                 {assessmentsUi.form.visibilityAfterReview.en} ·{" "}
-                {assessmentsUi.form.visibilityAfterReview.ar}
+                {assessmentsUi.form.visibilityAfterReview.en}
               </option>
               <option value="hidden">
                 {assessmentsUi.form.visibilityHidden.en} ·{" "}
-                {assessmentsUi.form.visibilityHidden.ar}
+                {assessmentsUi.form.visibilityHidden.en}
               </option>
             </Select>
           </Field>
@@ -393,15 +393,15 @@ export function AssessmentForm({
             >
               <option value="automatic">
                 {assessmentsUi.form.gradingAutomatic.en} ·{" "}
-                {assessmentsUi.form.gradingAutomatic.ar}
+                {assessmentsUi.form.gradingAutomatic.en}
               </option>
               <option value="mixed">
                 {assessmentsUi.form.gradingMixed.en} ·{" "}
-                {assessmentsUi.form.gradingMixed.ar}
+                {assessmentsUi.form.gradingMixed.en}
               </option>
               <option value="manual">
                 {assessmentsUi.form.gradingManual.en} ·{" "}
-                {assessmentsUi.form.gradingManual.ar}
+                {assessmentsUi.form.gradingManual.en}
               </option>
             </Select>
           </Field>
@@ -418,13 +418,13 @@ export function AssessmentForm({
               />
               <Bi
                 en={assessmentsUi.form.allowRetakes.en}
-                ar={assessmentsUi.form.allowRetakes.ar}
+                ar={assessmentsUi.form.allowRetakes.en}
               />
             </label>
             <p className="text-xs text-muted-foreground">
               <Bi
                 en={assessmentsUi.form.allowRetakesHint.en}
-                ar={assessmentsUi.form.allowRetakesHint.ar}
+                ar={assessmentsUi.form.allowRetakesHint.en}
               />
             </p>
           </div>
@@ -458,13 +458,13 @@ export function AssessmentForm({
               />
               <Bi
                 en={assessmentsUi.form.publish.en}
-                ar={assessmentsUi.form.publish.ar}
+                ar={assessmentsUi.form.publish.en}
               />
             </label>
             <p className="text-xs text-muted-foreground">
               <Bi
                 en={assessmentsUi.form.publishHint.en}
-                ar={assessmentsUi.form.publishHint.ar}
+                ar={assessmentsUi.form.publishHint.en}
               />
             </p>
           </div>
@@ -507,13 +507,13 @@ export function AssessmentForm({
           <h3 className="text-sm font-bold text-foreground">
             <Bi
               en={assessmentsUi.strict.title.en}
-              ar={assessmentsUi.strict.title.ar}
+              ar={assessmentsUi.strict.title.en}
             />
           </h3>
           <p className="mt-1 text-xs text-muted-foreground">
             <Bi
               en={assessmentsUi.strict.settingsHint.en}
-              ar={assessmentsUi.strict.settingsHint.ar}
+              ar={assessmentsUi.strict.settingsHint.en}
             />
           </p>
         </div>
@@ -530,13 +530,13 @@ export function AssessmentForm({
             />
             <Bi
               en={assessmentsUi.strict.enabled.en}
-              ar={assessmentsUi.strict.enabled.ar}
+              ar={assessmentsUi.strict.enabled.en}
             />
           </label>
           <p className="text-xs text-muted-foreground">
             <Bi
               en={assessmentsUi.strict.enabledHint.en}
-              ar={assessmentsUi.strict.enabledHint.ar}
+              ar={assessmentsUi.strict.enabledHint.en}
             />
           </p>
         </div>
@@ -556,13 +556,13 @@ export function AssessmentForm({
                   />
                   <Bi
                     en={assessmentsUi.strict.tabHidden.en}
-                    ar={assessmentsUi.strict.tabHidden.ar}
+                    ar={assessmentsUi.strict.tabHidden.en}
                   />
                 </label>
                 <p className="text-xs text-muted-foreground">
                   <Bi
                     en={assessmentsUi.strict.tabHiddenHint.en}
-                    ar={assessmentsUi.strict.tabHiddenHint.ar}
+                    ar={assessmentsUi.strict.tabHiddenHint.en}
                   />
                 </p>
               </div>
@@ -579,13 +579,13 @@ export function AssessmentForm({
                   />
                   <Bi
                     en={assessmentsUi.strict.navigation.en}
-                    ar={assessmentsUi.strict.navigation.ar}
+                    ar={assessmentsUi.strict.navigation.en}
                   />
                 </label>
                 <p className="text-xs text-muted-foreground">
                   <Bi
                     en={assessmentsUi.strict.navigationHint.en}
-                    ar={assessmentsUi.strict.navigationHint.ar}
+                    ar={assessmentsUi.strict.navigationHint.en}
                   />
                 </p>
               </div>
@@ -627,13 +627,13 @@ export function AssessmentForm({
                   />
                   <Bi
                     en={assessmentsUi.strict.allowResume.en}
-                    ar={assessmentsUi.strict.allowResume.ar}
+                    ar={assessmentsUi.strict.allowResume.en}
                   />
                 </label>
                 <p className="text-xs text-muted-foreground">
                   <Bi
                     en={assessmentsUi.strict.allowResumeHint.en}
-                    ar={assessmentsUi.strict.allowResumeHint.ar}
+                    ar={assessmentsUi.strict.allowResumeHint.en}
                   />
                 </p>
               </div>
@@ -652,13 +652,13 @@ export function AssessmentForm({
                   />
                   <Bi
                     en={assessmentsUi.strict.randomizeQuestions.en}
-                    ar={assessmentsUi.strict.randomizeQuestions.ar}
+                    ar={assessmentsUi.strict.randomizeQuestions.en}
                   />
                 </label>
                 <p className="text-xs text-muted-foreground">
                   <Bi
                     en={assessmentsUi.strict.randomizeQuestionsHint.en}
-                    ar={assessmentsUi.strict.randomizeQuestionsHint.ar}
+                    ar={assessmentsUi.strict.randomizeQuestionsHint.en}
                   />
                 </p>
               </div>
@@ -675,13 +675,13 @@ export function AssessmentForm({
                   />
                   <Bi
                     en={assessmentsUi.strict.randomizeOptions.en}
-                    ar={assessmentsUi.strict.randomizeOptions.ar}
+                    ar={assessmentsUi.strict.randomizeOptions.en}
                   />
                 </label>
                 <p className="text-xs text-muted-foreground">
                   <Bi
                     en={assessmentsUi.strict.randomizeOptionsHint.en}
-                    ar={assessmentsUi.strict.randomizeOptionsHint.ar}
+                    ar={assessmentsUi.strict.randomizeOptionsHint.en}
                   />
                 </p>
               </div>
@@ -690,7 +690,7 @@ export function AssessmentForm({
             <div className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-xs text-amber-950 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-100">
               <Bi
                 en={assessmentsUi.strict.warning.en}
-                ar={assessmentsUi.strict.warning.ar}
+                ar={assessmentsUi.strict.warning.en}
               />
             </div>
           </>
@@ -709,10 +709,10 @@ export function AssessmentForm({
             }
             ar={
               pending
-                ? assessmentsUi.actions.saving.ar
+                ? assessmentsUi.actions.saving.en
                 : mode === "create"
-                  ? assessmentsUi.actions.create.ar
-                  : assessmentsUi.actions.save.ar
+                  ? assessmentsUi.actions.create.en
+                  : assessmentsUi.actions.save.en
             }
           />
         </Button>
@@ -726,7 +726,7 @@ export function AssessmentForm({
         >
           <Bi
             en={assessmentsUi.actions.cancel.en}
-            ar={assessmentsUi.actions.cancel.ar}
+            ar={assessmentsUi.actions.cancel.en}
           />
         </Link>
       </div>

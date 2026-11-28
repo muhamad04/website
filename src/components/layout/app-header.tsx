@@ -78,7 +78,11 @@ export function AppHeader({ profile }: { profile: ProfileWithRelations }) {
                 href={dashboardHref}
                 className="inline-flex h-9 items-center rounded-lg px-3 text-sm font-semibold text-primary transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                <Bi en={ui.nav.dashboard.en} ar={ui.nav.dashboard.ar} />
+                <Bi
+                  en={ui.nav.dashboard.en}
+                  ar={ui.nav.dashboard.ar}
+                  bilingual
+                />
               </Link>
             </li>
             {navigation.map((item) => (
@@ -91,6 +95,7 @@ export function AppHeader({ profile }: { profile: ProfileWithRelations }) {
                     <Bi
                       en={item.label.en}
                       ar={item.label.ar}
+                      bilingual
                       hideSeparator
                     />
                   </Link>
@@ -103,12 +108,14 @@ export function AppHeader({ profile }: { profile: ProfileWithRelations }) {
                     <Bi
                       en={item.label.en}
                       ar={item.label.ar}
+                      bilingual
                       hideSeparator
                     />
                     <Badge variant="muted" className="px-1.5 py-0 text-[10px]">
                       <Bi
                         en={ui.common.soon.en}
                         ar={ui.common.soon.ar}
+                        bilingual
                         hideSeparator
                       />
                     </Badge>
@@ -146,7 +153,11 @@ export function AppHeader({ profile }: { profile: ProfileWithRelations }) {
           <form action={signOutAction}>
             <Button type="submit" variant="outline" size="sm">
               <LogOut aria-hidden="true" className="size-3.5" />
-              <Bi en={ui.common.signOut.en} ar={ui.common.signOut.ar} />
+              <Bi
+                en={ui.common.signOut.en}
+                ar={ui.common.signOut.ar}
+                bilingual
+              />
             </Button>
           </form>
         </div>

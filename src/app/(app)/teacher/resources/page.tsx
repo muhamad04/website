@@ -27,7 +27,7 @@ import {
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Resources · المصادر",
+  title: "Resources",
 };
 
 export const dynamic = "force-dynamic";
@@ -55,10 +55,10 @@ export default async function TeacherResourcesPage({
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow={<Bi en={resourcesUi.eyebrow.en} ar={resourcesUi.eyebrow.ar} />}
-        title={<Bi en={resourcesUi.title.en} ar={resourcesUi.title.ar} />}
+        eyebrow={<Bi en={resourcesUi.eyebrow.en} ar={resourcesUi.eyebrow.en} />}
+        title={<Bi en={resourcesUi.title.en} ar={resourcesUi.title.en} />}
         description={
-          <Bi en={resourcesUi.subtitle.en} ar={resourcesUi.subtitle.ar} />
+          <Bi en={resourcesUi.subtitle.en} ar={resourcesUi.subtitle.en} />
         }
         actions={
           <>
@@ -69,7 +69,7 @@ export default async function TeacherResourcesPage({
               <Tags aria-hidden="true" className="size-4" />
               <Bi
                 en={resourcesUi.actions.manageCategories.en}
-                ar={resourcesUi.actions.manageCategories.ar}
+                ar={resourcesUi.actions.manageCategories.en}
               />
             </Link>
             <Link
@@ -79,7 +79,7 @@ export default async function TeacherResourcesPage({
               <Plus aria-hidden="true" className="size-4" />
               <Bi
                 en={resourcesUi.actions.addResource.en}
-                ar={resourcesUi.actions.addResource.ar}
+                ar={resourcesUi.actions.addResource.en}
               />
             </Link>
           </>
@@ -90,7 +90,7 @@ export default async function TeacherResourcesPage({
         <Alert variant="success">
           <Bi
             en={resourcesUi.detail.deletedSuccess.en}
-            ar={resourcesUi.detail.deletedSuccess.ar}
+            ar={resourcesUi.detail.deletedSuccess.en}
           />
         </Alert>
       ) : null}
@@ -99,7 +99,7 @@ export default async function TeacherResourcesPage({
         <Alert variant="error">
           <Bi
             en={resourcesUi.messages.loadFailed.en}
-            ar={resourcesUi.messages.loadFailed.ar}
+            ar={resourcesUi.messages.loadFailed.en}
           />
         </Alert>
       ) : null}
@@ -108,7 +108,7 @@ export default async function TeacherResourcesPage({
         <Alert variant="error">
           <Bi
             en={resourcesUi.messages.categoriesLoadFailed.en}
-            ar={resourcesUi.messages.categoriesLoadFailed.ar}
+            ar={resourcesUi.messages.categoriesLoadFailed.en}
           />
         </Alert>
       ) : null}
@@ -151,22 +151,22 @@ export default async function TeacherResourcesPage({
             hasFilters ? (
               <Bi
                 en={resourcesUi.list.emptyFiltered.en}
-                ar={resourcesUi.list.emptyFiltered.ar}
+                ar={resourcesUi.list.emptyFiltered.en}
               />
             ) : (
-              <Bi en={resourcesUi.list.empty.en} ar={resourcesUi.list.empty.ar} />
+              <Bi en={resourcesUi.list.empty.en} ar={resourcesUi.list.empty.en} />
             )
           }
           description={
             hasFilters ? (
               <Bi
                 en={resourcesUi.list.emptyFilteredHint.en}
-                ar={resourcesUi.list.emptyFilteredHint.ar}
+                ar={resourcesUi.list.emptyFilteredHint.en}
               />
             ) : (
               <Bi
                 en={resourcesUi.list.emptyHint.en}
-                ar={resourcesUi.list.emptyHint.ar}
+                ar={resourcesUi.list.emptyHint.en}
               />
             )
           }
@@ -178,7 +178,7 @@ export default async function TeacherResourcesPage({
               >
                 <Bi
                   en={resourcesUi.filters.clear.en}
-                  ar={resourcesUi.filters.clear.ar}
+                  ar={resourcesUi.filters.clear.en}
                 />
               </Link>
             ) : (
@@ -189,7 +189,7 @@ export default async function TeacherResourcesPage({
                 <Plus aria-hidden="true" className="size-4" />
                 <Bi
                   en={resourcesUi.actions.addResource.en}
-                  ar={resourcesUi.actions.addResource.ar}
+                  ar={resourcesUi.actions.addResource.en}
                 />
               </Link>
             )
@@ -213,7 +213,7 @@ export default async function TeacherResourcesPage({
                     >
                       <Bi
                         en={resourcesUi.actions.open.en}
-                        ar={resourcesUi.actions.open.ar}
+                        ar={resourcesUi.actions.open.en}
                       />
                     </Link>
                     <Link
@@ -239,7 +239,7 @@ export default async function TeacherResourcesPage({
 
       {list.pageCount > 1 ? (
         <nav
-          aria-label="Pagination / التنقل بين الصفحات"
+          aria-label="Pagination"
           className="flex items-center justify-between gap-3"
         >
           {list.page > 1 ? (
@@ -249,7 +249,7 @@ export default async function TeacherResourcesPage({
               })}`}
               className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
             >
-              <Bi en={resourcesUi.list.previous.en} ar={resourcesUi.list.previous.ar} />
+              <Bi en={resourcesUi.list.previous.en} ar={resourcesUi.list.previous.en} />
             </Link>
           ) : (
             <span />
@@ -270,7 +270,7 @@ export default async function TeacherResourcesPage({
               })}`}
               className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
             >
-              <Bi en={resourcesUi.list.next.en} ar={resourcesUi.list.next.ar} />
+              <Bi en={resourcesUi.list.next.en} ar={resourcesUi.list.next.en} />
             </Link>
           ) : (
             <span />

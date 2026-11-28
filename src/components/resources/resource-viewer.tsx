@@ -18,15 +18,13 @@ export function ResourceViewer({
   signedUrl,
   youtubeId,
   titleEn,
-  titleAr,
 }: {
   type: ResourceType;
   signedUrl: string | null;
   youtubeId: string | null;
   titleEn: string;
-  titleAr: string;
 }) {
-  const title = `${titleEn} / ${titleAr}`;
+  const title = titleEn;
 
   if (type === "youtube") {
     if (!youtubeId) {
@@ -62,7 +60,7 @@ export function ResourceViewer({
         <p className="text-xs text-muted-foreground">
           <Bi
             en={resourcesUi.detail.reloadHint.en}
-            ar={resourcesUi.detail.reloadHint.ar}
+            ar={resourcesUi.detail.reloadHint.en}
           />
         </p>
       </div>
@@ -79,7 +77,7 @@ export function ResourceViewer({
       <p className="mt-2 text-center text-xs text-muted-foreground">
         <Bi
           en={resourcesUi.detail.reloadHint.en}
-          ar={resourcesUi.detail.reloadHint.ar}
+          ar={resourcesUi.detail.reloadHint.en}
         />
       </p>
     </div>
@@ -92,7 +90,7 @@ function PreviewUnavailable() {
       <Alert variant="error">
         <Bi
           en={resourcesUi.detail.previewUnavailableHint.en}
-          ar={resourcesUi.detail.previewUnavailableHint.ar}
+          ar={resourcesUi.detail.previewUnavailableHint.en}
         />
       </Alert>
       <EmptyState
@@ -100,13 +98,13 @@ function PreviewUnavailable() {
         title={
           <Bi
             en={resourcesUi.detail.previewUnavailable.en}
-            ar={resourcesUi.detail.previewUnavailable.ar}
+            ar={resourcesUi.detail.previewUnavailable.en}
           />
         }
         description={
           <Bi
             en={resourcesUi.detail.previewUnavailableHint.en}
-            ar={resourcesUi.detail.previewUnavailableHint.ar}
+            ar={resourcesUi.detail.previewUnavailableHint.en}
           />
         }
       />

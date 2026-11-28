@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 import { StaffForm } from "@/app/(app)/teacher/staff/staff-form";
 
 export const metadata: Metadata = {
-  title: "New staff · موظف جديد",
+  title: "New staff",
 };
 
 export const dynamic = "force-dynamic";
@@ -28,17 +28,17 @@ export default async function NewStaffPage() {
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow={<Bi en={staffUi.eyebrow.en} ar={staffUi.eyebrow.ar} />}
+        eyebrow={<Bi en={staffUi.eyebrow.en} ar={staffUi.eyebrow.en} />}
         title={
           <Bi
             en={staffUi.form.createTitle.en}
-            ar={staffUi.form.createTitle.ar}
+            ar={staffUi.form.createTitle.en}
           />
         }
         description={
           <Bi
             en={staffUi.form.createSubtitle.en}
-            ar={staffUi.form.createSubtitle.ar}
+            ar={staffUi.form.createSubtitle.en}
           />
         }
         actions={
@@ -48,7 +48,7 @@ export default async function NewStaffPage() {
           >
             <Bi
               en={staffUi.actions.backToList.en}
-              ar={staffUi.actions.backToList.ar}
+              ar={staffUi.actions.backToList.en}
             />
           </Link>
         }

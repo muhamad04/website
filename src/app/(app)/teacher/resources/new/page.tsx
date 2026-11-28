@@ -14,7 +14,7 @@ import { resourcesUi } from "@/lib/i18n/resources";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "New resource · مصدر جديد",
+  title: "New resource",
 };
 
 export const dynamic = "force-dynamic";
@@ -30,14 +30,14 @@ export default async function NewResourcePage() {
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow={<Bi en={resourcesUi.eyebrow.en} ar={resourcesUi.eyebrow.ar} />}
+        eyebrow={<Bi en={resourcesUi.eyebrow.en} ar={resourcesUi.eyebrow.en} />}
         title={
-          <Bi en={resourcesUi.form.createTitle.en} ar={resourcesUi.form.createTitle.ar} />
+          <Bi en={resourcesUi.form.createTitle.en} ar={resourcesUi.form.createTitle.en} />
         }
         description={
           <Bi
             en={resourcesUi.form.createSubtitle.en}
-            ar={resourcesUi.form.createSubtitle.ar}
+            ar={resourcesUi.form.createSubtitle.en}
           />
         }
         actions={
@@ -48,7 +48,7 @@ export default async function NewResourcePage() {
             <ArrowLeft aria-hidden="true" className="size-4" />
             <Bi
               en={resourcesUi.actions.backToList.en}
-              ar={resourcesUi.actions.backToList.ar}
+              ar={resourcesUi.actions.backToList.en}
             />
           </Link>
         }
@@ -58,7 +58,7 @@ export default async function NewResourcePage() {
         <Alert variant="error">
           <Bi
             en={resourcesUi.messages.categoriesLoadFailed.en}
-            ar={resourcesUi.messages.categoriesLoadFailed.ar}
+            ar={resourcesUi.messages.categoriesLoadFailed.en}
           />
         </Alert>
       ) : null}
@@ -69,13 +69,13 @@ export default async function NewResourcePage() {
           title={
             <Bi
               en={resourcesUi.messages.noGrades.en}
-              ar={resourcesUi.messages.noGrades.ar}
+              ar={resourcesUi.messages.noGrades.en}
             />
           }
           description={
             <Bi
               en={resourcesUi.messages.noGradesHint.en}
-              ar={resourcesUi.messages.noGradesHint.ar}
+              ar={resourcesUi.messages.noGradesHint.en}
             />
           }
           action={

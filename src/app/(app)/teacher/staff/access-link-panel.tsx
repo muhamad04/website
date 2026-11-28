@@ -29,7 +29,7 @@ export function StaffAccessLinkPanel({ url }: { url: string }) {
         <Link2 aria-hidden="true" className="size-4 text-success" />
         <Bi
           en={staffUi.access.ready.en}
-          ar={staffUi.access.ready.ar}
+          ar={staffUi.access.ready.en}
           hideSeparator
         />
       </p>
@@ -38,7 +38,7 @@ export function StaffAccessLinkPanel({ url }: { url: string }) {
         <Input
           readOnly
           value={url}
-          aria-label="Staff setup link / رابط إعداد الموظف"
+          aria-label="Staff setup link"
           onFocus={(event) => event.currentTarget.select()}
           className="h-9 font-mono text-xs"
         />
@@ -56,14 +56,14 @@ export function StaffAccessLinkPanel({ url }: { url: string }) {
           )}
           <Bi
             en={copied ? staffUi.actions.copied.en : staffUi.actions.copy.en}
-            ar={copied ? staffUi.actions.copied.ar : staffUi.actions.copy.ar}
+            ar={copied ? staffUi.actions.copied.en : staffUi.actions.copy.en}
             hideSeparator
           />
         </Button>
       </div>
 
       <p className="text-xs leading-relaxed text-muted-foreground">
-        <Bi en={staffUi.access.once.en} ar={staffUi.access.once.ar} />
+        <Bi en={staffUi.access.once.en} ar={staffUi.access.once.en} />
       </p>
     </div>
   );

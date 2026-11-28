@@ -33,7 +33,7 @@ import { isUuid } from "@/lib/search";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Assessment · الاختبار",
+  title: "Assessment",
 };
 
 export const dynamic = "force-dynamic";
@@ -107,7 +107,7 @@ export default async function StudentAssessmentIntroPage({
         eyebrow={
           <Bi
             en={assessmentTypeCopy[assessment.type].en}
-            ar={assessmentTypeCopy[assessment.type].ar}
+            ar={assessmentTypeCopy[assessment.type].en}
           />
         }
         title={<Bi en={assessment.title_en} ar="" hideSeparator />}
@@ -117,7 +117,7 @@ export default async function StudentAssessmentIntroPage({
           ) : (
             <Bi
               en={assessmentsUi.student.autoSubmit.en}
-              ar={assessmentsUi.student.autoSubmit.ar}
+              ar={assessmentsUi.student.autoSubmit.en}
             />
           )
         }
@@ -137,7 +137,7 @@ export default async function StudentAssessmentIntroPage({
               <ArrowLeft aria-hidden="true" className="size-4" />
               <Bi
                 en={assessmentsUi.student.backToAssessments.en}
-                ar={assessmentsUi.student.backToAssessments.ar}
+                ar={assessmentsUi.student.backToAssessments.en}
               />
             </Link>
           </>
@@ -148,7 +148,7 @@ export default async function StudentAssessmentIntroPage({
         <Alert variant="info">
           <Bi
             en={`${assessmentsUi.student.notOpenYet.en} ${assessmentsUi.list.availableFrom.en} ${formatAdminDateTime(assessment.available_from)}`}
-            ar={`${assessmentsUi.student.notOpenYet.ar} ${assessmentsUi.list.availableFrom.ar} ${formatAdminDateTime(assessment.available_from)}`}
+            ar={`${assessmentsUi.student.notOpenYet.en} ${assessmentsUi.list.availableFrom.en} ${formatAdminDateTime(assessment.available_from)}`}
           />
         </Alert>
       ) : null}
@@ -157,7 +157,7 @@ export default async function StudentAssessmentIntroPage({
         <Alert variant="error">
           <Bi
             en={`${assessmentsUi.student.closed.en} ${formatAdminDateTime(assessment.available_until)}`}
-            ar={`${assessmentsUi.student.closed.ar} ${formatAdminDateTime(assessment.available_until)}`}
+            ar={`${assessmentsUi.student.closed.en} ${formatAdminDateTime(assessment.available_until)}`}
           />
         </Alert>
       ) : null}
@@ -166,7 +166,7 @@ export default async function StudentAssessmentIntroPage({
         <Alert variant="error">
           <Bi
             en={assessmentsUi.strict.warning.en}
-            ar={assessmentsUi.strict.warning.ar}
+            ar={assessmentsUi.strict.warning.en}
           />
         </Alert>
       ) : null}
@@ -176,7 +176,7 @@ export default async function StudentAssessmentIntroPage({
           <ListChecks aria-hidden="true" className="size-4 text-primary" />
           <Bi
             en={assessmentsUi.student.rules.en}
-            ar={assessmentsUi.student.rules.ar}
+            ar={assessmentsUi.student.rules.en}
           />
         </h2>
 
@@ -187,14 +187,14 @@ export default async function StudentAssessmentIntroPage({
               <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 <Bi
                   en={assessmentsUi.student.timeLimit.en}
-                  ar={assessmentsUi.student.timeLimit.ar}
+                  ar={assessmentsUi.student.timeLimit.en}
                 />
               </dt>
               <dd className="font-medium">
                 {assessment.time_limit_minutes}{" "}
                 <Bi
                   en={assessmentsUi.student.minutes.en}
-                  ar={assessmentsUi.student.minutes.ar}
+                  ar={assessmentsUi.student.minutes.en}
                 />
               </dd>
             </div>
@@ -206,7 +206,7 @@ export default async function StudentAssessmentIntroPage({
               <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 <Bi
                   en={assessmentsUi.student.attemptsAllowed.en}
-                  ar={assessmentsUi.student.attemptsAllowed.ar}
+                  ar={assessmentsUi.student.attemptsAllowed.en}
                 />
               </dt>
               <dd className="font-medium">
@@ -215,7 +215,7 @@ export default async function StudentAssessmentIntroPage({
                   <span className="ms-1 text-xs text-muted-foreground">
                     <Bi
                       en={assessmentsUi.list.unlimited.en}
-                      ar={assessmentsUi.list.unlimited.ar}
+                      ar={assessmentsUi.list.unlimited.en}
                     />
                   </span>
                 ) : null}
@@ -229,13 +229,13 @@ export default async function StudentAssessmentIntroPage({
               <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 <Bi
                   en={assessmentsUi.student.results.en}
-                  ar={assessmentsUi.student.results.ar}
+                  ar={assessmentsUi.student.results.en}
                 />
               </dt>
               <dd className="font-medium">
                 <Bi
                   en={resultsVisibilityCopy[assessment.results_visibility].en}
-                  ar={resultsVisibilityCopy[assessment.results_visibility].ar}
+                  ar={resultsVisibilityCopy[assessment.results_visibility].en}
                 />
               </dd>
             </div>
@@ -247,13 +247,13 @@ export default async function StudentAssessmentIntroPage({
               <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 <Bi
                   en={assessmentsUi.form.gradingMode.en}
-                  ar={assessmentsUi.form.gradingMode.ar}
+                  ar={assessmentsUi.form.gradingMode.en}
                 />
               </dt>
               <dd className="font-medium">
                 <Bi
                   en={gradingModeCopy[assessment.grading_mode].en}
-                  ar={gradingModeCopy[assessment.grading_mode].ar}
+                  ar={gradingModeCopy[assessment.grading_mode].en}
                 />
               </dd>
             </div>
@@ -265,7 +265,7 @@ export default async function StudentAssessmentIntroPage({
               <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 <Bi
                   en={assessmentsUi.list.availableUntil.en}
-                  ar={assessmentsUi.list.availableUntil.ar}
+                  ar={assessmentsUi.list.availableUntil.en}
                 />
               </dt>
               <dd className="font-medium">
@@ -290,7 +290,7 @@ export default async function StudentAssessmentIntroPage({
               <Eye aria-hidden="true" className="size-3.5" />
               <Bi
                 en={assessmentsUi.actions.openResult.en}
-                ar={assessmentsUi.actions.openResult.ar}
+                ar={assessmentsUi.actions.openResult.en}
               />
             </Link>
           ) : null}
@@ -299,7 +299,7 @@ export default async function StudentAssessmentIntroPage({
             <p className="text-sm text-muted-foreground">
               <Bi
                 en={assessmentsUi.student.noAttemptsLeft.en}
-                ar={assessmentsUi.student.noAttemptsLeft.ar}
+                ar={assessmentsUi.student.noAttemptsLeft.en}
               />
             </p>
           ) : null}
@@ -311,26 +311,26 @@ export default async function StudentAssessmentIntroPage({
           <AlarmClock aria-hidden="true" className="size-4 text-primary" />
           <Bi
             en={assessmentsUi.student.introTitle.en}
-            ar={assessmentsUi.student.introTitle.ar}
+            ar={assessmentsUi.student.introTitle.en}
           />
         </h2>
         <ul className="mt-2 list-disc space-y-1 ps-5 text-sm text-muted-foreground">
           <li>
             <Bi
               en={assessmentsUi.student.autoSubmit.en}
-              ar={assessmentsUi.student.autoSubmit.ar}
+              ar={assessmentsUi.student.autoSubmit.en}
             />
           </li>
           <li>
             <Bi
               en={assessmentsUi.student.submitHint.en}
-              ar={assessmentsUi.student.submitHint.ar}
+              ar={assessmentsUi.student.submitHint.en}
             />
           </li>
           <li>
             <Bi
               en={assessmentsUi.student.inProgressHint.en}
-              ar={assessmentsUi.student.inProgressHint.ar}
+              ar={assessmentsUi.student.inProgressHint.en}
             />
           </li>
         </ul>

@@ -72,13 +72,13 @@ export function AttemptsTable({
           title={
             <Bi
               en={reportingUi.results.empty.en}
-              ar={reportingUi.results.empty.ar}
+              ar={reportingUi.results.empty.en}
             />
           }
           description={
             <Bi
               en={reportingUi.results.emptyHint.en}
-              ar={reportingUi.results.emptyHint.ar}
+              ar={reportingUi.results.emptyHint.en}
             />
           }
         />
@@ -91,37 +91,37 @@ export function AttemptsTable({
       <div className="hidden overflow-x-auto md:block">
         <table className="w-full min-w-[62rem] text-sm">
           <caption className="sr-only">
-            Assessment results / نتائج التقييمات
+            Assessment results
           </caption>
           <thead className="bg-secondary/50 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
             <tr>
               <th scope="col" className="px-4 py-2.5">
-                <Bi en={reportingUi.results.columns.student.en} ar={reportingUi.results.columns.student.ar} />
+                <Bi en={reportingUi.results.columns.student.en} ar={reportingUi.results.columns.student.en} />
               </th>
               <th scope="col" className="px-4 py-2.5">
-                <Bi en={reportingUi.results.columns.placement.en} ar={reportingUi.results.columns.placement.ar} />
+                <Bi en={reportingUi.results.columns.placement.en} ar={reportingUi.results.columns.placement.en} />
               </th>
               <th scope="col" className="px-4 py-2.5">
-                <Bi en={reportingUi.results.columns.assessment.en} ar={reportingUi.results.columns.assessment.ar} />
+                <Bi en={reportingUi.results.columns.assessment.en} ar={reportingUi.results.columns.assessment.en} />
               </th>
               <th scope="col" className="px-4 py-2.5">
-                <Bi en={reportingUi.results.columns.submitted.en} ar={reportingUi.results.columns.submitted.ar} />
+                <Bi en={reportingUi.results.columns.submitted.en} ar={reportingUi.results.columns.submitted.en} />
               </th>
               <th scope="col" className="px-4 py-2.5">
-                <Bi en={reportingUi.results.columns.score.en} ar={reportingUi.results.columns.score.ar} />
+                <Bi en={reportingUi.results.columns.score.en} ar={reportingUi.results.columns.score.en} />
               </th>
               <th scope="col" className="px-4 py-2.5">
-                <Bi en={reportingUi.results.columns.grading.en} ar={reportingUi.results.columns.grading.ar} />
+                <Bi en={reportingUi.results.columns.grading.en} ar={reportingUi.results.columns.grading.en} />
               </th>
               <th scope="col" className="px-4 py-2.5">
-                <Bi en={reportingUi.results.columns.visibility.en} ar={reportingUi.results.columns.visibility.ar} />
+                <Bi en={reportingUi.results.columns.visibility.en} ar={reportingUi.results.columns.visibility.en} />
               </th>
               <th scope="col" className="px-4 py-2.5">
-                <Bi en={reportingUi.results.columns.review.en} ar={reportingUi.results.columns.review.ar} />
+                <Bi en={reportingUi.results.columns.review.en} ar={reportingUi.results.columns.review.en} />
               </th>
               <th scope="col" className="px-4 py-2.5">
                 <span className="sr-only">
-                  <Bi en={reportingUi.results.columns.details.en} ar={reportingUi.results.columns.details.ar} />
+                  <Bi en={reportingUi.results.columns.details.en} ar={reportingUi.results.columns.details.en} />
                 </span>
               </th>
             </tr>
@@ -149,14 +149,14 @@ export function AttemptsTable({
                     {attempt.assessment ? (
                       <Bi
                         en={assessmentTypeCopy[attempt.assessment.type].en}
-                        ar={assessmentTypeCopy[attempt.assessment.type].ar}
+                        ar={assessmentTypeCopy[attempt.assessment.type].en}
                         hideSeparator
                       />
                     ) : null}
                     {" · "}
                     <Bi
                       en={`${reportingUi.results.attemptNumber.en} ${attempt.attempt_number}`}
-                      ar={`${reportingUi.results.attemptNumber.ar} ${attempt.attempt_number}`}
+                      ar={`${reportingUi.results.attemptNumber.en} ${attempt.attempt_number}`}
                       hideSeparator
                     />
                   </p>
@@ -172,7 +172,7 @@ export function AttemptsTable({
                     {attempt.assessment ? (
                       <Bi
                         en={gradingModeCopy[attempt.assessment.grading_mode].en}
-                        ar={gradingModeCopy[attempt.assessment.grading_mode].ar}
+                        ar={gradingModeCopy[attempt.assessment.grading_mode].en}
                         hideSeparator
                       />
                     ) : null}
@@ -180,7 +180,7 @@ export function AttemptsTable({
                   <p className="mt-0.5 text-xs text-muted-foreground">
                     <Bi
                       en={attemptStatusCopy[attempt.status].en}
-                      ar={attemptStatusCopy[attempt.status].ar}
+                      ar={attemptStatusCopy[attempt.status].en}
                       hideSeparator
                     />
                   </p>
@@ -189,7 +189,7 @@ export function AttemptsTable({
                   {attempt.assessment ? (
                     <Bi
                       en={resultsVisibilityCopy[attempt.assessment.results_visibility].en}
-                      ar={resultsVisibilityCopy[attempt.assessment.results_visibility].ar}
+                      ar={resultsVisibilityCopy[attempt.assessment.results_visibility].en}
                     />
                   ) : (
                     "—"
@@ -199,7 +199,7 @@ export function AttemptsTable({
                   <Badge variant={reviewVariant(attempt.manual_review_status)}>
                     <Bi
                       en={manualReviewCopy(attempt.manual_review_status).en}
-                      ar={manualReviewCopy(attempt.manual_review_status).ar}
+                      ar={manualReviewCopy(attempt.manual_review_status).en}
                       hideSeparator
                     />
                   </Badge>
@@ -210,7 +210,7 @@ export function AttemptsTable({
                     className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
                   >
                     <ArrowRight aria-hidden="true" className="size-3.5 rtl:rotate-180" />
-                    <Bi en={reportingUi.results.columns.details.en} ar={reportingUi.results.columns.details.ar} />
+                    <Bi en={reportingUi.results.columns.details.en} ar={reportingUi.results.columns.details.en} />
                   </Link>
                 </td>
               </tr>
@@ -234,7 +234,7 @@ export function AttemptsTable({
               <Badge variant={reviewVariant(attempt.manual_review_status)}>
                 <Bi
                   en={manualReviewCopy(attempt.manual_review_status).en}
-                  ar={manualReviewCopy(attempt.manual_review_status).ar}
+                  ar={manualReviewCopy(attempt.manual_review_status).en}
                   hideSeparator
                 />
               </Badge>
@@ -256,7 +256,7 @@ export function AttemptsTable({
                 className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
               >
                 <ArrowRight aria-hidden="true" className="size-3.5 rtl:rotate-180" />
-                <Bi en={reportingUi.results.columns.details.en} ar={reportingUi.results.columns.details.ar} />
+                <Bi en={reportingUi.results.columns.details.en} ar={reportingUi.results.columns.details.en} />
               </Link>
             </div>
           </li>

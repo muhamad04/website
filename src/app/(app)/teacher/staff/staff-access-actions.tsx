@@ -122,7 +122,7 @@ export function StaffAccessActions({
           htmlFor="staff-role"
           className="text-sm font-semibold text-foreground"
         >
-          <Bi en={staffUi.form.role.en} ar={staffUi.form.role.ar} />
+          <Bi en={staffUi.form.role.en} ar={staffUi.form.role.en} />
         </label>
         <div className="flex flex-col gap-2 sm:flex-row">
           <Select
@@ -152,7 +152,7 @@ export function StaffAccessActions({
             <ShieldCheck aria-hidden="true" className="size-3.5" />
             <Bi
               en={staffUi.actions.changeRole.en}
-              ar={staffUi.actions.changeRole.ar}
+              ar={staffUi.actions.changeRole.en}
               hideSeparator
             />
           </Button>
@@ -161,14 +161,14 @@ export function StaffAccessActions({
           <p className="text-xs text-muted-foreground">
             <Bi
               en={staffUi.guards.selfRole.en}
-              ar={staffUi.guards.selfRole.ar}
+              ar={staffUi.guards.selfRole.en}
             />
           </p>
         ) : roleChangeWouldRemoveLastAdmin ? (
           <p className="text-xs text-muted-foreground">
             <Bi
               en={staffUi.guards.lastAdmin.en}
-              ar={staffUi.guards.lastAdmin.ar}
+              ar={staffUi.guards.lastAdmin.en}
             />
           </p>
         ) : null}
@@ -185,7 +185,7 @@ export function StaffAccessActions({
           <KeyRound aria-hidden="true" className="size-3.5" />
           <Bi
             en={staffUi.actions.resetAccess.en}
-            ar={staffUi.actions.resetAccess.ar}
+            ar={staffUi.actions.resetAccess.en}
             hideSeparator
           />
         </Button>
@@ -210,8 +210,8 @@ export function StaffAccessActions({
             }
             ar={
               active
-                ? staffUi.actions.deactivate.ar
-                : staffUi.actions.activate.ar
+                ? staffUi.actions.deactivate.en
+                : staffUi.actions.activate.en
             }
             hideSeparator
           />
@@ -228,8 +228,8 @@ export function StaffAccessActions({
             }
             ar={
               isSelf
-                ? staffUi.guards.selfDeactivate.ar
-                : staffUi.guards.lastAdmin.ar
+                ? staffUi.guards.selfDeactivate.en
+                : staffUi.guards.lastAdmin.en
             }
           />
         </p>
@@ -241,7 +241,7 @@ export function StaffAccessActions({
         <Alert variant="success">
           <Bi
             en={staffUi.messages[message].en}
-            ar={staffUi.messages[message].ar}
+            ar={staffUi.messages[message].en}
           />
         </Alert>
       ) : null}

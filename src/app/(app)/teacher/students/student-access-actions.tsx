@@ -81,7 +81,7 @@ export function StudentAccessActions({
           <KeyRound aria-hidden="true" className="size-3.5" />
           <Bi
             en={studentsUi.actions.resetAccess.en}
-            ar={studentsUi.actions.resetAccess.ar}
+            ar={studentsUi.actions.resetAccess.en}
             hideSeparator
           />
         </Button>
@@ -106,8 +106,8 @@ export function StudentAccessActions({
             }
             ar={
               isActive
-                ? studentsUi.actions.deactivate.ar
-                : studentsUi.actions.activate.ar
+                ? studentsUi.actions.deactivate.en
+                : studentsUi.actions.activate.en
             }
             hideSeparator
           />

@@ -39,7 +39,7 @@ export function ReportFiltersBar({
           <Label htmlFor={id("search")}>
             <Bi
               en={reportingUi.filters.search.en}
-              ar={reportingUi.filters.search.ar}
+              ar={reportingUi.filters.search.en}
             />
           </Label>
           <Input
@@ -47,7 +47,7 @@ export function ReportFiltersBar({
             name="q"
             type="search"
             defaultValue={filters.search ?? ""}
-            placeholder={`${reportingUi.filters.searchPlaceholder.en} / ${reportingUi.filters.searchPlaceholder.ar}`}
+            placeholder={reportingUi.filters.searchPlaceholder.en}
           />
         </div>
       ) : null}
@@ -56,14 +56,14 @@ export function ReportFiltersBar({
         <Label htmlFor={id("grade")}>
           <Bi
             en={reportingUi.filters.grade.en}
-            ar={reportingUi.filters.grade.ar}
+            ar={reportingUi.filters.grade.en}
           />
         </Label>
         <Select id={id("grade")} name="grade" defaultValue={filters.gradeId ?? ""}>
           <option value="">{reportingUi.filters.allGrades.en}</option>
           {options.grades.map((grade) => (
             <option key={grade.id} value={grade.id}>
-              {grade.name_en} · {grade.name_ar}
+              {grade.name_en}
             </option>
           ))}
         </Select>
@@ -73,20 +73,17 @@ export function ReportFiltersBar({
         <Label htmlFor={id("class")}>
           <Bi
             en={reportingUi.filters.class.en}
-            ar={reportingUi.filters.class.ar}
+            ar={reportingUi.filters.class.en}
           />
         </Label>
         <Select id={id("class")} name="class" defaultValue={filters.classId ?? ""}>
           <option value="">{reportingUi.filters.allClasses.en}</option>
           {options.grades.map((grade) =>
             grade.classes.length > 0 ? (
-              <optgroup
-                key={grade.id}
-                label={`${grade.name_en} · ${grade.name_ar}`}
-              >
+              <optgroup key={grade.id} label={grade.name_en}>
                 {grade.classes.map((classRow) => (
                   <option key={classRow.id} value={classRow.id}>
-                    {classRow.name_en} · {classRow.name_ar}
+                    {classRow.name_en}
                   </option>
                 ))}
               </optgroup>
@@ -99,7 +96,7 @@ export function ReportFiltersBar({
         <Label htmlFor={id("student")}>
           <Bi
             en={reportingUi.filters.student.en}
-            ar={reportingUi.filters.student.ar}
+            ar={reportingUi.filters.student.en}
           />
         </Label>
         <Select
@@ -121,7 +118,7 @@ export function ReportFiltersBar({
         <Label htmlFor={id("assessment")}>
           <Bi
             en={reportingUi.filters.assessment.en}
-            ar={reportingUi.filters.assessment.ar}
+            ar={reportingUi.filters.assessment.en}
           />
         </Label>
         <Select
@@ -132,7 +129,7 @@ export function ReportFiltersBar({
           <option value="">{reportingUi.filters.allAssessments.en}</option>
           {options.assessments.map((assessment) => (
             <option key={assessment.id} value={assessment.id}>
-              {assessment.title_en} · {assessment.title_ar}
+              {assessment.title_en}
             </option>
           ))}
         </Select>
@@ -142,7 +139,7 @@ export function ReportFiltersBar({
         <Label htmlFor={id("type")}>
           <Bi
             en={reportingUi.filters.type.en}
-            ar={reportingUi.filters.type.ar}
+            ar={reportingUi.filters.type.en}
           />
         </Label>
         <Select id={id("type")} name="type" defaultValue={filters.type}>
@@ -156,7 +153,7 @@ export function ReportFiltersBar({
         <Label htmlFor={id("grading")}>
           <Bi
             en={reportingUi.filters.grading.en}
-            ar={reportingUi.filters.grading.ar}
+            ar={reportingUi.filters.grading.en}
           />
         </Label>
         <Select id={id("grading")} name="grading" defaultValue={filters.grading}>
@@ -173,7 +170,7 @@ export function ReportFiltersBar({
 
       <div className="space-y-1.5">
         <Label htmlFor={id("from")}>
-          <Bi en={reportingUi.filters.from.en} ar={reportingUi.filters.from.ar} />
+          <Bi en={reportingUi.filters.from.en} ar={reportingUi.filters.from.en} />
         </Label>
         <Input
           id={id("from")}
@@ -186,7 +183,7 @@ export function ReportFiltersBar({
 
       <div className="space-y-1.5">
         <Label htmlFor={id("to")}>
-          <Bi en={reportingUi.filters.to.en} ar={reportingUi.filters.to.ar} />
+          <Bi en={reportingUi.filters.to.en} ar={reportingUi.filters.to.en} />
         </Label>
         <Input
           id={id("to")}
@@ -200,13 +197,13 @@ export function ReportFiltersBar({
       <div className="flex flex-wrap items-center gap-2 sm:col-span-2 lg:col-span-4">
         <Button type="submit" size="sm">
           <Search aria-hidden="true" className="size-3.5" />
-          <Bi en={reportingUi.filters.apply.en} ar={reportingUi.filters.apply.ar} />
+          <Bi en={reportingUi.filters.apply.en} ar={reportingUi.filters.apply.en} />
         </Button>
         <Link
           href={action}
           className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
         >
-          <Bi en={reportingUi.filters.clear.en} ar={reportingUi.filters.clear.ar} />
+          <Bi en={reportingUi.filters.clear.en} ar={reportingUi.filters.clear.en} />
         </Link>
       </div>
     </form>

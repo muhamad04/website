@@ -15,7 +15,7 @@ import {
 import { isUuid } from "@/lib/search";
 
 export const metadata: Metadata = {
-  title: "Attempt · المحاولة",
+  title: "Attempt",
 };
 
 export const dynamic = "force-dynamic";
@@ -100,7 +100,7 @@ export default async function StudentAttemptPage({
         eyebrow={
           <Bi
             en={assessmentTypeCopy[payload.assessment.type].en}
-            ar={assessmentTypeCopy[payload.assessment.type].ar}
+            ar={assessmentTypeCopy[payload.assessment.type].en}
           />
         }
         title={
@@ -120,7 +120,7 @@ export default async function StudentAttemptPage({
           ) : (
             <Bi
               en={assessmentsUi.student.autoSubmit.en}
-              ar={assessmentsUi.student.autoSubmit.ar}
+              ar={assessmentsUi.student.autoSubmit.en}
             />
           )
         }
@@ -129,7 +129,7 @@ export default async function StudentAttemptPage({
             <AlarmClock aria-hidden="true" className="size-3.5" />
             <Bi
               en={`${assessmentsUi.student.attemptNumber.en} #${payload.attempt.number}`}
-              ar={`${assessmentsUi.student.attemptNumber.ar} #${payload.attempt.number}`}
+              ar={`${assessmentsUi.student.attemptNumber.en} #${payload.attempt.number}`}
             />
           </Badge>
         }

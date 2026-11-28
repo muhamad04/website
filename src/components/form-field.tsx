@@ -7,7 +7,7 @@ import { studentErrorCopy } from "@/lib/i18n/students";
 import type { Bilingual } from "@/lib/i18n/dictionary";
 import type { StudentErrorCode } from "@/lib/validation/students";
 
-/** Label + control + hint + bilingual field error. */
+/** Label + control + hint + field error. */
 export function FormField({
   id,
   label,
@@ -16,6 +16,7 @@ export function FormField({
   errorCopy,
   children,
   className,
+  bilingual = false,
 }: {
   id: string;
   label: Bilingual;
@@ -25,6 +26,7 @@ export function FormField({
   errorCopy?: Record<string, Bilingual>;
   children: ReactNode;
   className?: string;
+  bilingual?: boolean;
 }) {
   const dictionary: Record<string, Bilingual> = errorCopy ?? studentErrorCopy;
   const copy =
@@ -35,15 +37,15 @@ export function FormField({
   return (
     <div className={cn("space-y-1.5", className)}>
       <Label htmlFor={id}>
-        <Bi en={label.en} ar={label.ar} />
+        <Bi en={label.en} ar={label.ar} bilingual={bilingual} />
       </Label>
       {children}
       {hint ? (
         <p className="text-xs leading-relaxed text-muted-foreground">
-          <Bi en={hint.en} ar={hint.ar} />
+          <Bi en={hint.en} ar={hint.ar} bilingual={bilingual} />
         </p>
       ) : null}
-      <FormError copy={copy} />
+      <FormError copy={copy} bilingual={bilingual} />
     </div>
   );
 }

@@ -49,7 +49,7 @@ export function SetPasswordForm({ nextPath }: { nextPath: string }) {
     return (
       <div className="space-y-4">
         <Alert variant="success">
-          <Bi
+          <Bi bilingual
             en={studentsUi.password.success.en}
             ar={studentsUi.password.success.ar}
           />
@@ -58,7 +58,7 @@ export function SetPasswordForm({ nextPath }: { nextPath: string }) {
           href={nextPath}
           className={cn(buttonVariants(), "w-full")}
         >
-          <Bi
+          <Bi bilingual
             en={studentsUi.password.continue.en}
             ar={studentsUi.password.continue.ar}
           />
@@ -71,11 +71,11 @@ export function SetPasswordForm({ nextPath }: { nextPath: string }) {
     <form onSubmit={submit} className="space-y-4" noValidate>
       {error ? (
         <Alert variant="error">
-          <Bi en={passwordErrorCopy[error].en} ar={passwordErrorCopy[error].ar} />
+          <Bi bilingual en={passwordErrorCopy[error].en} ar={passwordErrorCopy[error].ar} />
         </Alert>
       ) : null}
 
-      <FormField
+      <FormField bilingual
         id="new-password"
         label={studentsUi.password.newPassword}
         hint={studentsUi.password.hint}
@@ -98,7 +98,7 @@ export function SetPasswordForm({ nextPath }: { nextPath: string }) {
         />
       </FormField>
 
-      <FormField
+      <FormField bilingual
         id="confirm-password"
         label={studentsUi.password.confirmPassword}
         error={errors.confirm_password}
@@ -122,7 +122,7 @@ export function SetPasswordForm({ nextPath }: { nextPath: string }) {
 
       <Button type="submit" className="w-full" disabled={pending}>
         <KeyRound aria-hidden="true" className="size-4" />
-        <Bi
+        <Bi bilingual
           en={
             pending
               ? studentsUi.password.saving.en

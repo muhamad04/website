@@ -23,7 +23,7 @@ import { resourcesUi } from "@/lib/i18n/resources";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Resource categories · فئات المصادر",
+  title: "Resource categories",
 };
 
 export const dynamic = "force-dynamic";
@@ -41,19 +41,19 @@ export default async function ResourceCategoriesPage() {
         eyebrow={
           <Bi
             en={resourcesUi.categories.eyebrow.en}
-            ar={resourcesUi.categories.eyebrow.ar}
+            ar={resourcesUi.categories.eyebrow.en}
           />
         }
         title={
           <Bi
             en={resourcesUi.categories.title.en}
-            ar={resourcesUi.categories.title.ar}
+            ar={resourcesUi.categories.title.en}
           />
         }
         description={
           <Bi
             en={resourcesUi.categories.subtitle.en}
-            ar={resourcesUi.categories.subtitle.ar}
+            ar={resourcesUi.categories.subtitle.en}
           />
         }
         actions={
@@ -64,7 +64,7 @@ export default async function ResourceCategoriesPage() {
             <ArrowLeft aria-hidden="true" className="size-4" />
             <Bi
               en={resourcesUi.actions.backToList.en}
-              ar={resourcesUi.actions.backToList.ar}
+              ar={resourcesUi.actions.backToList.en}
             />
           </Link>
         }
@@ -74,7 +74,7 @@ export default async function ResourceCategoriesPage() {
         <Alert variant="error">
           <Bi
             en={resourcesUi.messages.categoriesLoadFailed.en}
-            ar={resourcesUi.messages.categoriesLoadFailed.ar}
+            ar={resourcesUi.messages.categoriesLoadFailed.en}
           />
         </Alert>
       ) : null}
@@ -85,13 +85,13 @@ export default async function ResourceCategoriesPage() {
             <Tags aria-hidden="true" className="size-4 text-primary" />
             <Bi
               en={resourcesUi.categories.addCategory.en}
-              ar={resourcesUi.categories.addCategory.ar}
+              ar={resourcesUi.categories.addCategory.en}
             />
           </CardTitle>
           <CardDescription>
             <Bi
               en={resourcesUi.categories.subtitle.en}
-              ar={resourcesUi.categories.subtitle.ar}
+              ar={resourcesUi.categories.subtitle.en}
             />
           </CardDescription>
         </CardHeader>
@@ -105,13 +105,13 @@ export default async function ResourceCategoriesPage() {
           <CardTitle>
             <Bi
               en={resourcesUi.categories.title.en}
-              ar={resourcesUi.categories.title.ar}
+              ar={resourcesUi.categories.title.en}
             />
           </CardTitle>
           <CardDescription>
             <Bi
               en={resourcesUi.categories.activeHint.en}
-              ar={resourcesUi.categories.activeHint.ar}
+              ar={resourcesUi.categories.activeHint.en}
             />
           </CardDescription>
         </CardHeader>
@@ -122,13 +122,13 @@ export default async function ResourceCategoriesPage() {
               title={
                 <Bi
                   en={resourcesUi.categories.empty.en}
-                  ar={resourcesUi.categories.empty.ar}
+                  ar={resourcesUi.categories.empty.en}
                 />
               }
               description={
                 <Bi
                   en={resourcesUi.categories.emptyHint.en}
-                  ar={resourcesUi.categories.emptyHint.ar}
+                  ar={resourcesUi.categories.emptyHint.en}
                 />
               }
             />

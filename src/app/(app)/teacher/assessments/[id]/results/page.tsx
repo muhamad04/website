@@ -24,7 +24,7 @@ import { isUuid } from "@/lib/search";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Assessment results · نتائج الاختبار",
+  title: "Assessment results",
 };
 
 export const dynamic = "force-dynamic";
@@ -58,13 +58,13 @@ export default async function AssessmentResultsPage({
         title={
           <Bi
             en={assessmentsUi.results.title.en}
-            ar={assessmentsUi.results.title.ar}
+            ar={assessmentsUi.results.title.en}
           />
         }
         description={
           <Bi
             en={assessmentsUi.results.subtitle.en}
-            ar={assessmentsUi.results.subtitle.ar}
+            ar={assessmentsUi.results.subtitle.en}
           />
         }
         actions={
@@ -75,7 +75,7 @@ export default async function AssessmentResultsPage({
             <ArrowLeft aria-hidden="true" className="size-4" />
             <Bi
               en={assessmentsUi.actions.backToBuilder.en}
-              ar={assessmentsUi.actions.backToBuilder.ar}
+              ar={assessmentsUi.actions.backToBuilder.en}
             />
           </Link>
         }
@@ -85,7 +85,7 @@ export default async function AssessmentResultsPage({
         <Alert variant="error">
           <Bi
             en={assessmentsUi.messages.loadFailed.en}
-            ar={assessmentsUi.messages.loadFailed.ar}
+            ar={assessmentsUi.messages.loadFailed.en}
           />
         </Alert>
       ) : null}
@@ -96,13 +96,13 @@ export default async function AssessmentResultsPage({
           title={
             <Bi
               en={assessmentsUi.results.empty.en}
-              ar={assessmentsUi.results.empty.ar}
+              ar={assessmentsUi.results.empty.en}
             />
           }
           description={
             <Bi
               en={assessmentsUi.results.emptyHint.en}
-              ar={assessmentsUi.results.emptyHint.ar}
+              ar={assessmentsUi.results.emptyHint.en}
             />
           }
         />
@@ -114,49 +114,49 @@ export default async function AssessmentResultsPage({
                 <th className="px-4 py-3">
                   <Bi
                     en={assessmentsUi.results.student.en}
-                    ar={assessmentsUi.results.student.ar}
+                    ar={assessmentsUi.results.student.en}
                   />
                 </th>
                 <th className="px-4 py-3">
                   <Bi
                     en={assessmentsUi.results.attempt.en}
-                    ar={assessmentsUi.results.attempt.ar}
+                    ar={assessmentsUi.results.attempt.en}
                   />
                 </th>
                 <th className="px-4 py-3">
                   <Bi
                     en={assessmentsUi.results.status.en}
-                    ar={assessmentsUi.results.status.ar}
+                    ar={assessmentsUi.results.status.en}
                   />
                 </th>
                 <th className="px-4 py-3">
                   <Bi
                     en={assessmentsUi.results.score.en}
-                    ar={assessmentsUi.results.score.ar}
+                    ar={assessmentsUi.results.score.en}
                   />
                 </th>
                 <th className="px-4 py-3">
                   <Bi
                     en={assessmentsUi.results.submitted.en}
-                    ar={assessmentsUi.results.submitted.ar}
+                    ar={assessmentsUi.results.submitted.en}
                   />
                 </th>
                 <th className="px-4 py-3">
                   <Bi
                     en={assessmentsUi.results.reason.en}
-                    ar={assessmentsUi.results.reason.ar}
+                    ar={assessmentsUi.results.reason.en}
                   />
                 </th>
                 <th className="px-4 py-3">
                   <Bi
                     en={assessmentsUi.results.flags.en}
-                    ar={assessmentsUi.results.flags.ar}
+                    ar={assessmentsUi.results.flags.en}
                   />
                 </th>
                 <th className="px-4 py-3">
                   <Bi
                     en={assessmentsUi.results.review.en}
-                    ar={assessmentsUi.results.review.ar}
+                    ar={assessmentsUi.results.review.en}
                   />
                 </th>
                 <th className="px-4 py-3" />
@@ -169,21 +169,21 @@ export default async function AssessmentResultsPage({
                     <Badge variant="outline">
                       <Bi
                         en={assessmentsUi.results.pending.en}
-                        ar={assessmentsUi.results.pending.ar}
+                        ar={assessmentsUi.results.pending.en}
                       />
                     </Badge>
                   ) : attempt.manual_review_status === "completed" ? (
                     <Badge variant="success">
                       <Bi
                         en={assessmentsUi.results.completed.en}
-                        ar={assessmentsUi.results.completed.ar}
+                        ar={assessmentsUi.results.completed.en}
                       />
                     </Badge>
                   ) : (
                     <span className="text-xs text-muted-foreground">
                       <Bi
                         en={assessmentsUi.results.notRequired.en}
-                        ar={assessmentsUi.results.notRequired.ar}
+                        ar={assessmentsUi.results.notRequired.en}
                       />
                     </span>
                   );
@@ -215,7 +215,7 @@ export default async function AssessmentResultsPage({
                       <Badge variant="muted">
                         <Bi
                           en={attemptStatusCopy[attempt.status].en}
-                          ar={attemptStatusCopy[attempt.status].ar}
+                          ar={attemptStatusCopy[attempt.status].en}
                         />
                       </Badge>
                     </td>
@@ -242,7 +242,7 @@ export default async function AssessmentResultsPage({
                         <Badge variant="outline">
                           <Bi
                             en={submissionReasonCopy[attempt.submission_reason].en}
-                            ar={submissionReasonCopy[attempt.submission_reason].ar}
+                            ar={submissionReasonCopy[attempt.submission_reason].en}
                           />
                         </Badge>
                       ) : (
@@ -254,21 +254,21 @@ export default async function AssessmentResultsPage({
                       0 ? (
                         <Bi
                           en={assessmentsUi.results.noFlags.en}
-                          ar={assessmentsUi.results.noFlags.ar}
+                          ar={assessmentsUi.results.noFlags.en}
                         />
                       ) : (
                         <span className="inline-flex flex-wrap gap-1">
                           <Badge variant="outline">
                             <Bi
                               en={assessmentsUi.results.tabHidden.en}
-                              ar={assessmentsUi.results.tabHidden.ar}
+                              ar={assessmentsUi.results.tabHidden.en}
                             />
                             : {attempt.tab_hidden_count}
                           </Badge>
                           <Badge variant="outline">
                             <Bi
                               en={assessmentsUi.results.focusLoss.en}
-                              ar={assessmentsUi.results.focusLoss.ar}
+                              ar={assessmentsUi.results.focusLoss.en}
                             />
                             : {attempt.focus_loss_count}
                           </Badge>
@@ -294,8 +294,8 @@ export default async function AssessmentResultsPage({
                             }
                             ar={
                               attempt.manual_review_status === "pending"
-                                ? assessmentsUi.results.grade.ar
-                                : assessmentsUi.results.review.ar
+                                ? assessmentsUi.results.grade.en
+                                : assessmentsUi.results.review.en
                             }
                           />
                         </Link>

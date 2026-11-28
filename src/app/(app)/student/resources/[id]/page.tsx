@@ -33,7 +33,7 @@ import { formatAdminDateTime } from "@/lib/students/format";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Resource · المصدر",
+  title: "Resource",
 };
 
 export const dynamic = "force-dynamic";
@@ -70,22 +70,22 @@ export default async function StudentResourceDetailPage({
     <div className="space-y-5">
       <PageHeader
         eyebrow={
-          <Bi en={resourcesUi.student.title.en} ar={resourcesUi.student.title.ar} />
+          <Bi en={resourcesUi.student.title.en} ar={resourcesUi.student.title.en} />
         }
         title={
-          <Bi en={resource.title_en} ar={resource.title_ar} layout="stacked" />
+          <Bi en={resource.title_en} ar={resource.title_en} layout="stacked" />
         }
         description={
           <Bi
             en={resourcesUi.student.subtitle.en}
-            ar={resourcesUi.student.subtitle.ar}
+            ar={resourcesUi.student.subtitle.en}
           />
         }
         actions={
           <Badge variant="success">
             <Bi
               en={resourcesUi.student.gradeLocked.en}
-              ar={resourcesUi.student.gradeLocked.ar}
+              ar={resourcesUi.student.gradeLocked.en}
             />
           </Badge>
         }
@@ -99,17 +99,17 @@ export default async function StudentResourceDetailPage({
           <ArrowLeft aria-hidden="true" className="size-3.5" />
           <Bi
             en={resourcesUi.actions.backToList.en}
-            ar={resourcesUi.actions.backToList.ar}
+            ar={resourcesUi.actions.backToList.en}
           />
         </Link>
         <Badge variant="outline">
-          <Bi en={type.en} ar={type.ar} hideSeparator />
+          <Bi en={type.en} ar={type.en} hideSeparator />
         </Badge>
         {resource.category ? (
           <Badge variant="default">
             <Bi
               en={resource.category.name_en}
-              ar={resource.category.name_ar}
+              ar={resource.category.name_en}
               hideSeparator
             />
           </Badge>
@@ -122,13 +122,13 @@ export default async function StudentResourceDetailPage({
             <CardTitle>
               <Bi
                 en={resourcesUi.detail.previewTitle.en}
-                ar={resourcesUi.detail.previewTitle.ar}
+                ar={resourcesUi.detail.previewTitle.en}
               />
             </CardTitle>
             <p className="text-sm text-muted-foreground">
               <Bi
                 en={resourcesUi.detail.noDownload.en}
-                ar={resourcesUi.detail.noDownload.ar}
+                ar={resourcesUi.detail.noDownload.en}
               />
             </p>
           </CardHeader>
@@ -138,7 +138,6 @@ export default async function StudentResourceDetailPage({
               signedUrl={signedUrl}
               youtubeId={youtubeId}
               titleEn={resource.title_en}
-              titleAr={resource.title_ar}
             />
           </CardContent>
         </Card>
@@ -149,7 +148,7 @@ export default async function StudentResourceDetailPage({
               <CardTitle>
                 <Bi
                   en={resourcesUi.detail.detailsTitle.en}
-                  ar={resourcesUi.detail.detailsTitle.ar}
+                  ar={resourcesUi.detail.detailsTitle.en}
                 />
               </CardTitle>
             </CardHeader>
@@ -164,13 +163,13 @@ export default async function StudentResourceDetailPage({
                     <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                       <Bi
                         en={resourcesUi.detail.grade.en}
-                        ar={resourcesUi.detail.grade.ar}
+                        ar={resourcesUi.detail.grade.en}
                       />
                     </dt>
                     <dd className="mt-0.5">
                       <Bi
                         en={grade.name_en}
-                        ar={grade.name_ar}
+                        ar={grade.name_en}
                         layout="stacked"
                       />
                     </dd>
@@ -186,20 +185,20 @@ export default async function StudentResourceDetailPage({
                     <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                       <Bi
                         en={resourcesUi.detail.category.en}
-                        ar={resourcesUi.detail.category.ar}
+                        ar={resourcesUi.detail.category.en}
                       />
                     </dt>
                     <dd className="mt-0.5">
                       {resource.category ? (
                         <Bi
                           en={resource.category.name_en}
-                          ar={resource.category.name_ar}
+                          ar={resource.category.name_en}
                           layout="stacked"
                         />
                       ) : (
                         <Bi
                           en={resourcesUi.detail.noCategory.en}
-                          ar={resourcesUi.detail.noCategory.ar}
+                          ar={resourcesUi.detail.noCategory.en}
                         />
                       )}
                     </dd>
@@ -215,11 +214,11 @@ export default async function StudentResourceDetailPage({
                     <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                       <Bi
                         en={resourcesUi.detail.type.en}
-                        ar={resourcesUi.detail.type.ar}
+                        ar={resourcesUi.detail.type.en}
                       />
                     </dt>
                     <dd className="mt-0.5">
-                      <Bi en={type.en} ar={type.ar} />
+                      <Bi en={type.en} ar={type.en} />
                     </dd>
                   </div>
                 </div>
@@ -233,7 +232,7 @@ export default async function StudentResourceDetailPage({
                     <dt className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                       <Bi
                         en={resourcesUi.detail.updatedAt.en}
-                        ar={resourcesUi.detail.updatedAt.ar}
+                        ar={resourcesUi.detail.updatedAt.en}
                       />
                     </dt>
                     <dd className="mt-0.5 text-xs">
@@ -250,24 +249,18 @@ export default async function StudentResourceDetailPage({
               <CardTitle>
                 <Bi
                   en={resourcesUi.detail.descriptionTitle.en}
-                  ar={resourcesUi.detail.descriptionTitle.ar}
+                  ar={resourcesUi.detail.descriptionTitle.en}
                 />
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm leading-relaxed">
               {resource.description_en ? (
                 <p>{resource.description_en}</p>
-              ) : null}
-              {resource.description_ar ? (
-                <p lang="ar" dir="rtl" className="font-arabic">
-                  {resource.description_ar}
-                </p>
-              ) : null}
-              {!resource.description_en && !resource.description_ar ? (
+              ) : (
                 <p className="text-muted-foreground">
-                  <Bi en="No description yet." ar="لا يوجد وصف بعد." />
+                  <Bi en="No description yet." ar="No description yet." />
                 </p>
-              ) : null}
+              )}
             </CardContent>
           </Card>
         </div>
@@ -277,7 +270,7 @@ export default async function StudentResourceDetailPage({
         <Alert variant="error">
           <Bi
             en={resourcesUi.detail.previewUnavailableHint.en}
-            ar={resourcesUi.detail.previewUnavailableHint.ar}
+            ar={resourcesUi.detail.previewUnavailableHint.en}
           />
         </Alert>
       ) : null}

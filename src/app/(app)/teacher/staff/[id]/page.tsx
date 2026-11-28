@@ -26,7 +26,7 @@ import { StaffForm } from "@/app/(app)/teacher/staff/staff-form";
 import { StaffAccessActions } from "@/app/(app)/teacher/staff/staff-access-actions";
 
 export const metadata: Metadata = {
-  title: "Staff profile · ملف الموظف",
+  title: "Staff profile",
 };
 
 export const dynamic = "force-dynamic";
@@ -59,7 +59,7 @@ export default async function StaffDetailPage({
         eyebrow={
           <Bi
             en={staffUi.detail.profileTitle.en}
-            ar={staffUi.detail.profileTitle.ar}
+            ar={staffUi.detail.profileTitle.en}
           />
         }
         title={
@@ -90,8 +90,8 @@ export default async function StaffDetailPage({
                 }
                 ar={
                   staff.role === "admin"
-                    ? staffUi.roles.admin.ar
-                    : staffUi.roles.teacher.ar
+                    ? staffUi.roles.admin.en
+                    : staffUi.roles.teacher.en
                 }
                 hideSeparator
               />
@@ -109,8 +109,8 @@ export default async function StaffDetailPage({
                 }
                 ar={
                   staff.is_active
-                    ? staffUi.filters.activeOnly.ar
-                    : staffUi.filters.inactiveOnly.ar
+                    ? staffUi.filters.activeOnly.en
+                    : staffUi.filters.inactiveOnly.en
                 }
                 hideSeparator
               />
@@ -122,7 +122,7 @@ export default async function StaffDetailPage({
               <ArrowLeft aria-hidden="true" className="size-4" />
               <Bi
                 en={staffUi.actions.backToList.en}
-                ar={staffUi.actions.backToList.ar}
+                ar={staffUi.actions.backToList.en}
               />
             </Link>
           </>
@@ -135,13 +135,13 @@ export default async function StaffDetailPage({
             <CardTitle>
               <Bi
                 en={staffUi.form.editTitle.en}
-                ar={staffUi.form.editTitle.ar}
+                ar={staffUi.form.editTitle.en}
               />
             </CardTitle>
             <CardDescription>
               <Bi
                 en={staffUi.form.editSubtitle.en}
-                ar={staffUi.form.editSubtitle.ar}
+                ar={staffUi.form.editSubtitle.en}
               />
             </CardDescription>
           </CardHeader>
@@ -160,13 +160,13 @@ export default async function StaffDetailPage({
                 />
                 <Bi
                   en={staffUi.detail.accessTitle.en}
-                  ar={staffUi.detail.accessTitle.ar}
+                  ar={staffUi.detail.accessTitle.en}
                 />
               </CardTitle>
               <CardDescription>
                 <Bi
                   en={staffUi.detail.accessHint.en}
-                  ar={staffUi.detail.accessHint.ar}
+                  ar={staffUi.detail.accessHint.en}
                 />
               </CardDescription>
             </CardHeader>
@@ -176,7 +176,7 @@ export default async function StaffDetailPage({
                   <dt>
                     <Bi
                       en={staffUi.detail.lastInvite.en}
-                      ar={staffUi.detail.lastInvite.ar}
+                      ar={staffUi.detail.lastInvite.en}
                     />
                   </dt>
                   <dd className="font-medium text-foreground">
@@ -187,7 +187,7 @@ export default async function StaffDetailPage({
                   <dt>
                     <Bi
                       en={staffUi.detail.lastReset.en}
-                      ar={staffUi.detail.lastReset.ar}
+                      ar={staffUi.detail.lastReset.en}
                     />
                   </dt>
                   <dd className="font-medium text-foreground">
@@ -198,7 +198,7 @@ export default async function StaffDetailPage({
                   <dt>
                     <Bi
                       en={staffUi.detail.createdOn.en}
-                      ar={staffUi.detail.createdOn.ar}
+                      ar={staffUi.detail.createdOn.en}
                     />
                   </dt>
                   <dd className="font-medium text-foreground">
@@ -223,13 +223,13 @@ export default async function StaffDetailPage({
                 <History aria-hidden="true" className="size-4 text-primary" />
                 <Bi
                   en={staffUi.detail.activityTitle.en}
-                  ar={staffUi.detail.activityTitle.ar}
+                  ar={staffUi.detail.activityTitle.en}
                 />
               </CardTitle>
               <CardDescription>
                 <Bi
                   en={staffUi.detail.activityHint.en}
-                  ar={staffUi.detail.activityHint.ar}
+                  ar={staffUi.detail.activityHint.en}
                 />
               </CardDescription>
             </CardHeader>
@@ -238,7 +238,7 @@ export default async function StaffDetailPage({
                 <p className="text-sm text-muted-foreground">
                   <Bi
                     en={staffUi.detail.noActivity.en}
-                    ar={staffUi.detail.noActivity.ar}
+                    ar={staffUi.detail.noActivity.en}
                   />
                 </p>
               ) : (
@@ -250,7 +250,7 @@ export default async function StaffDetailPage({
                         <p className="text-sm font-medium text-foreground">
                           <Bi
                             en={staffEventCopy[event.action].en}
-                            ar={staffEventCopy[event.action].ar}
+                            ar={staffEventCopy[event.action].en}
                           />
                         </p>
                         <p className="text-[11px] text-muted-foreground">
@@ -258,13 +258,13 @@ export default async function StaffDetailPage({
                           {" · "}
                           <Bi
                             en={staffUi.detail.by.en}
-                            ar={staffUi.detail.by.ar}
+                            ar={staffUi.detail.by.en}
                             hideSeparator
                           />{" "}
                           {event.actor?.full_name_en ?? (
                             <Bi
                               en={staffUi.detail.systemActor.en}
-                              ar={staffUi.detail.systemActor.ar}
+                              ar={staffUi.detail.systemActor.en}
                               hideSeparator
                             />
                           )}
